@@ -11,17 +11,19 @@ WORKING ON IT....
 
 ## Tech Stack
 
-### Frontend 
-* **Framework**: React + TypeScript
-* **Build Tool**: Vite
-* **UI Library**: Ant Design
-* **State Management**: TanStack Query
-* **Routing**: React Router v6
-* **HTTP Client**: Axios
+### Frontend
+- React + TypeScript
+- Vite
+- Ant Design
+- TanStack Query
+- React Router v6
+- Axios
 
-### Backend 
-* **Core**: Spring Boot (Java 19)
-* **Database**: MySQL 8.0
-* **ORM**: Spring Data JPA 
-* **Cache**: Redis
-* **API Documentation**: Swagger / OpenAPI 
+### Backend
+- Java 19
+- Spring Boot 
+- Spring Data JPA
+- Spring Data Redis
+- MySQL 8.0
+- Swagger / OpenAPI
+- Maven
