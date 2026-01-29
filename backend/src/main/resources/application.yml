@@ -1,0 +1,64 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: rate-my-spot-backend
+
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/rate_my_spot?useUnicode=true&characterEncoding=UTF-8&serverTimezone=America/New_York&useSSL=false
+    username: root
+    password: ${DB_PASSWORD}
+
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 0
+      timeout: 3000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 1
+          max-wait: 1000ms
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+
+  jackson:
+    default-property-inclusion: non_null
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    protocol: smtp
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
+jwt:
+  secret: "U3VwZXJTZWN1cmVKYXd0U2VjcmV0Rm9yQ2hhdEVhc2UyMDI0KioqMTIzNDU2Nzg5MDE="
+  expiration-time: 86400000  # 1 day
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  sw-ui:
+    path: /swagger-ui.html
+    display-request-duration: true
+
+logging:
+  level:
+    com.ratemyspot: debug
+    org.hibernate.orm.connections.pooling: error
