@@ -7,6 +7,8 @@
 
 CREATE DATABASE IF NOT EXISTS `rate_my_spot` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+USE `rate_my_spot`;
+
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
@@ -119,12 +121,15 @@ CREATE TABLE `spot_review` (
 
 -- 7. Table: post
 -- Description: Instagram style posts (Rating is mandatory).
+-- UPDATE: Added redundant user_nickname and user_icon for easier querying.
 
 DROP TABLE IF EXISTS `post`;
 CREATE TABLE `post` (
                         `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
                         `spot_id` bigint(20) UNSIGNED NOT NULL COMMENT 'Foreign Key: Spot ID',
                         `user_id` bigint(20) UNSIGNED NOT NULL COMMENT 'Foreign Key: User ID',
+                        `user_nickname` varchar(32) DEFAULT '' COMMENT 'Redundant nickname',
+                        `user_icon` varchar(255) DEFAULT '' COMMENT 'Redundant avatar',
                         `title` varchar(255) NOT NULL COMMENT 'Post title',
                         `content` text NOT NULL COMMENT 'Post main text content',
                         `images` varchar(2048) NOT NULL COMMENT 'Comma-separated image URLs',
@@ -159,7 +164,7 @@ CREATE TABLE `post_comment` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Comments on posts (Supports nesting and images)';
 
 
--- 9. Table: post_like (Optional) //But I don't use it~
+-- 9. Table: post_like
 -- Description: To track who liked which post (prevents duplicate likes).
 
 DROP TABLE IF EXISTS `post_like`;

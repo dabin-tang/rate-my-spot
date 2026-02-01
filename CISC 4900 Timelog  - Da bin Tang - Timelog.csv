@@ -1,0 +1,24 @@
+Date,Duration (hours),Category,Description of completed task,Challenges and/or next steps,Reflection
+1/26/26,1,Other,Attended the orientation meeting.,,
+1/27/26,0.6,Other,"Completed the Orientation Quiz. 
+Created GitHub repository ""rate-my-spot"" and set up the Project Management Board. Configured columns (Todo, In Progress, Done), linked the board to the repo, and set visibility to Public.",,
+1/29/26,3,"Research, Training, Learning",Conducted technical research and drafted the initial database schema. ,.,
+1/29/26,2,Coding,"Initialized both the backend and frontend projects. 
+Implemented 8 core backend entities (User, Spot, Post, etc.) ",Prepare for the implementation of the backend business logic and API endpoints,
+1/30/26,2.3,"Research, Training, Learning","Determine the categories of spot_category. 
+Collected and integrated real-world spot data using NYC Open Data and the Overpass Turbo API.","The raw data was messy. NYC Open Data and OpenStreetMap used different formats and naming conventions, so I spent time figuring out a unified schema that could handle both without losing key info.",
+1/30/26,1.3,Coding,"Processed and inserted 23,000+ real-world spot records
+into the database for testing purposes.","Hit unexpected database issues. The generated SQL was too large for MySQL’s default limits, and I had to fix the import by rewriting scripts to sanitize problematic characters.",
+1/31/26,3.4,Design,Design prototypes and create a set of images using Google Gemini.,"Since I’m not familiar with Figma, I hand-drew a prototype and then used Google Gemini to generate the project prototypes and an image set.","It was a very interesting experience. Normally, product managers provide prototypes, but for this independent project, I had to come up with another solution."
+2/1/26,0.6,Supervisor Discussion,"Sent the weekly report to the supervisor 
+and PMed him to discuss the next tasks.",,
+2/1/26,1.2,Documentation,Analyzing which APIs are needed for the backend.,,
+2/1/26,1.1,Coding,"Built the backend skeleton. Created empty Controllers, 
+Services, and Repositories for all 9 entities 
+(just the shell, no business logic yet). 
+Also configured the core infrastructure like JWT, Redis, 
+and Global Exception Handler.","Next step: Start implementing the actual business logic, beginning with the User and Spot modules.",Setting up the structure first makes me feel organized. Now I can just focus on filling in the logic.
+2/1/26,0.2,Documentation,"Synced everything to GitHub. 
+Pushed the new backend skeleton code, 
+the updated timelog.csv, and the folder of 
+prototype images.",,
