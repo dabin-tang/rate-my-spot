@@ -2,6 +2,7 @@ package com.ratemyspot.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -32,6 +33,7 @@ public class Follow implements Serializable {
     /**
      * Follower ID (Who is following)
      */
+    @NotNull(message = "User ID cannot be null")
     @Column(name = "user_id", nullable = false)
     @Schema(description = "Follower User ID", example = "1001")
     private Long userId;
@@ -39,6 +41,7 @@ public class Follow implements Serializable {
     /**
      * Target ID (Who is being followed)
      */
+    @NotNull(message = "Follow User ID cannot be null")
     @Column(name = "follow_user_id", nullable = false)
     @Schema(description = "Target User ID (Being Followed)", example = "1002")
     private Long followUserId;

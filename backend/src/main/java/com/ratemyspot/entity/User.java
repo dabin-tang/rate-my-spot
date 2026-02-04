@@ -2,6 +2,10 @@ package com.ratemyspot.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -32,6 +36,9 @@ public class User implements Serializable {
     /**
      * User Email (Login Account)
      */
+    @NotBlank(message = "Email cannot be empty")
+    @Email(message = "Invalid email format")
+    @Size(max = 128, message = "Email must be less than 128 characters")
     @Column(name = "email", length = 128, nullable = false, unique = true)
     @Schema(description = "Email / Login Account", example = "dabin@example.com")
     private String email;
@@ -39,6 +46,8 @@ public class User implements Serializable {
     /**
      * Encrypted Password
      */
+    @NotBlank(message = "Password cannot be empty")
+    @Size(max = 128, message = "Password must be less than 128 characters")
     @Column(name = "password", length = 128, nullable = false)
     @Schema(description = "Encrypted Password", example = "bcrypt_hash_string")
     private String password;
@@ -46,6 +55,7 @@ public class User implements Serializable {
     /**
      * User Nickname
      */
+    @Size(max = 32, message = "Nickname must be less than 32 characters")
     @Column(name = "nickname", length = 32)
     @Schema(description = "Display Name", example = "Dabin")
     private String nickname;
@@ -53,6 +63,7 @@ public class User implements Serializable {
     /**
      * Avatar URL
      */
+    @Size(max = 255, message = "Avatar URL must be less than 255 characters")
     @Column(name = "icon", length = 255)
     @Schema(description = "Avatar URL", example = "https://example.com/icon.jpg")
     private String icon;
@@ -60,6 +71,7 @@ public class User implements Serializable {
     /**
      * City Name
      */
+    @Size(max = 64, message = "City name must be less than 64 characters")
     @Column(name = "city", length = 64)
     @Schema(description = "City", example = "New York")
     private String city;
@@ -67,6 +79,7 @@ public class User implements Serializable {
     /**
      * Self Introduction
      */
+    @Size(max = 128, message = "Intro must be less than 128 characters")
     @Column(name = "intro", length = 128)
     @Schema(description = "Self Introduction", example = "CS Student @ QC")
     private String intro;
@@ -94,7 +107,6 @@ public class User implements Serializable {
 
     /**
      * Creation Time
-     * Note: Handled manually in Service layer
      */
     @Column(name = "create_time", nullable = false)
     @Schema(description = "Registration Time")
@@ -102,7 +114,6 @@ public class User implements Serializable {
 
     /**
      * Update Time
-     * Note: Handled manually in Service layer
      */
     @Column(name = "update_time", nullable = false)
     @Schema(description = "Last Update Time")

@@ -2,6 +2,8 @@ package com.ratemyspot.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -32,6 +34,8 @@ public class SpotCategory implements Serializable {
     /**
      * Category Name
      */
+    @NotBlank(message = "Category name cannot be empty")
+    @Size(max = 32, message = "Category name must be less than 32 characters")
     @Column(name = "name", length = 32, nullable = false)
     @Schema(description = "Category Name", example = "Park")
     private String name;
@@ -39,6 +43,7 @@ public class SpotCategory implements Serializable {
     /**
      * Category Icon URL
      */
+    @Size(max = 255, message = "Icon URL must be less than 255 characters")
     @Column(name = "icon", length = 255)
     @Schema(description = "Category Icon URL", example = "https://example.com/icons/park.png")
     private String icon;

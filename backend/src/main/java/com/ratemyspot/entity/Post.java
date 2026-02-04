@@ -2,6 +2,11 @@ package com.ratemyspot.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -32,6 +37,7 @@ public class Post implements Serializable {
     /**
      * Spot ID (Foreign Key)
      */
+    @NotNull(message = "Spot ID cannot be null")
     @Column(name = "spot_id", nullable = false)
     @Schema(description = "Related Spot ID", example = "1001")
     private Long spotId;
@@ -39,6 +45,7 @@ public class Post implements Serializable {
     /**
      * User ID (Foreign Key)
      */
+    @NotNull(message = "User ID cannot be null")
     @Column(name = "user_id", nullable = false)
     @Schema(description = "Author User ID", example = "2002")
     private Long userId;
@@ -46,6 +53,8 @@ public class Post implements Serializable {
     /**
      * Post Title
      */
+    @NotBlank(message = "Title cannot be empty")
+    @Size(max = 255, message = "Title must be less than 255 characters")
     @Column(name = "title", length = 255, nullable = false)
     @Schema(description = "Post Title", example = "My weekend at Central Park")
     private String title;
@@ -53,6 +62,7 @@ public class Post implements Serializable {
     /**
      * Post Content
      */
+    @NotBlank(message = "Content cannot be empty")
     @Column(name = "content", columnDefinition = "TEXT", nullable = false)
     @Schema(description = "Main Content", example = "It was a sunny day...")
     private String content;
@@ -60,6 +70,8 @@ public class Post implements Serializable {
     /**
      * Post Images (Comma separated URLs)
      */
+    @NotNull(message = "Images cannot be null")
+    @Size(max = 2048, message = "Image URLs must be less than 2048 characters")
     @Column(name = "images", length = 2048, nullable = false)
     @Schema(description = "Post Images", example = "url1.jpg,url2.jpg")
     private String images;
@@ -67,6 +79,9 @@ public class Post implements Serializable {
     /**
      * Rating (1-5 stars)
      */
+    @NotNull(message = "Rating cannot be null")
+    @Min(value = 1, message = "Rating must be at least 1")
+    @Max(value = 5, message = "Rating must be at most 5")
     @Column(name = "rating", nullable = false)
     @Schema(description = "User Rating for the Spot", example = "4")
     private Integer rating;
@@ -88,6 +103,7 @@ public class Post implements Serializable {
     /**
      * Author Nickname (Redundant)
      */
+    @Size(max = 32, message = "Nickname must be less than 32 characters")
     @Column(name = "user_nickname", length = 32)
     @Schema(description = "Author Nickname (Redundant)", example = "Dabin")
     private String userNickname;
@@ -95,6 +111,7 @@ public class Post implements Serializable {
     /**
      * Author Avatar URL (Redundant)
      */
+    @Size(max = 255, message = "Avatar URL must be less than 255 characters")
     @Column(name = "user_icon", length = 255)
     @Schema(description = "Author Avatar URL (Redundant)", example = "https://example.com/icon.jpg")
     private String userIcon;
