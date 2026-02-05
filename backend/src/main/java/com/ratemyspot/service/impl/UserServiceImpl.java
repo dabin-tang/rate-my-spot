@@ -117,6 +117,7 @@ public class UserServiceImpl implements UserService {
         UserDTO userDTO = new UserDTO();
         BeanUtils.copyProperties(user, userDTO);
         String token = jwtUtil.generateToken(userDTO);
+        // Return token and user info
         Map<String, Object> map = new HashMap<>();
         map.put("token", token);
         map.put("user", userDTO);
@@ -144,11 +145,21 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new BusinessException(Constants.ERR_USER_NOT_FOUND));
         // Partial Update: Check nulls before setting
-        if (userUpdateInfo.getNickname() != null) user.setNickname(userUpdateInfo.getNickname());
-        if (userUpdateInfo.getIcon() != null) user.setIcon(userUpdateInfo.getIcon());
-        if (userUpdateInfo.getIntro() != null) user.setIntro(userUpdateInfo.getIntro());
-        if (userUpdateInfo.getCity() != null) user.setCity(userUpdateInfo.getCity());
-        if (userUpdateInfo.getGender() != null) user.setGender(userUpdateInfo.getGender());
+        if (userUpdateInfo.getNickname() != null) {
+            user.setNickname(userUpdateInfo.getNickname());
+        }
+        if (userUpdateInfo.getIcon() != null) {
+            user.setIcon(userUpdateInfo.getIcon());
+        }
+        if (userUpdateInfo.getIntro() != null) {
+            user.setIntro(userUpdateInfo.getIntro());
+        }
+        if (userUpdateInfo.getCity() != null) {
+            user.setCity(userUpdateInfo.getCity());
+        }
+        if (userUpdateInfo.getGender() != null) {
+            user.setGender(userUpdateInfo.getGender());
+        }
         user.setUpdateTime(LocalDateTime.now());
         userRepository.save(user);
         UserDTO userDTO = new UserDTO();
@@ -172,6 +183,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public Result<String> resetPassword(UserRegisterDTO resetDTO) {
         String redisKey = Constants.REDIS_VERIFY_CODE_PREFIX + resetDTO.getEmail();
+        // Validate Code
         String cacheCode = redisTemplate.opsForValue().get(redisKey);
         if (cacheCode == null || !cacheCode.equals(resetDTO.getCode())) {
             return Result.fail(Constants.ERR_CODE_INVALID);
@@ -180,7 +192,9 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new BusinessException(Constants.ERR_USER_NOT_FOUND));
         user.setPassword(PasswordUtil.hashPassword(resetDTO.getPassword()))
                 .setUpdateTime(LocalDateTime.now());
+        // update password
         userRepository.save(user);
+        // Clean up cache
         redisTemplate.delete(redisKey);
         return Result.ok(Constants.MSG_PASSWORD_RESET);
     }
