@@ -44,87 +44,53 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     public Result<PostResponse> getDetail(Long id) {
-        // 1. Get current user ID (Nullable)
+        // Get current user ID (nullable for guests)
         Long userId = UserContext.getCurrentUserId();
 
-        // 2. Query Post with Cache Pass-Through Protection
+        // cache key
         String key = Constants.CACHE_POST_KEY + id;
-        Post post = cacheUtil.queryWithPassThrough(
+
+        // Query with Cache Pass-Through Protection
+        // If cache miss: The repository's findPostDetailVO fetches Post + SpotName + CategoryName in a single query.
+        PostResponse response = cacheUtil.queryWithPassThrough(
                 key,
-                Post.class,
+                PostResponse.class,
                 Constants.CACHE_POST_TTL,
                 TimeUnit.MINUTES,
-                (k) -> postRepository.findById(id).orElse(null)
+                (k) -> postRepository.findPostDetailVO(id)
         );
 
-        // 3. Validation
-        if (post == null || post.getStatus() != 0) {
+        //  Validate result
+        if (response == null) {
             return Result.fail(Constants.ERR_POST_NOT_FOUND);
         }
 
-        // 4. Convert to Response VO
-        PostResponse response = new PostResponse();
-        BeanUtils.copyProperties(post, response);
-
-        // 5. Fill Spot and Category Info
-        Spot spot = spotRepository.findById(post.getSpotId()).orElse(null);
-        if (spot != null) {
-            response.setSpotName(spot.getName());
-            SpotCategory category = spotCategoryRepository.findById(spot.getCategoryId()).orElse(null);
-            if (category != null) {
-                response.setCategoryName(category.getName());
-            }
-        }
-
-        // 6. Interaction Status
+        // Set the current Like and Follow status
         if (userId != null) {
             boolean isLiked = postLikeRepository.existsByUserIdAndPostId(userId, id);
-            boolean isFollow = followRepository.existsByUserIdAndFollowUserId(userId, post.getUserId());
-            
+            boolean isFollow = followRepository.existsByUserIdAndFollowUserId(userId, response.getUserId());
             response.setIsLiked(isLiked);
             response.setIsFollow(isFollow);
         }
 
         return Result.ok(response);
     }
-
+    
     /**
      * Get post feed.
      */
     @Override
     public Result<Page<PostResponse>> feed(PostFeedRequestDTO dto) {
-        // 1. Build PageRequest (Note: dbt uses 1-based page index, Spring uses 0-based)
-        // Sort logic is handled in SQL, so we use Pageable.unpaged() or simple unsorted PageRequest for limits
+        // 1. Build PageRequest (Spring uses 0-based index)
         PageRequest pageable = PageRequest.of(dto.getPage() - 1, dto.getSize());
 
-        // 2. Query Repository
-        Page<PostRepository.PostFeedProjection> projectionPage = postRepository.findFeed(
+        // 2. Query Repository directly
+        // The repository now returns Page<PostResponse>, so no mapping logic is needed here.
+        Page<PostResponse> responsePage = postRepository.findFeedVO(
                 dto.getCategoryId(),
                 dto.getSort(),
                 pageable
         );
-
-        // 3. Convert Projection to Response VO
-        Page<PostResponse> responsePage = projectionPage.map(p -> new PostResponse()
-                .setId(p.getId())
-                .setSpotId(p.getSpotId())
-                .setUserId(p.getUserId())
-                .setTitle(p.getTitle())
-                .setContent(p.getContent())
-                .setImages(p.getImages())
-                .setRating(p.getRating())
-                .setLiked(p.getLiked())
-                .setCreateTime(p.getCreateTime())
-                .setUpdateTime(p.getCreateTime()) // Use createTime as fallback
-                .setUserNickname(p.getUserNickname())
-                .setUserIcon(p.getUserIcon())
-                .setStatus(0) // Default active
-                .setSpotName(p.getSpotName())
-                .setCategoryName(p.getCategoryName())
-                .setIsLiked(false)  // Default
-                .setIsFollow(false) // Default
-        );
-
         return Result.ok(responsePage);
     }
 
@@ -145,12 +111,12 @@ public class PostServiceImpl implements PostService {
 
         // 3. Set additional fields
         post.setUserId(userId)
-            .setUserNickname(nickname)
-            .setUserIcon(icon)
-            .setLiked(0)
-            .setStatus(0) // 0: Active
-            .setCreateTime(LocalDateTime.now())
-            .setUpdateTime(LocalDateTime.now());
+                .setUserNickname(nickname)
+                .setUserIcon(icon)
+                .setLiked(0)
+                .setStatus(0) // 0: Active
+                .setCreateTime(LocalDateTime.now())
+                .setUpdateTime(LocalDateTime.now());
 
         // 4. Save to database
         postRepository.save(post);
