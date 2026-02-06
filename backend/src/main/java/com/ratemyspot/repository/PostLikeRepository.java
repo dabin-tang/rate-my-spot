@@ -6,4 +6,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
+    
+    /**
+     * Check if user liked the post
+     */
+    boolean existsByUserIdAndPostId(Long userId, Long postId);
 }

@@ -12,14 +12,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 /**
- * Features: Logical Expiration, Cache Penetration Protection, and Distributed Mutex Locking.
- * * This component handles high-concurrency caching scenarios to prevent Cache Avalanche and Cache Breakdown.
+ * Features: Pass-Through Protection, Logical Expiration, and Mutex Locking.
+ * Designed for high-concurrency scenarios to prevent Cache Penetration, Breakdown, and Avalanche.
  */
 @Slf4j
 @Component
@@ -29,8 +28,8 @@ public class CacheUtil {
     private final RedisTemplate<String, Object> redisTemplate;
     private final RedissonClient redissonClient;
 
-    // Thread pool for asynchronous cache rebuilding
-    private static final ExecutorService REBUILD_EXECUTOR = Executors.newFixedThreadPool(10);
+    // Injected Spring-managed thread pool for async cache rebuilding
+    private final Executor cacheRebuildExecutor;
 
     /**
      * Wrapper class for Logical Expiration.
@@ -46,7 +45,7 @@ public class CacheUtil {
 
     /**
      * Set cache with Logical Expiration.
-     * Note: The actual key in Redis does not have a TTL (or has a very long one).
+     * Note: The actual key in Redis usually does not have a TTL (or has a very long one).
      *
      * @param key      Cache key
      * @param data     Data to cache
@@ -60,7 +59,7 @@ public class CacheUtil {
         RedisData<T> redisData = new RedisData<>();
         redisData.setData(data);
         redisData.setExpireTime(LocalDateTime.now().plusSeconds(unit.toSeconds(duration)));
-        
+
         redisTemplate.opsForValue().set(key, redisData);
     }
 
@@ -82,90 +81,12 @@ public class CacheUtil {
         }
     }
 
-    /**
-     * Query with Logical Expiration (High Availability/Consistency Trade-off).
-     * If data is logically expired, it returns stale data immediately and launches an async thread to rebuild cache.
-     *
-     * @param key         Cache key
-     * @param type        Class type of the data
-     * @param lockTimeout Time to wait for the lock
-     * @param lockUnit    Unit for lock timeout
-     * @param duration    Duration for the new data logic expiration
-     * @param timeUnit    Unit for data duration
-     * @param dbFallback  Function to fetch data from DB if needed
-     * @return Data object
-     */
-    public <T> T queryWithLogicalExpire(
-            String key,
-            Class<T> type,
-            long lockTimeout,
-            TimeUnit lockUnit,
-            long duration,
-            TimeUnit timeUnit,
-            Function<String, T> dbFallback
-    ) {
-        // 1. Query Redis
-        Object obj = redisTemplate.opsForValue().get(key);
-
-        // 2. If completely missing, return null (Caller should handle or pre-heat cache)
-        if (obj == null) {
-            return null;
-        }
-
-        // 3. Deserialize
-        RedisData<T> redisData;
-        try {
-            redisData = (RedisData<T>) obj;
-        } catch (Exception e) {
-            log.warn("Cache data format mismatch for key: {}", key);
-            return null;
-        }
-
-        // 4. Check if expired
-        if (redisData.getExpireTime().isAfter(LocalDateTime.now())) {
-            // Not expired, return data
-            return redisData.getData();
-        }
-
-        // 5. Expired: Try to acquire lock for reconstruction
-        String lockKey = key + ":lock";
-        RLock lock = redissonClient.getLock(lockKey);
-
-        // tryLock() is non-blocking here (or minimally blocking if args used correctly)
-        // We only want one thread to trigger the rebuild
-        if (lock.tryLock()) {
-            // Double check inside lock
-            Object newObj = redisTemplate.opsForValue().get(key);
-            if (newObj != null) {
-                 RedisData<T> newData = (RedisData<T>) newObj;
-                 if (newData.getExpireTime().isAfter(LocalDateTime.now())) {
-                     lock.unlock();
-                     return newData.getData();
-                 }
-            }
-
-            // Submit rebuild task to thread pool
-            REBUILD_EXECUTOR.submit(() -> {
-                try {
-                    // Query DB
-                    T newDbData = dbFallback.apply(key);
-                    // Refresh Cache
-                    this.setWithLogicalExpire(key, newDbData, duration, timeUnit);
-                } catch (Exception e) {
-                    log.error("Async cache rebuild failed for key: {}", key, e);
-                } finally {
-                    lock.unlock();
-                }
-            });
-        }
-
-        // 6. Return stale data (while async build is happening or if lock failed)
-        return redisData.getData();
-    }
+    //QUERY METHODS
 
     /**
-     * Query with Pass-Through Protection.
+     * 1. Query with Pass-Through Protection (Standard Mode).
      * Handles the "Cache Penetration" problem by caching null/empty values.
+     * Recommended for general use cases.
      *
      * @param key        Cache key
      * @param type       Class type
@@ -190,7 +111,12 @@ public class CacheUtil {
             if (value instanceof String && !StringUtils.hasLength((String) value)) {
                 return null;
             }
-            return (T) value;
+            try {
+                return (T) value;
+            } catch (ClassCastException e) {
+                log.warn("Cache data type mismatch for key: {}", key);
+                return null;
+            }
         }
 
         // 3. Query Database
@@ -208,22 +134,120 @@ public class CacheUtil {
     }
 
     /**
-     * Query with Mutex Lock (Strong Consistency).
-     * Prevents "Cache Breakdown" by locking so only one thread queries the DB.
+     * 2. Query with Logical Expiration (High Availability Mode).
+     * Used for Hotspot Keys. If data is logically expired, it returns stale data immediately
+     * and launches an async thread to rebuild cache.
+     * * Pre-requisite: Data must be pre-heated (loaded) into Redis first.
      *
-     * @param key         Cache key
-     * @param type        Class type
-     * @param lockTimeout Lock wait time
-     * @param lockUnit    Lock unit
-     * @param duration    Data TTL
-     * @param timeUnit    Data unit
-     * @param dbFallback  Database fallback function
+     * @param key        Cache key
+     * @param type       Class type of the data
+     * @param lockWait   Time to wait to acquire lock (usually 0 for non-blocking)
+     * @param lockLease  Time to hold the lock before auto-release (safety net)
+     * @param lockUnit   Unit for lock times
+     * @param duration   Duration for the new data logic expiration
+     * @param timeUnit   Unit for data duration
+     * @param dbFallback Function to fetch data from DB
+     * @return Data object
+     */
+    public <T> T queryWithLogicalExpire(
+            String key,
+            Class<T> type,
+            long lockWait,
+            long lockLease,
+            TimeUnit lockUnit,
+            long duration,
+            TimeUnit timeUnit,
+            Function<String, T> dbFallback
+    ) {
+        // 1. Query Redis
+        Object obj = redisTemplate.opsForValue().get(key);
+
+        // 2. If completely missing, return null (Caller must handle or pre-heat cache)
+        if (obj == null) {
+            return null;
+        }
+
+        // 3. Deserialize
+        RedisData<T> redisData;
+        try {
+            redisData = (RedisData<T>) obj;
+        } catch (Exception e) {
+            log.warn("Cache data format mismatch for key: {}", key);
+            return null;
+        }
+
+        // 4. Check if expired
+        if (redisData.getExpireTime().isAfter(LocalDateTime.now())) {
+            // Not expired, return data
+            return redisData.getData();
+        }
+
+        // 5. Expired: Try to acquire lock for reconstruction
+        String lockKey = key + ":lock";
+        RLock lock = redissonClient.getLock(lockKey);
+
+        try {
+            // Try to acquire lock non-blockingly.
+            // We use leaseTime to ensure the lock is eventually released if the server crashes.
+            boolean isLocked = lock.tryLock(lockWait, lockLease, lockUnit);
+
+            if (isLocked) {
+                // Double check inside lock
+                Object newObj = redisTemplate.opsForValue().get(key);
+                if (newObj != null) {
+                    RedisData<T> newData = (RedisData<T>) newObj;
+                    if (newData.getExpireTime().isAfter(LocalDateTime.now())) {
+                        // Cache was just updated by another thread
+                        return newData.getData();
+                        // Note: We don't unlock here because the async thread isn't running.
+                        // The lock will expire automatically after lockLease time.
+                    }
+                }
+
+                // Submit rebuild task to thread pool
+                cacheRebuildExecutor.execute(() -> {
+                    try {
+                        // Query DB
+                        T newDbData = dbFallback.apply(key);
+                        // Refresh Cache
+                        this.setWithLogicalExpire(key, newDbData, duration, timeUnit);
+                    } catch (Exception e) {
+                        log.error("Async cache rebuild failed for key: {}", key, e);
+                    }
+                    // IMPORTANT: We DO NOT unlock here.
+                    // Redisson locks are thread-bound. The async thread cannot unlock a lock held by the main thread.
+                    // We rely on the 'lockLease' time set in tryLock to automatically release the lock.
+                    // This acts as a rate-limiter for DB queries.
+                });
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        // 6. Return stale data (whether lock was acquired or not)
+        return redisData.getData();
+    }
+
+    /**
+     * 3. Query with Mutex Lock (Strong Consistency Mode).
+     * Prevents "Cache Breakdown" by locking so only one thread queries the DB.
+     * Recommended for data that requires strict consistency (e.g., inventory).
+     *
+     * @param key        Cache key
+     * @param type       Class type
+     * @param lockWait   Lock wait time
+     * @param lockLease  Lock lease time (auto unlock)
+     * @param lockUnit   Lock unit
+     * @param duration   Data TTL
+     * @param timeUnit   Data unit
+     * @param dbFallback Database fallback function
      * @return Data object
      */
     public <T> T queryWithMutex(
             String key,
             Class<T> type,
-            long lockTimeout,
+            long lockWait,
+            long lockLease,
             TimeUnit lockUnit,
             long duration,
             TimeUnit timeUnit,
@@ -245,12 +269,12 @@ public class CacheUtil {
 
         try {
             // Try to acquire lock (blocking with wait time)
-            isLocked = lock.tryLock(lockTimeout, lockUnit);
-            
+            isLocked = lock.tryLock(lockWait, lockLease, lockUnit);
+
             if (!isLocked) {
-                // Failed to acquire lock, sleep and retry (recursive or loop)
+                // Failed to acquire lock, sleep and retry
                 Thread.sleep(50);
-                return queryWithMutex(key, type, lockTimeout, lockUnit, duration, timeUnit, dbFallback);
+                return queryWithMutex(key, type, lockWait, lockLease, lockUnit, duration, timeUnit, dbFallback);
             }
 
             // 3. Double Check
@@ -278,6 +302,7 @@ public class CacheUtil {
             Thread.currentThread().interrupt();
             throw new RuntimeException("Cache query interrupted", e);
         } finally {
+            // Unlock only if held by current thread
             if (isLocked && lock.isHeldByCurrentThread()) {
                 lock.unlock();
             }

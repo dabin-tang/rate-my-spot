@@ -7,6 +7,17 @@ public class Constants {
 
     // Redis Keys
     public static final String REDIS_VERIFY_CODE_PREFIX = "VERIFY_CODE:";
+    
+    // Spot Cache
+    public static final String CACHE_SPOT_KEY = "cache:spot:";
+    public static final Long CACHE_NULL_TTL = 2L; // Minutes
+    public static final Long CACHE_SPOT_LOGICAL_EXPIRE = 20L; // Seconds
+    public static final Long CACHE_SPOT_LOCK_WAIT = 0L; // Seconds
+    public static final Long CACHE_SPOT_LOCK_LEASE = 10L; // Seconds
+
+    // Post Cache
+    public static final String CACHE_POST_KEY = "cache:post:";
+    public static final Long CACHE_POST_TTL = 30L; // Minutes
 
     // Email Config (Temporary, ideally in application.yml)
     public static final String EMAIL_FROM = "your-email@gmail.com";
@@ -28,4 +39,6 @@ public class Constants {
     public static final String ERR_ACCOUNT_BANNED = "Account is banned";
     public static final String ERR_USER_NOT_LOGIN = "User not logged in";
     public static final String ERR_USER_NOT_FOUND = "User not found";
+    public static final String ERR_SPOT_NOT_FOUND = "Spot not found";
+    public static final String ERR_POST_NOT_FOUND = "Post not found or unavailable";
 }

@@ -31,7 +31,7 @@ public class UserController {
     @Operation(summary = "Send Email Verification Code")
     @PostMapping("/send-code")
     public Result<String> sendCode(@RequestParam String email, @RequestParam Integer type) {
-        // Just forward the request to the service
+        log.info("Request to send verification code to email: {}, type: {}", email, type);
         return userService.sendVerificationCode(email, type);
     }
 
@@ -42,7 +42,7 @@ public class UserController {
     @Operation(summary = "Register New User")
     @PostMapping("/register")
     public Result<UserDTO> register(@RequestBody @Valid UserRegisterDTO registerDTO) {
-        // Service now returns Result<UserDTO>, so we return it directly
+        log.info("Request to register new user: {}", registerDTO);
         return userService.register(registerDTO);
     }
 
@@ -56,6 +56,7 @@ public class UserController {
     @Operation(summary = "User Login")
     @PostMapping("/login")
     public Result<Map<String, Object>> login(@RequestBody @Valid UserLoginDTO loginDTO) {
+        log.info("Request to login user: {}", loginDTO);
         return userService.login(loginDTO);
     }
 
@@ -65,6 +66,7 @@ public class UserController {
     @Operation(summary = "Get Current User Info")
     @GetMapping("/current")
     public Result<UserDTO> getCurrentUser() {
+        log.info("Request to get current user");
         return userService.getCurrentUserInfo();
     }
 
@@ -75,6 +77,7 @@ public class UserController {
     @Operation(summary = "Update User Profile")
     @PutMapping("/update")
     public Result<UserDTO> updateProfile(@RequestBody User user) {
+        log.info("Request to update user: {}", user);
         return userService.updateUserInfo(user);
     }
 
@@ -84,6 +87,7 @@ public class UserController {
     @Operation(summary = "Update Password (Logged In)")
     @PutMapping("/update-password")
     public Result<String> updatePassword(@RequestParam String newPassword) {
+        log.info("Request to update password: {}", newPassword);
         return userService.updatePassword(newPassword);
     }
 
@@ -94,6 +98,7 @@ public class UserController {
     @Operation(summary = "Reset Password (Forgot Password)")
     @PostMapping("/reset-password")
     public Result<String> resetPassword(@RequestBody @Valid UserRegisterDTO resetDTO) {
+        log.info("Request to reset password for email: {}", resetDTO.getEmail());
         return userService.resetPassword(resetDTO);
     }
 
@@ -103,6 +108,7 @@ public class UserController {
     @Operation(summary = "Logout")
     @PostMapping("/logout")
     public Result<String> logout() {
+        log.info("Request to logout user");
         return userService.logout();
     }
 }
