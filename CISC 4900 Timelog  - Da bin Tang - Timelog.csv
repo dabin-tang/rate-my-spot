@@ -22,3 +22,47 @@ and Global Exception Handler.","Next step: Start implementing the actual busines
 Pushed the new backend skeleton code, 
 the updated timelog.csv, and the folder of 
 prototype images.",,
+2/2/26,0.5,Coding,"Upgraded all 9 Entity classes with Spring Validation 
+annotations.",,
+2/3/26,4.2,Coding,"Implemented the JwtInterceptor for backend 
+security and token validation. Developed core User 
+Backend APIs: Login, Register, Send Verification Code, 
+Update Profile, and Reset Password.",,
+2/3/26,0.1,Documentation,"Synced all local changes to the remote GitHub repository. 
+Pushed the implemented User backend modules ",,
+2/4/26,0.5,Documentation,Updated the project management board.,,
+2/4/26,0.5,Coding,"Upgraded database icons: Replaced spot_category 
+emojis with professional SVG URLs. Added smarter Redis 
+caching using CacheUtil with Redisson to prevent 
+cache penetration, breakdown, and avalanche. 
+Set up RedisConfig with Jackson so everything gets 
+stored in JSON properly.",Next Steps: Apply CacheUtil strategies to the upcoming Spot service implementation.,CacheUtil was reused from one of my previous projects. This allowed me to focus more on the core business logic rather than re-implementing common caching utilities.
+2/4/26,0.4,Coding,"Implemented the backend API for fetching spot categories 
+with Redis caching.",,
+2/5/26,6.5,Coding,"Implemented several core Backend API services for 
+the Spot and Post modules, designing DTOs and 
+Response objects for data contracts:
+1. Spot APIs: Implemented the spot list with distance 
+sorting (using user coords) and keyword search. Added 
+Redis caching to the Spot Detail view to speed up reads.
+2. Post APIs: Implemented the post creation logic 
+and the main feed. Added caching for Post Details to 
+reduce database load.",,
+2/5/26,0.6,Testing & Debugging,"Verified the functionality of all completed backend API 
+endpoints using Postman.",,
+2/5/26,0.1,Documentation,"Synced all local changes to the remote GitHub repository. 
+",,
+2/6/26,2,Coding,"Improved Get Post Detail API: used JPQL constructor 
+projection to return response directly, cutting down 
+database queries.
+
+Improved Get Post Feed API: changed from 
+interface projection to JPQL constructor projection 
+for better readability.",,
+2/6/26,0.1,Documentation,Synced all local changes to the remote GitHub repository.,,
+2/6/26,0.2,Documentation,Updated the project management board.,,
+2/9/26,0.5,Supervisor Discussion,"Sent the weekly report to my supervisor and reached 
+out to discuss the next tasks.",,
+2/10/26,8.7,Other,Completed the Project Details Survey.,,"So many questions, it’s exhausting."
+2/11/26,1.2,Coding,"Fix the post creation logic and asynchronously 
+update the spot rating.",,

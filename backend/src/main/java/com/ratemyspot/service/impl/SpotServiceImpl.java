@@ -1,5 +1,6 @@
 package com.ratemyspot.service.impl;
 
+import com.ratemyspot.dto.SpotRatingDTO;
 import com.ratemyspot.entity.Spot;
 import com.ratemyspot.exception.BusinessException;
 import com.ratemyspot.repository.SpotRepository;
@@ -15,6 +16,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.ratemyspot.util.CacheUtil;
+import org.springframework.scheduling.annotation.Async;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -26,7 +31,10 @@ import java.util.stream.Collectors;
 public class SpotServiceImpl implements SpotService {
 
     private final SpotRepository spotRepository;
+    private final com.ratemyspot.repository.PostRepository postRepository;
+    private final com.ratemyspot.repository.SpotReviewRepository spotReviewRepository;
     private final CacheUtil cacheUtil;
+    private final org.springframework.data.redis.core.RedisTemplate<String, Object> redisTemplate;
 
     /**
      * Retrieves a paginated list of spots with dynamic sorting strategies.
@@ -78,16 +86,13 @@ public class SpotServiceImpl implements SpotService {
     @Override
     public Result<SpotResponse> getSpotDetail(Long id) {
         String key = Constants.CACHE_SPOT_KEY + id;
-        
-        // Logical Expiration: 20 seconds
-        SpotResponse spotResponse = cacheUtil.queryWithLogicalExpire(
+
+        // Use Pass-Through Protection instead of Logical Expiration
+        SpotResponse spotResponse = cacheUtil.queryWithPassThrough(
                 key,
                 SpotResponse.class,
-                Constants.CACHE_SPOT_LOCK_WAIT,
-                Constants.CACHE_SPOT_LOCK_LEASE,
-                TimeUnit.SECONDS,
-                Constants.CACHE_SPOT_LOGICAL_EXPIRE,
-                TimeUnit.SECONDS,
+                Constants.CACHE_SPOT_TTL,
+                TimeUnit.MINUTES,
                 k -> {
                     Spot spot = spotRepository.findById(id).orElse(null);
                     if (spot == null) {
@@ -99,18 +104,52 @@ public class SpotServiceImpl implements SpotService {
                 }
         );
 
-        // Handle Cache Miss (Cold Start): Query DB and write to cache
         if (spotResponse == null) {
-            Spot spot = spotRepository.findById(id)
-                    .orElseThrow(() -> new BusinessException(Constants.ERR_SPOT_NOT_FOUND));
-
-            spotResponse = new SpotResponse();
-            BeanUtils.copyProperties(spot, spotResponse);
-            
-            // Write to cache with logical expiration
-            cacheUtil.setWithLogicalExpire(key, spotResponse, Constants.CACHE_SPOT_LOGICAL_EXPIRE, TimeUnit.SECONDS);
+            return Result.fail(Constants.ERR_SPOT_NOT_FOUND);
         }
 
         return Result.ok(spotResponse);
     }
+
+    /**
+     * Asynchronously update spot rating and review count.
+     */
+    @Override
+    @Async
+    public void updateSpotRatingAsync(Long spotId) {
+        // 1. Fetch aggregated stats from Post and SpotReview
+        SpotRatingDTO postStats = postRepository.findPostRatingStats(spotId);
+        SpotRatingDTO reviewStats = spotReviewRepository.findReviewRatingStats(spotId);
+
+        // 2. Handle nulls (Just in case)
+        long postCount = postStats != null && postStats.getCount() != null ? postStats.getCount() : 0L;
+        double postAvg = postStats != null && postStats.getAvgScore() != null ? postStats.getAvgScore() : 0.0;
+
+        long reviewCount = reviewStats != null && reviewStats.getCount() != null ? reviewStats.getCount() : 0L;
+        double reviewAvg = reviewStats != null && reviewStats.getAvgScore() != null ? reviewStats.getAvgScore() : 0.0;
+
+        // 3. Calculate Weighted Average
+        long totalCount = postCount + reviewCount;
+        double finalScore = 0.0;
+
+        if (totalCount > 0) {
+            BigDecimal totalSum = BigDecimal.valueOf(postCount).multiply(BigDecimal.valueOf(postAvg))
+                    .add(BigDecimal.valueOf(reviewCount).multiply(BigDecimal.valueOf(reviewAvg)));
+
+            finalScore = totalSum.divide(BigDecimal.valueOf(totalCount), 1, RoundingMode.HALF_UP).doubleValue();
+        }
+
+        // 4. Update Spot Entity
+        Spot spot = spotRepository.findById(spotId).orElse(null);
+        if (spot != null) {
+            spot.setReviewCount((int) totalCount); // Cast to int as per entity definition
+            spot.setScore(finalScore);
+            spotRepository.save(spot);
+
+            // 5. Clear Cache
+            redisTemplate.delete(Constants.CACHE_SPOT_KEY + spotId);
+            log.info("Updated spot rating for spotId: {}, newScore: {}, newCount: {}", spotId, finalScore, totalCount);
+        }
+    }
+
 }

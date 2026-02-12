@@ -21,4 +21,9 @@ public interface SpotService {
      * Get spot detail by ID.
      */
     Result<SpotResponse> getSpotDetail(Long id);
+
+    /**
+     * Asynchronously update spot rating and review count.
+     */
+    void updateSpotRatingAsync(Long spotId);
 }

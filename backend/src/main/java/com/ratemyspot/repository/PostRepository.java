@@ -1,5 +1,6 @@
 package com.ratemyspot.repository;
 
+import com.ratemyspot.dto.SpotRatingDTO;
 import com.ratemyspot.entity.Post;
 import com.ratemyspot.response.PostResponse;
 import org.springframework.data.domain.Page;
@@ -35,7 +36,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                                   @Param("sort") String sort,
                                   Pageable pageable);
 
-    // PostRepository.java
+    /**
+     * Find post detail by ID.
+     * Uses JPQL Constructor Expression to return PostResponse directly.
+     */
     @Query("SELECT new com.ratemyspot.response.PostResponse(" +
             "p.id, p.spotId, p.userId, p.userNickname, p.userIcon, " +
             "p.title, p.content, p.images, p.rating, p.liked, " +
@@ -46,4 +50,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "LEFT JOIN SpotCategory c ON s.categoryId = c.id " +
             "WHERE p.id = :id AND p.status = 0")
     PostResponse findPostDetailVO(@Param("id") Long id);
+
+    /**
+     * Get aggregated rating stats for a spot from posts.
+     */
+    @Query("SELECT new com.ratemyspot.dto.SpotRatingDTO(COUNT(p), AVG(p.rating)) " +
+            "FROM Post p WHERE p.spotId = :spotId AND p.status = 0")
+    SpotRatingDTO findPostRatingStats(@Param("spotId") Long spotId);
 }

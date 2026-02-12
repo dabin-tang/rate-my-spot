@@ -16,7 +16,7 @@ public interface PostService {
     /**
      * Get post details.
      */
-    Result<PostResponse> getDetail(Long id);
+    Result<PostResponse> getPostDetail(Long id);
 
     /**
      * Create a new post.

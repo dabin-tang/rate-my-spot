@@ -38,6 +38,7 @@ public class PostController {
     @GetMapping("/feed")
     @Operation(summary = "Get Post Feed", description = "Waterfall flow for posts. Supports filtering by category and sorting.")
     public Result<Page<PostResponse>> feed(@ParameterObject @Valid PostFeedRequestDTO dto) {
+        log.info("Get Post Feed: {}", dto);
         return postService.feed(dto);
     }
 
@@ -49,7 +50,8 @@ public class PostController {
      */
     @PostMapping("/create")
     @Operation(summary = "Create a new post", description = "Create a new post for a specific spot")
-    public Result<PostResponse> create(@RequestBody @Valid PostCreateDTO dto) {
+    public Result<PostResponse> createPost(@RequestBody @Valid PostCreateDTO dto) {
+        log.info("Create Post: {}", dto);
         return postService.create(dto);
     }
 
@@ -61,8 +63,9 @@ public class PostController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "Get Post Detail", description = "Get detailed information of a post including user interaction status")
-    public Result<PostResponse> getDetail(@PathVariable Long id) {
-        return postService.getDetail(id);
+    public Result<PostResponse> getPostDetail(@PathVariable Long id) {
+        log.info("Get Post Detail: {}", id);
+        return postService.getPostDetail(id);
     }
 
 }

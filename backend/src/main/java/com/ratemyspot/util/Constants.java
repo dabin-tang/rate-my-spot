@@ -11,6 +11,7 @@ public class Constants {
     // Spot Cache
     public static final String CACHE_SPOT_KEY = "cache:spot:";
     public static final Long CACHE_NULL_TTL = 2L; // Minutes
+    public static final Long CACHE_SPOT_TTL = 30L; // Minutes
     public static final Long CACHE_SPOT_LOGICAL_EXPIRE = 20L; // Seconds
     public static final Long CACHE_SPOT_LOCK_WAIT = 0L; // Seconds
     public static final Long CACHE_SPOT_LOCK_LEASE = 10L; // Seconds

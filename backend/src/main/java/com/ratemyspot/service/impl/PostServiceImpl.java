@@ -3,13 +3,9 @@ package com.ratemyspot.service.impl;
 import com.ratemyspot.dto.PostCreateDTO;
 import com.ratemyspot.repository.FollowRepository;
 import com.ratemyspot.repository.PostLikeRepository;
-import com.ratemyspot.repository.SpotCategoryRepository;
-import com.ratemyspot.repository.SpotRepository;
 import com.ratemyspot.dto.PostFeedRequestDTO;
 import com.ratemyspot.response.PostResponse;
 import com.ratemyspot.entity.Post;
-import com.ratemyspot.entity.Spot;
-import com.ratemyspot.entity.SpotCategory;
 import com.ratemyspot.repository.PostRepository;
 import com.ratemyspot.service.PostService;
 import com.ratemyspot.util.CacheUtil;
@@ -23,6 +19,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
@@ -33,17 +31,16 @@ import java.util.concurrent.TimeUnit;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
-    private final SpotRepository spotRepository;
-    private final SpotCategoryRepository spotCategoryRepository;
     private final PostLikeRepository postLikeRepository;
     private final FollowRepository followRepository;
     private final CacheUtil cacheUtil;
+    private final com.ratemyspot.service.SpotService spotService;
 
     /**
      * Get post details.
      */
     @Override
-    public Result<PostResponse> getDetail(Long id) {
+    public Result<PostResponse> getPostDetail(Long id) {
         // Get current user ID (nullable for guests)
         Long userId = UserContext.getCurrentUserId();
 
@@ -75,7 +72,7 @@ public class PostServiceImpl implements PostService {
 
         return Result.ok(response);
     }
-    
+
     /**
      * Get post feed.
      */
@@ -121,10 +118,21 @@ public class PostServiceImpl implements PostService {
         // 4. Save to database
         postRepository.save(post);
 
-        // 5. Convert to Response VO
+        // 5. Async update spot rating (After Commit)
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        spotService.updateSpotRatingAsync(post.getSpotId());
+                    }
+                }
+        );
+
+        // 6. Convert to Response VO
         PostResponse response = new PostResponse();
         BeanUtils.copyProperties(post, response);
 
         return Result.ok(response);
     }
+    
 }
