@@ -2,7 +2,9 @@ package com.ratemyspot.controller;
 
 import com.ratemyspot.dto.PostCreateDTO;
 import com.ratemyspot.dto.PostFeedRequestDTO;
+import com.ratemyspot.response.PageResult;
 import com.ratemyspot.response.PostResponse;
+import com.ratemyspot.response.RecentPostResponse;
 import com.ratemyspot.service.PostService;
 import com.ratemyspot.util.Result;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,7 +19,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/post")
@@ -37,7 +42,7 @@ public class PostController {
      */
     @GetMapping("/feed")
     @Operation(summary = "Get Post Feed", description = "Waterfall flow for posts. Supports filtering by category and sorting.")
-    public Result<Page<PostResponse>> feed(@ParameterObject @Valid PostFeedRequestDTO dto) {
+    public Result<PageResult<PostResponse>> feed(@ParameterObject @Valid PostFeedRequestDTO dto) {
         log.info("Get Post Feed: {}", dto);
         return postService.feed(dto);
     }
@@ -52,7 +57,7 @@ public class PostController {
     @Operation(summary = "Create a new post", description = "Create a new post for a specific spot")
     public Result<PostResponse> createPost(@RequestBody @Valid PostCreateDTO dto) {
         log.info("Create Post: {}", dto);
-        return postService.create(dto);
+        return postService.createPost(dto);
     }
 
     /**
@@ -68,4 +73,33 @@ public class PostController {
         return postService.getPostDetail(id);
     }
 
+    /**
+     * Get posts by user ID.
+     *
+     * @param userId user ID
+     * @param page   page number (default 1)
+     * @param size   page size (default 10)
+     * @return list of posts
+     */
+    @GetMapping("/user/{userId}")
+    @Operation(summary = "Get User Posts", description = "Get paginated list of posts created by a specific user")
+    public Result<PageResult<PostResponse>> getUserPosts(@PathVariable Long userId,
+                                                   @RequestParam(defaultValue = "1") Integer page,
+                                                   @RequestParam(defaultValue = "10") Integer size) {
+        log.info("Get User Posts: userId={}, page={}, size={}", userId, page, size);
+        return postService.getUserPosts(userId, page, size);
+    }
+
+    /**
+     * Get recent posts for a spot.
+     *
+     * @param spotId spot ID
+     * @return list of recent posts
+     */
+    @GetMapping("/spot/{spotId}")
+    @Operation(summary = "Get Recent Posts", description = "Get 2 most recent posts for a specific spot")
+    public Result<List<RecentPostResponse>> getRecentPosts(@PathVariable Long spotId) {
+        log.info("Get Recent Posts: spotId={}", spotId);
+        return postService.getRecentPosts(spotId);
+    }
 }

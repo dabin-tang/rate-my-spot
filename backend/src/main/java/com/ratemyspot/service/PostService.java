@@ -2,16 +2,20 @@ package com.ratemyspot.service;
 
 import com.ratemyspot.dto.PostCreateDTO;
 import com.ratemyspot.dto.PostFeedRequestDTO;
+import com.ratemyspot.response.PageResult;
 import com.ratemyspot.response.PostResponse;
+import com.ratemyspot.response.RecentPostResponse;
 import com.ratemyspot.util.Result;
 import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 public interface PostService {
 
     /**
      * Get post feed with pagination.
      */
-    Result<Page<PostResponse>> feed(PostFeedRequestDTO requestDTO);
+    Result<PageResult<PostResponse>> feed(PostFeedRequestDTO requestDTO);
 
     /**
      * Get post details.
@@ -21,5 +25,15 @@ public interface PostService {
     /**
      * Create a new post.
      */
-    Result<PostResponse> create(PostCreateDTO postCreateDTO);
+    Result<PostResponse> createPost(PostCreateDTO postCreateDTO);
+
+    /**
+     * Get posts by user ID.
+     */
+    Result<PageResult<PostResponse>> getUserPosts(Long userId, Integer page, Integer size);
+
+    /**
+     * Get recent posts for a spot.
+     */
+    Result<List<RecentPostResponse>> getRecentPosts(Long spotId);
 }

@@ -4,9 +4,11 @@ import com.ratemyspot.dto.PostCreateDTO;
 import com.ratemyspot.repository.FollowRepository;
 import com.ratemyspot.repository.PostLikeRepository;
 import com.ratemyspot.dto.PostFeedRequestDTO;
+import com.ratemyspot.response.PageResult;
 import com.ratemyspot.response.PostResponse;
 import com.ratemyspot.entity.Post;
 import com.ratemyspot.repository.PostRepository;
+import com.ratemyspot.response.RecentPostResponse;
 import com.ratemyspot.service.PostService;
 import com.ratemyspot.util.CacheUtil;
 import com.ratemyspot.util.Constants;
@@ -23,6 +25,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -77,18 +80,28 @@ public class PostServiceImpl implements PostService {
      * Get post feed.
      */
     @Override
-    public Result<Page<PostResponse>> feed(PostFeedRequestDTO dto) {
-        // 1. Build PageRequest (Spring uses 0-based index)
+    public Result<PageResult<PostResponse>> feed(PostFeedRequestDTO dto) {
+        // 1. Build PageRequest
         PageRequest pageable = PageRequest.of(dto.getPage() - 1, dto.getSize());
 
-        // 2. Query Repository directly
-        // The repository now returns Page<PostResponse>, so no mapping logic is needed here.
-        Page<PostResponse> responsePage = postRepository.findFeedVO(
-                dto.getCategoryId(),
-                dto.getSort(),
-                pageable
+        // 2. Query Repository based on sort strategy
+        Page<PostResponse> responsePage;
+        if ("latest".equals(dto.getSort())) {
+            responsePage = postRepository.findFeedLatest(dto.getCategoryId(), pageable);
+        } else {
+            // Default sort (random + liked)
+            responsePage = postRepository.findFeedDefault(dto.getCategoryId(), pageable);
+        }
+
+        PageResult<PostResponse> pageResult = new PageResult<>(
+            dto.getPage(),
+            dto.getSize(),
+            responsePage.getTotalElements(),
+            responsePage.getTotalPages(),
+            responsePage.getContent()
         );
-        return Result.ok(responsePage);
+        
+        return Result.ok(pageResult);
     }
 
     /**
@@ -96,7 +109,7 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     @Transactional
-    public Result<PostResponse> create(PostCreateDTO postCreateDTO) {
+    public Result<PostResponse> createPost(PostCreateDTO postCreateDTO) {
         // 1. Get current user
         Long userId = UserContext.getCurrentUserId();
         String nickname = UserContext.getCurrentUser().getNickname();
@@ -133,6 +146,36 @@ public class PostServiceImpl implements PostService {
         BeanUtils.copyProperties(post, response);
 
         return Result.ok(response);
+    }
+
+    /**
+     * Get posts by user ID.
+     */
+    @Override
+    public Result<PageResult<PostResponse>> getUserPosts(Long userId, Integer page, Integer size) {
+        PageRequest pageable = PageRequest.of(page - 1, size);
+        Page<PostResponse> responsePage = postRepository.findUserPostsVO(userId, pageable);
+        
+        PageResult<PostResponse> pageResult = new PageResult<>(
+            page,
+            size,
+            responsePage.getTotalElements(),
+            responsePage.getTotalPages(),
+            responsePage.getContent()
+        );
+
+        return Result.ok(pageResult);
+    }
+
+    /**
+     * Get recent posts for a spot.
+     */
+    @Override
+    public Result<List<RecentPostResponse>> getRecentPosts(Long spotId) {
+        // Fetch top 2 recent posts
+        PageRequest pageable = PageRequest.of(0, 2);
+        Page<RecentPostResponse> page = postRepository.findRecentPostsVO(spotId, pageable);
+        return Result.ok(page.getContent());
     }
     
 }

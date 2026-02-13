@@ -15,6 +15,7 @@ public class Constants {
     public static final Long CACHE_SPOT_LOGICAL_EXPIRE = 20L; // Seconds
     public static final Long CACHE_SPOT_LOCK_WAIT = 0L; // Seconds
     public static final Long CACHE_SPOT_LOCK_LEASE = 10L; // Seconds
+    public static final String CACHE_SPOT_REVIEW_KEY = "cache:spot:reviews:";
 
     // Post Cache
     public static final String CACHE_POST_KEY = "cache:post:";

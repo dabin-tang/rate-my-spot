@@ -4,6 +4,7 @@ import com.ratemyspot.dto.SpotRatingDTO;
 import com.ratemyspot.entity.Spot;
 import com.ratemyspot.exception.BusinessException;
 import com.ratemyspot.repository.SpotRepository;
+import com.ratemyspot.response.PageResult;
 import com.ratemyspot.response.SpotResponse;
 import com.ratemyspot.service.SpotService;
 import com.ratemyspot.util.Constants;
@@ -40,7 +41,7 @@ public class SpotServiceImpl implements SpotService {
      * Retrieves a paginated list of spots with dynamic sorting strategies.
      */
     @Override
-    public Result<Page<SpotResponse>> getSpotList(Long categoryId, String sort, Double lat, Double lon, Integer page) {
+    public Result<PageResult<SpotResponse>> getSpotList(Long categoryId, String sort, Double lat, Double lon, Integer page) {
         Pageable pageable = PageRequest.of(page - 1, 20); // Page is 1-indexed in API, 0-indexed in JPA
         Page<Spot> spotPage;
 
@@ -55,13 +56,21 @@ public class SpotServiceImpl implements SpotService {
             spotPage = spotRepository.findByFilterDefault(categoryId, pageable);
         }
 
-        Page<SpotResponse> responsePage = spotPage.map(spot -> {
+        List<SpotResponse> responseList = spotPage.stream().map(spot -> {
             SpotResponse response = new SpotResponse();
             BeanUtils.copyProperties(spot, response);
             return response;
-        });
+        }).collect(Collectors.toList());
 
-        return Result.ok(responsePage);
+        PageResult<SpotResponse> pageResult = new PageResult<>(
+            page,
+            20,
+            spotPage.getTotalElements(),
+            spotPage.getTotalPages(),
+            responseList
+        );
+
+        return Result.ok(pageResult);
     }
 
     /**

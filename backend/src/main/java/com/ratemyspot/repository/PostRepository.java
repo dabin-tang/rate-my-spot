@@ -3,6 +3,7 @@ package com.ratemyspot.repository;
 import com.ratemyspot.dto.SpotRatingDTO;
 import com.ratemyspot.entity.Post;
 import com.ratemyspot.response.PostResponse;
+import com.ratemyspot.response.RecentPostResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,8 +17,7 @@ import java.time.LocalDateTime;
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     /**
-     * Find post feed with dynamic filtering and sorting.
-     * Uses JPQL Constructor Expression to return PostResponse directly.
+     * Find post feed sorted by latest (create_time DESC).
      */
     @Query("SELECT new com.ratemyspot.response.PostResponse(" +
             "p.id, p.spotId, p.userId, p.userNickname, p.userIcon, " +
@@ -29,12 +29,24 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "LEFT JOIN SpotCategory c ON s.categoryId = c.id " +
             "WHERE p.status = 0 " +
             "AND (:categoryId IS NULL OR s.categoryId = :categoryId) " +
-            "ORDER BY " +
-            "CASE WHEN :sort = 'latest' THEN p.createTime END DESC, " +
-            "CASE WHEN :sort = 'default' THEN (p.liked * 0.1 + function('RAND')) END DESC")
-    Page<PostResponse> findFeedVO(@Param("categoryId") Long categoryId,
-                                  @Param("sort") String sort,
-                                  Pageable pageable);
+            "ORDER BY p.createTime DESC")
+    Page<PostResponse> findFeedLatest(@Param("categoryId") Long categoryId, Pageable pageable);
+
+    /**
+     * Find post feed sorted by default algorithm (liked * 0.1 + RAND()).
+     */
+    @Query("SELECT new com.ratemyspot.response.PostResponse(" +
+            "p.id, p.spotId, p.userId, p.userNickname, p.userIcon, " +
+            "p.title, p.content, p.images, p.rating, p.liked, " +
+            "p.status, p.createTime, p.updateTime, " +
+            "s.name, c.name) " +
+            "FROM Post p " +
+            "LEFT JOIN Spot s ON p.spotId = s.id " +
+            "LEFT JOIN SpotCategory c ON s.categoryId = c.id " +
+            "WHERE p.status = 0 " +
+            "AND (:categoryId IS NULL OR s.categoryId = :categoryId) " +
+            "ORDER BY (p.liked * 0.1 + cast(function('RAND') as Double)) DESC")
+    Page<PostResponse> findFeedDefault(@Param("categoryId") Long categoryId, Pageable pageable);
 
     /**
      * Find post detail by ID.
@@ -57,4 +69,31 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("SELECT new com.ratemyspot.dto.SpotRatingDTO(COUNT(p), AVG(p.rating)) " +
             "FROM Post p WHERE p.spotId = :spotId AND p.status = 0")
     SpotRatingDTO findPostRatingStats(@Param("spotId") Long spotId);
+
+    /**
+     * Get posts by user ID.
+     */
+    @Query("SELECT new com.ratemyspot.response.PostResponse(" +
+            "p.id, p.spotId, p.userId, p.userNickname, p.userIcon, " +
+            "p.title, p.content, p.images, p.rating, p.liked, " +
+            "p.status, p.createTime, p.updateTime, " +
+            "s.name, c.name) " +
+            "FROM Post p " +
+            "LEFT JOIN Spot s ON p.spotId = s.id " +
+            "LEFT JOIN SpotCategory c ON s.categoryId = c.id " +
+            "WHERE p.userId = :userId AND p.status = 0 " +
+            "ORDER BY p.createTime DESC")
+    Page<PostResponse> findUserPostsVO(@Param("userId") Long userId, Pageable pageable);
+
+    /**
+     * Get recent posts for a spot.
+     */
+    @Query("SELECT new com.ratemyspot.response.RecentPostResponse(" +
+            "p.id, p.spotId, p.userId, p.userNickname, p.userIcon, " +
+            "p.title, p.content, p.images, p.status, " +
+            "p.createTime, p.updateTime) " +
+            "FROM Post p " +
+            "WHERE p.spotId = :spotId AND p.status = 0 " +
+            "ORDER BY p.createTime DESC")
+    Page<RecentPostResponse> findRecentPostsVO(@Param("spotId") Long spotId, Pageable pageable);
 }

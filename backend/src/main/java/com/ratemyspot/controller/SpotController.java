@@ -1,5 +1,6 @@
 package com.ratemyspot.controller;
 
+import com.ratemyspot.response.PageResult;
 import com.ratemyspot.response.SpotResponse;
 import com.ratemyspot.service.SpotService;
 import com.ratemyspot.util.Result;
@@ -15,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-
-import org.springframework.data.domain.Page;
 
 @RestController
 @RequestMapping("/api/spot")
@@ -39,7 +38,7 @@ public class SpotController {
      */
     @GetMapping("/list")
     @Operation(summary = "Get Spot List", description = "Get list of spots with optional filtering and sorting.")
-    public Result<Page<SpotResponse>> getSpotList(
+    public Result<PageResult<SpotResponse>> getSpotList(
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) String sort,
             @RequestParam @NotNull(message = "Latitude is required") Double latitude,
