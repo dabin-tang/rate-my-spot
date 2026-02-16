@@ -27,15 +27,29 @@ public class SpotReviewController {
 
     private final SpotReviewService spotReviewService;
 
+    /**
+     * Get verified reviews for a specific spot (Pagination).
+     *
+     * @param req Pagination request
+     * @return Page of Review Responses
+     */
     @Operation(summary = "Get Spot Review List")
     @GetMapping("/list")
     public Result<PageResult<SpotReviewResponse>> SpotReviewList(@ModelAttribute @Valid SpotReviewPageReq req) {
+        log.info("Get Spot Review List: {}", req);
         return spotReviewService.SpotReviewList(req);
     }
 
+    /**
+     * Create a new spot review.
+     *
+     * @param dto the spot review
+     * @return the created spot review response
+     */
     @Operation(summary = "Create Spot Review")
     @PostMapping("/create")
     public Result<SpotReviewResponse> createSpotReview(@RequestBody @Valid SpotReviewCreateDTO dto) {
+        log.info("Create Spot Review: {}", dto);
         return spotReviewService.createSpotReview(dto);
     }
 }

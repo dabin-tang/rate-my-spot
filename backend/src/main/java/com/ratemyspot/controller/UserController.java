@@ -64,7 +64,7 @@ public class UserController {
      * Get information of the currently logged-in user.
      */
     @Operation(summary = "Get Current User Info")
-    @GetMapping("/current")
+    @GetMapping("/me")
     public Result<UserDTO> getCurrentUser() {
         log.info("Request to get current user");
         return userService.getCurrentUserInfo();

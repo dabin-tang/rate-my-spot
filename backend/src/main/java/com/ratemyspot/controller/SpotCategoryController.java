@@ -25,6 +25,7 @@ public class SpotCategoryController {
     @Operation(summary = "Get all categories")
     @GetMapping("/list")
     public Result<List<SpotCategoryResponse>> list() {
+        log.info("Get all categories");
         return spotCategoryService.getCategoryList();
     }
 }
