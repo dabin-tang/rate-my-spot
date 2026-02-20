@@ -54,7 +54,7 @@ jwt:
 springdoc:
   api-docs:
     path: /v3/api-docs
-  sw-ui:
+  swagger-ui:
     path: /swagger-ui.html
     display-request-duration: true
 
