@@ -88,6 +88,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public Result<?> handleException(Exception e) {
         log.error("Unknown System Exception: {}", e.getMessage(), e);
+        try {
+            java.io.PrintWriter pw = new java.io.PrintWriter(new java.io.FileWriter("C:\\picture\\rate-my-spot\\error.txt", true));
+            pw.println("----- " + java.time.LocalDateTime.now() + " -----");
+            e.printStackTrace(pw);
+            pw.close();
+        } catch (Exception ex) {}
         return Result.fail("Internal server error, please contact administrator.");
     }
 }

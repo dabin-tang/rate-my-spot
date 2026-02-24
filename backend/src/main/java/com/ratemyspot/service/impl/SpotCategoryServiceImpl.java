@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -26,7 +27,7 @@ public class SpotCategoryServiceImpl implements SpotCategoryService {
     @SuppressWarnings("unchecked")
     public Result<List<SpotCategoryResponse>> getCategoryList() {
         // Define cache key
-        String key = "spot:category:list";
+        String key = "spot:category:list:v2";
 
         // Use CacheUtil with Pass-Through protection
         // Queries cache first. If missing, queries DB (via lambda), caches result, and returns.
@@ -44,7 +45,7 @@ public class SpotCategoryServiceImpl implements SpotCategoryService {
                         SpotCategoryResponse response = new SpotCategoryResponse();
                         BeanUtils.copyProperties(entity, response);
                         return response;
-                    }).toList();
+                    }).collect(Collectors.toList());
                 }
         );
 

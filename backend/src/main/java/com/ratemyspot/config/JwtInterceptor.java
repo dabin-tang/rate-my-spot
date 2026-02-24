@@ -20,6 +20,7 @@ public class JwtInterceptor implements HandlerInterceptor {
     // These paths do not need login, just let them pass
     private static final String[] EXCLUDE_PATHS = {
             // 1. Login and register. Obviously need to let these through
+            "/api/user/send-code",
             "/api/user/login",
             "/api/user/register",
             "/api/admin/login",
@@ -49,6 +50,11 @@ public class JwtInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String requestURI = request.getRequestURI();
+
+        // Allow viewing post details by ID (/api/post/1)
+        if (requestURI.matches("^/api/post/\\d+$")) {
+            return true;
+        }
 
         // Just let static files and websocket pass
         if (requestURI.startsWith("/files/") || requestURI.startsWith("/ws/")) {
