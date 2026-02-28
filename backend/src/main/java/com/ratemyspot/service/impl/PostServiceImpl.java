@@ -10,6 +10,7 @@ import com.ratemyspot.entity.Post;
 import com.ratemyspot.repository.PostRepository;
 import com.ratemyspot.response.RecentPostResponse;
 import com.ratemyspot.service.PostService;
+import com.ratemyspot.service.SpotService;
 import com.ratemyspot.util.CacheUtil;
 import com.ratemyspot.util.Constants;
 import com.ratemyspot.util.Result;
@@ -37,7 +38,7 @@ public class PostServiceImpl implements PostService {
     private final PostLikeRepository postLikeRepository;
     private final FollowRepository followRepository;
     private final CacheUtil cacheUtil;
-    private final com.ratemyspot.service.SpotService spotService;
+    private final SpotService spotService;
 
     /**
      * Get post details.
@@ -94,13 +95,13 @@ public class PostServiceImpl implements PostService {
         }
 
         PageResult<PostResponse> pageResult = new PageResult<>(
-            dto.getPage(),
-            dto.getSize(),
-            responsePage.getTotalElements(),
-            responsePage.getTotalPages(),
-            responsePage.getContent()
+                dto.getPage(),
+                dto.getSize(),
+                responsePage.getTotalElements(),
+                responsePage.getTotalPages(),
+                responsePage.getContent()
         );
-        
+
         return Result.ok(pageResult);
     }
 
@@ -110,16 +111,15 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public Result<PostResponse> createPost(PostCreateDTO postCreateDTO) {
-        // 1. Get current user
+        //  Get current user
         Long userId = UserContext.getCurrentUserId();
         String nickname = UserContext.getCurrentUser().getNickname();
         String icon = UserContext.getCurrentUser().getIcon();
 
-        // 2. Convert DTO to Entity
         Post post = new Post();
         BeanUtils.copyProperties(postCreateDTO, post);
 
-        // 3. Set additional fields
+        // Set additional fields
         post.setUserId(userId)
                 .setUserNickname(nickname)
                 .setUserIcon(icon)
@@ -128,10 +128,10 @@ public class PostServiceImpl implements PostService {
                 .setCreateTime(LocalDateTime.now())
                 .setUpdateTime(LocalDateTime.now());
 
-        // 4. Save to database
+        // Save to database
         postRepository.save(post);
 
-        // 5. Async update spot rating (After Commit)
+        // Async update spot rating
         TransactionSynchronizationManager.registerSynchronization(
                 new TransactionSynchronization() {
                     @Override
@@ -141,7 +141,6 @@ public class PostServiceImpl implements PostService {
                 }
         );
 
-        // 6. Convert to Response VO
         PostResponse response = new PostResponse();
         BeanUtils.copyProperties(post, response);
 
@@ -155,13 +154,13 @@ public class PostServiceImpl implements PostService {
     public Result<PageResult<PostResponse>> getUserPosts(Long userId, Integer page, Integer size) {
         PageRequest pageable = PageRequest.of(page - 1, size);
         Page<PostResponse> responsePage = postRepository.findUserPostsVO(userId, pageable);
-        
+
         PageResult<PostResponse> pageResult = new PageResult<>(
-            page,
-            size,
-            responsePage.getTotalElements(),
-            responsePage.getTotalPages(),
-            responsePage.getContent()
+                page,
+                size,
+                responsePage.getTotalElements(),
+                responsePage.getTotalPages(),
+                responsePage.getContent()
         );
 
         return Result.ok(pageResult);
@@ -177,5 +176,5 @@ public class PostServiceImpl implements PostService {
         Page<RecentPostResponse> page = postRepository.findRecentPostsVO(spotId, pageable);
         return Result.ok(page.getContent());
     }
-    
+
 }

@@ -66,3 +66,49 @@ out to discuss the next tasks.",,
 2/10/26,8.7,Other,Completed the Project Details Survey.,,"So many questions, it’s exhausting."
 2/11/26,1.2,Coding,"Fix the post creation logic and asynchronously 
 update the spot rating.",,
+2/11/26,0.15,Documentation,"Synced all local changes, including the updated 
+timelog.csv, to the remote GitHub repository.",,
+2/12/26,4.6,Coding,"Implemented getUserPosts, getRecentPosts, 
+SpotReviewList, and createSpotReview to handle 
+user posts, recent posts for a spot, paginated spot 
+reviews, and creating new reviews.",,
+2/12/26,0.1,Documentation,Synced all local changes to the remote GitHub repository.,,
+2/12/26,0.2,Documentation,Updated the project management board.,,
+2/14/26,5.6,Documentation,Create project slides.,,
+2/14/26,3.2,Documentation,Refine the PPT,,
+2/16/26,2.3,Coding,"Implemented an API for liking and unliking posts and 
+another API to retrieve all posts liked by the current 
+user for the Profile page (“My Likes”).",,
+2/16/26,0.1,Documentation,Synced all local changes to the remote GitHub repository.,,
+2/16/26,1.3,Documentation,"Analyzed the frontend project structure based on 
+the current backend project structure.",,
+2/17/26,0.6,Supervisor Discussion,"Discuss the project progress and upcoming tasks 
+with my supervisor.",,
+2/18/26,1.5,Design,"Reanalyzed the frontend structure to better match 
+the backend API design.",,
+2/18/26,1,Design,"Planned a feature-based modular structure for 
+the frontend application.",,
+2/18/26,3.6,Coding,"Set up the skeleton of the frontend project, 
+including all module folders and placeholder files.
+(no implementation yet).",,
+2/18/26,0.1,Documentation,Synced all local changes to the remote GitHub repository.,,
+2/19/26,0.4,Coding,Implemented the image upload API,,
+2/19/26,4.2,Coding,"Set up the core network and global state: created a 
+reusable Axios instance and a persistent Zustand store 
+to handle user info and token, with login/logout support.",,
+2/19/26,5.5,Coding,"Set up API types and request functions: created 
+TypeScript types and Axios functions for all done endpoints.",,
+2/20/26,7.8,Coding,"Set up routing, layout, and auth: built the basic app 
+structure with sidebar and search bar, and implemented 
+login/register with API connection and token handling.",,
+2/20/26,0.15,Documentation,Updated the project management board.,,
+2/23/26,7.3,Coding,"Built the Discover page: implemented the category filter, 
+post feed with data fetching, and post detail modal 
+(likes and comments are currently static placeholders).",,
+2/26/26,7.2,Coding,"Built the two-step post creation flow with image upload 
+and spot selection, and connected it to the backend for 
+post submission and redirect.",,
+2/28/26,0.4,Supervisor Discussion,"Discuss the project progress and upcoming tasks 
+with my supervisor.",,
+2/28/26,0.1,Documentation,Updated the project management board.,,
+2/28/26,0.2,Documentation,Synced all local changes to the remote GitHub repository.,,

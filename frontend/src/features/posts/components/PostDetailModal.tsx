@@ -169,7 +169,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ postId, visibl
                     {post.spotName || 'View Location'}
                   </div>
                   <span className="score">
-                    {post.spotScore || 5.0} ★
+                    {post.rating || 5.0} ★
                   </span>
                 </div>
               </div>

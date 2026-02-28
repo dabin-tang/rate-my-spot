@@ -3,7 +3,9 @@ package com.ratemyspot.service.impl;
 import com.ratemyspot.dto.SpotRatingDTO;
 import com.ratemyspot.entity.Spot;
 import com.ratemyspot.exception.BusinessException;
+import com.ratemyspot.repository.PostRepository;
 import com.ratemyspot.repository.SpotRepository;
+import com.ratemyspot.repository.SpotReviewRepository;
 import com.ratemyspot.response.PageResult;
 import com.ratemyspot.response.SpotResponse;
 import com.ratemyspot.service.SpotService;
@@ -15,6 +17,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import com.ratemyspot.util.CacheUtil;
 import org.springframework.scheduling.annotation.Async;
@@ -32,27 +35,27 @@ import java.util.stream.Collectors;
 public class SpotServiceImpl implements SpotService {
 
     private final SpotRepository spotRepository;
-    private final com.ratemyspot.repository.PostRepository postRepository;
-    private final com.ratemyspot.repository.SpotReviewRepository spotReviewRepository;
+    private final PostRepository postRepository;
+    private final SpotReviewRepository spotReviewRepository;
     private final CacheUtil cacheUtil;
-    private final org.springframework.data.redis.core.RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     /**
      * Retrieves a paginated list of spots with dynamic sorting strategies.
      */
     @Override
     public Result<PageResult<SpotResponse>> getSpotList(Long categoryId, String sort, Double lat, Double lon, Integer page) {
-        Pageable pageable = PageRequest.of(page - 1, 20); // Page is 1-indexed in API, 0-indexed in JPA
+        Pageable pageable = PageRequest.of(page - 1, 20); 
         Page<Spot> spotPage;
 
         if ("distance".equalsIgnoreCase(sort)) {
-            // Sort by distance using custom JPQL
+            // Sort by distance 
             spotPage = spotRepository.findByFilterOrderByDistance(categoryId, lat, lon, pageable);
         } else if ("score".equalsIgnoreCase(sort)) {
             // Sort by score descending
             spotPage = spotRepository.findByFilterOrderByScore(categoryId, pageable);
         } else {
-            // Default sort (e.g. by ID)
+            // Default sort 
             spotPage = spotRepository.findByFilterDefault(categoryId, pageable);
         }
 

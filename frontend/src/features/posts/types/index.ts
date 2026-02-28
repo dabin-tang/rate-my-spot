@@ -15,7 +15,7 @@ export interface PostResponse {
   spotId: number;
   spotName?: string;
   userId: number;
-  spotScore: number;
+  rating: number;
   userNickname: string;
   userIcon: string;
   liked: number;
