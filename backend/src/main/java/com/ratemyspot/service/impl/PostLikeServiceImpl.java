@@ -31,37 +31,38 @@ public class PostLikeServiceImpl implements PostLikeService {
 
     /**
      * Toggle like status for a post.
+     * Cache strategy: Redis Set (cache:post:likes:{postId}) stores all userId who liked the post.
+     * Priority: check cache first → operate DB → sync cache.
      */
     @Override
     @Transactional
     public Result<Void> toggle(Long postId) {
-        // 1. Get current user
         Long userId = UserContext.getCurrentUserId();
-        
-        // 2. Check if already liked
-        boolean isLiked = postLikeRepository.existsByUserIdAndPostId(userId, postId);
+        String likesKey = Constants.CACHE_POST_LIKES_KEY + postId;
 
-        if (isLiked) {
-            // 3. If Liked -> Unlike
-            // 3.1 Delete record
+        // 1. Check like status from Redis Set first (avoids DB query)
+        Boolean isLiked = redisTemplate.opsForSet().isMember(likesKey, userId);
+
+        if (Boolean.TRUE.equals(isLiked)) {
+            // 2. Unlike: delete record from DB, decrement liked count
             postLikeRepository.deleteByUserIdAndPostId(userId, postId);
-            // 3.2 Decrement post liked count
             postRepository.decrementLiked(postId);
+            // Sync cache: remove userId from the Set
+            redisTemplate.opsForSet().remove(likesKey, userId);
         } else {
-            // 4. If Not Liked -> Like
-            // 4.1 Create record
+            // 3. Like: insert record into DB, increment liked count
             PostLike postLike = new PostLike();
             postLike.setPostId(postId)
                     .setUserId(userId)
                     .setCreateTime(LocalDateTime.now());
             postLikeRepository.save(postLike);
-            // 4.2 Increment post liked count
             postRepository.incrementLiked(postId);
+            // Sync cache: add userId to the Set
+            redisTemplate.opsForSet().add(likesKey, userId);
         }
 
-        // 5. Clear Cache (Post Detail Cache)
-        String cacheKey = Constants.CACHE_POST_KEY + postId;
-        redisTemplate.delete(cacheKey);
+        // 4. Delete post detail cache to keep liked count consistent
+        redisTemplate.delete(Constants.CACHE_POST_KEY + postId);
 
         return Result.ok();
     }

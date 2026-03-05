@@ -1,8 +1,6 @@
 package com.ratemyspot.service.impl;
 
 import com.ratemyspot.dto.PostCreateDTO;
-import com.ratemyspot.repository.FollowRepository;
-import com.ratemyspot.repository.PostLikeRepository;
 import com.ratemyspot.dto.PostFeedRequestDTO;
 import com.ratemyspot.response.PageResult;
 import com.ratemyspot.response.PostResponse;
@@ -20,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -35,10 +34,9 @@ import java.util.concurrent.TimeUnit;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
-    private final PostLikeRepository postLikeRepository;
-    private final FollowRepository followRepository;
     private final CacheUtil cacheUtil;
     private final SpotService spotService;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     /**
      * Get post details.
@@ -66,12 +64,12 @@ public class PostServiceImpl implements PostService {
             return Result.fail(Constants.ERR_POST_NOT_FOUND);
         }
 
-        // Set the current Like and Follow status
+        // Check like and follow status from Redis Sets
         if (userId != null) {
-            boolean isLiked = postLikeRepository.existsByUserIdAndPostId(userId, id);
-            boolean isFollow = followRepository.existsByUserIdAndFollowUserId(userId, response.getUserId());
-            response.setIsLiked(isLiked);
-            response.setIsFollow(isFollow);
+            Boolean liked = redisTemplate.opsForSet().isMember(Constants.CACHE_POST_LIKES_KEY + id, userId);
+            Boolean follow = redisTemplate.opsForSet().isMember(Constants.CACHE_USER_FOLLOWING_KEY + userId, response.getUserId());
+            response.setIsLiked(Boolean.TRUE.equals(liked));
+            response.setIsFollow(Boolean.TRUE.equals(follow));
         }
 
         return Result.ok(response);

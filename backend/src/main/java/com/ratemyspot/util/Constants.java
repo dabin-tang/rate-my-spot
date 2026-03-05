@@ -21,6 +21,16 @@ public class Constants {
     public static final String CACHE_POST_KEY = "cache:post:";
     public static final Long CACHE_POST_TTL = 30L; // Minutes
 
+    // Post Comment Tree Cache
+    public static final String CACHE_POST_COMMENTS_KEY = "cache:post:comments:";
+    public static final Long CACHE_POST_COMMENTS_TTL = 10L; // Minutes
+
+    // Post Like Set Cache (Redis Set: members = userIds who liked the post)
+    public static final String CACHE_POST_LIKES_KEY = "cache:post:likes:";
+
+    // Follow Set Cache (Redis Set: members = followUserId that current user follows)
+    public static final String CACHE_USER_FOLLOWING_KEY = "cache:user:following:";
+
     // Email Config (Temporary, ideally in application.yml)
     public static final String EMAIL_FROM = "your-email@gmail.com";
     public static final String EMAIL_SUBJECT = "Rate My Spot Verification Code";
@@ -43,4 +53,7 @@ public class Constants {
     public static final String ERR_USER_NOT_FOUND = "User not found";
     public static final String ERR_SPOT_NOT_FOUND = "Spot not found";
     public static final String ERR_POST_NOT_FOUND = "Post not found or unavailable";
+    public static final String ERR_COMMENT_NOT_FOUND = "Comment not found";
+    public static final String ERR_COMMENT_NO_PERMISSION = "No permission to delete this comment";
+    public static final String ERR_FOLLOW_SELF = "You cannot follow yourself";
 }
