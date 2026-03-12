@@ -31,8 +31,6 @@ public class PostLikeServiceImpl implements PostLikeService {
 
     /**
      * Toggle like status for a post.
-     * Cache strategy: Redis Set (cache:post:likes:{postId}) stores all userId who liked the post.
-     * Priority: check cache first → operate DB → sync cache.
      */
     @Override
     @Transactional
@@ -40,14 +38,14 @@ public class PostLikeServiceImpl implements PostLikeService {
         Long userId = UserContext.getCurrentUserId();
         String likesKey = Constants.CACHE_POST_LIKES_KEY + postId;
 
-        // 1. Check like status from Redis Set first (avoids DB query)
+        // 1. Check like status from Redis Set first
         Boolean isLiked = redisTemplate.opsForSet().isMember(likesKey, userId);
 
         if (Boolean.TRUE.equals(isLiked)) {
             // 2. Unlike: delete record from DB, decrement liked count
             postLikeRepository.deleteByUserIdAndPostId(userId, postId);
             postRepository.decrementLiked(postId);
-            // Sync cache: remove userId from the Set
+            // remove userId from the Redis like set
             redisTemplate.opsForSet().remove(likesKey, userId);
         } else {
             // 3. Like: insert record into DB, increment liked count
@@ -57,7 +55,7 @@ public class PostLikeServiceImpl implements PostLikeService {
                     .setCreateTime(LocalDateTime.now());
             postLikeRepository.save(postLike);
             postRepository.incrementLiked(postId);
-            // Sync cache: add userId to the Set
+            // add userId to the Redis like set
             redisTemplate.opsForSet().add(likesKey, userId);
         }
 

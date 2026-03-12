@@ -18,6 +18,12 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     /** Delete the follow relationship between two users. */
     void deleteByUserIdAndFollowUserId(Long userId, Long followUserId);
 
+    /** Count the number of followers for a given user. */
+    long countByFollowUserId(Long followUserId);
+
+    /** Count the number of users a given user is following. */
+    long countByUserId(Long userId);
+
     /** Get paginated list of followers for a given user using Constructor Projection. */
     @Query("SELECT new com.ratemyspot.response.UserResponse(" +
             "u.id, u.nickname, u.icon, u.city, u.intro) " +

@@ -33,8 +33,6 @@ public class PostCommentServiceImpl implements PostCommentService {
 
     /**
      * Get all comments for a post and assemble them into a Parent→Children tree structure.
-     * @param postId
-     * @return
      */
     @Override
     public Result<List<PostCommentResponse>> getPostCommentTree(Long postId) {

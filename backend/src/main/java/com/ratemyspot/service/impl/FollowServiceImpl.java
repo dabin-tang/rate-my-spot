@@ -29,8 +29,6 @@ public class FollowServiceImpl implements FollowService {
 
     /**
      * Toggle follow status for a target user.
-     * Cache strategy: Redis Set (cache:user:following:{userId}) stores all followUserIds the current user follows.
-     * Priority: check cache first → operate DB → sync cache.
      */
     @Override
     @Transactional
@@ -47,18 +45,18 @@ public class FollowServiceImpl implements FollowService {
         Boolean isFollowing = redisTemplate.opsForSet().isMember(followingKey, targetUserId);
 
         if (Boolean.TRUE.equals(isFollowing)) {
-            // 2. Unfollow: delete record from DB, decrement target user's followers count
+            // 2. Unfollow: delete record from DB
             followRepository.deleteByUserIdAndFollowUserId(currentUserId, targetUserId);
-            // delete cache
+            // remove from Redis Set
             redisTemplate.opsForSet().remove(followingKey, targetUserId);
         } else {
-            // 3. Follow: insert record into DB, increment target user's followers count
+            // 3. Follow: insert record into DB
             Follow follow = new Follow();
             follow.setUserId(currentUserId)
                     .setFollowUserId(targetUserId)
                     .setCreateTime(LocalDateTime.now());
             followRepository.save(follow);
-            // delete cache
+            // add to Redis Set
             redisTemplate.opsForSet().add(followingKey, targetUserId);
         }
 

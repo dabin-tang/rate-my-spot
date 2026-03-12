@@ -17,6 +17,23 @@ import java.time.LocalDateTime;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
 
+    /** Count posts created after a given timestamp (used for daily post stats). */
+    long countByCreateTimeAfter(LocalDateTime dateTime);
+
+    /**
+     * Find all posts for admin review (no status filter), ordered by create time DESC.
+     */
+    @Query("SELECT new com.ratemyspot.response.PostResponse(" +
+            "p.id, p.spotId, p.userId, p.userNickname, p.userIcon, " +
+            "p.title, p.content, p.images, p.rating, p.liked, " +
+            "p.status, p.createTime, p.updateTime, " +
+            "s.name, c.name) " +
+            "FROM Post p " +
+            "LEFT JOIN Spot s ON p.spotId = s.id " +
+            "LEFT JOIN SpotCategory c ON s.categoryId = c.id " +
+            "ORDER BY p.createTime DESC")
+    Page<PostResponse> findAllForAdmin(Pageable pageable);
+
     /**
      * Find post feed sorted by latest (create_time DESC).
      */
