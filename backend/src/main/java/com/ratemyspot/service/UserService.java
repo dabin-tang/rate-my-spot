@@ -4,6 +4,7 @@ import com.ratemyspot.dto.UserDTO;
 import com.ratemyspot.dto.UserLoginDTO;
 import com.ratemyspot.dto.UserRegisterDTO;
 import com.ratemyspot.entity.User;
+import com.ratemyspot.response.UserProfileResponse;
 import com.ratemyspot.util.Result;
 
 import java.util.Map;
@@ -78,4 +79,12 @@ public interface UserService {
      * @return Result with success message
      */
     Result<String> logout();
+
+    /**
+     * Get the public profile information of the target user.
+     *
+     * @param targetUserId The ID of the user whose profile is to be retrieved
+     * @return Result containing the UserProfileResponse
+     */
+    Result<UserProfileResponse> getUserProfile(Long targetUserId);
 }

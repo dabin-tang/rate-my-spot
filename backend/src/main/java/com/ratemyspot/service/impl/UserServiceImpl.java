@@ -5,12 +5,15 @@ import com.ratemyspot.dto.UserLoginDTO;
 import com.ratemyspot.dto.UserRegisterDTO;
 import com.ratemyspot.entity.User;
 import com.ratemyspot.exception.BusinessException;
+import com.ratemyspot.repository.FollowRepository;
 import com.ratemyspot.repository.UserRepository;
+import com.ratemyspot.response.UserProfileResponse;
 import com.ratemyspot.service.UserService;
 import com.ratemyspot.util.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -31,6 +34,8 @@ public class UserServiceImpl implements UserService {
     private final JavaMailSender mailSender;
     private final StringRedisTemplate redisTemplate;
     private final UserRepository userRepository;
+    private final FollowRepository followRepository;
+    private final RedisTemplate<String, Object> redisTemplateObj;
     private final JwtUtil jwtUtil;
 
     // Generate 6-digit code
@@ -202,5 +207,30 @@ public class UserServiceImpl implements UserService {
     @Override
     public Result<String> logout() {
         return Result.ok(Constants.MSG_LOGOUT);
+    }
+
+    @Override
+    public Result<UserProfileResponse> getUserProfile(Long targetUserId) {
+        User targetUser = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new BusinessException(Constants.ERR_USER_NOT_FOUND));
+
+        UserProfileResponse response = new UserProfileResponse();
+        BeanUtils.copyProperties(targetUser, response);
+
+        // Fetch counts
+        long followersCount = followRepository.countByFollowUserId(targetUserId);
+        long followingCount = followRepository.countByUserId(targetUserId);
+        response.setFollowersCount(followersCount);
+        response.setFollowingCount(followingCount);
+
+        // Check if current user is following the target user from Redis Set cache
+        Long currentUserId = UserContext.getCurrentUserId();
+        if (currentUserId != null) {
+            String followingKey = Constants.CACHE_USER_FOLLOWING_KEY + currentUserId;
+            Boolean isFollowing = redisTemplateObj.opsForSet().isMember(followingKey, targetUserId);
+            response.setIsFollowing(Boolean.TRUE.equals(isFollowing));
+        }
+
+        return Result.ok(response);
     }
 }

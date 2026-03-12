@@ -4,9 +4,11 @@ import com.ratemyspot.dto.UserDTO;
 import com.ratemyspot.dto.UserLoginDTO;
 import com.ratemyspot.dto.UserRegisterDTO;
 import com.ratemyspot.entity.User;
+import com.ratemyspot.response.UserProfileResponse;
 import com.ratemyspot.service.UserService;
 import com.ratemyspot.util.Result;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -110,5 +112,20 @@ public class UserController {
     public Result<String> logout() {
         log.info("Request to logout user");
         return userService.logout();
+    }
+
+    /**
+     * Get the public profile information of a target user.
+     *
+     * @param id The ID of the target user
+     * @return Result containing UserProfileResponse
+     */
+    @Operation(summary = "Get User Public Profile")
+    @GetMapping("/{id}")
+    public Result<UserProfileResponse> getUserProfile(
+            @Parameter(description = "Target user ID", required = true)
+            @PathVariable("id") Long id) {
+        log.info("Request to get public profile for user: {}", id);
+        return userService.getUserProfile(id);
     }
 }
