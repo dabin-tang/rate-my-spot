@@ -177,4 +177,23 @@ CREATE TABLE `post_like` (
                              UNIQUE KEY `idx_user_like` (`user_id`, `post_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Track user likes on posts';
 
+-- 10. Table: report
+-- Description: User reports for content moderation (Posts, Comments, Reviews).
+
+DROP TABLE IF EXISTS `report`;
+CREATE TABLE `report` (
+                          `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
+                          `user_id` bigint(20) UNSIGNED NOT NULL COMMENT 'Foreign Key: User ID (Who reported it)',
+                          `target_type` varchar(32) NOT NULL COMMENT 'Type of content: POST, COMMENT, or REVIEW',
+                          `target_id` bigint(20) UNSIGNED NOT NULL COMMENT 'ID of the reported content',
+                          `reason` varchar(255) NOT NULL COMMENT 'Reason for reporting (e.g., Spam, Inappropriate)',
+                          `status` tinyint(1) UNSIGNED DEFAULT 0 COMMENT '0: Pending, 1: Resolved (Deleted), 2: Rejected (Ignored)',
+                          `admin_remark` varchar(255) DEFAULT NULL COMMENT 'Note from admin after handling the report',
+                          `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Report submitted time',
+                          `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Report handled time',
+                          PRIMARY KEY (`id`),
+                          KEY `idx_status` (`status`),
+                          KEY `idx_target` (`target_type`, `target_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='User reports for content moderation';
+
 SET FOREIGN_KEY_CHECKS = 1;
