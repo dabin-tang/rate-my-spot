@@ -43,6 +43,7 @@ public class Constants {
     public static final String MSG_LOGOUT = "Logged out successfully";
     public static final String MSG_SPOT_DELETED = "Spot deleted successfully";
     public static final String MSG_USER_STATUS_UPDATED = "User status updated successfully";
+    public static final String MSG_POST_DELETED = "Post deleted successfully";
 
     // Error Messages
     public static final String ERR_EMAIL_EXISTS = "Email is already registered";

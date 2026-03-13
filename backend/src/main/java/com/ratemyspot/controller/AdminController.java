@@ -204,4 +204,19 @@ public class AdminController {
             @RequestParam(defaultValue = "10") Integer size) {
         return adminService.getPostList(page, size);
     }
+
+    /**
+     * Force delete a post that violates community guidelines.
+     *
+     * @param id Target post ID
+     * @return Result with success or failure message
+     */
+    @DeleteMapping("/post/{id}")
+    @Operation(summary = "Force Delete Post (Admin)")
+    public Result<String> deletePost(
+            @Parameter(description = "Target post ID", required = true)
+            @PathVariable("id") Long id) {
+        log.info("Admin force delete post: id={}", id);
+        return adminService.deletePost(id);
+    }
 }

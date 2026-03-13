@@ -52,4 +52,7 @@ public interface AdminService {
 
     /** Get paginated post list for admin review (all statuses). */
     Result<PageResult<PostResponse>> getPostList(Integer page, Integer size);
+
+    /** Force delete a post by ID. */
+    Result<String> deletePost(Long postId);
 }

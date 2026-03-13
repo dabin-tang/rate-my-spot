@@ -252,4 +252,18 @@ public class AdminServiceImpl implements AdminService {
         );
         return Result.ok(result);
     }
+
+    /**
+     * Force delete a post by ID.
+     */
+    @Override
+    @Transactional
+    public Result<String> deletePost(Long postId) {
+        // Verify that the post exists before deleting
+        if (!postRepository.existsById(postId)) {
+            return Result.fail(Constants.ERR_POST_NOT_FOUND);
+        }
+        postRepository.deleteById(postId);
+        return Result.ok(Constants.MSG_POST_DELETED);
+    }
 }
