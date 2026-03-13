@@ -5,6 +5,7 @@ import com.ratemyspot.dto.AdminUserQueryDTO;
 import com.ratemyspot.dto.SpotCategoryUpdateDTO;
 import com.ratemyspot.dto.SpotCreateDTO;
 import com.ratemyspot.entity.SpotCategory;
+import com.ratemyspot.entity.Report;
 import com.ratemyspot.response.AdminCommentResponse;
 import com.ratemyspot.response.AdminStatsResponse;
 import com.ratemyspot.response.AdminUserResponse;
@@ -69,4 +70,7 @@ public interface AdminService {
 
     /** Force delete a spot review by ID. */
     Result<String> deleteSpotReview(Long reviewId);
+
+    /** Get paginated report list with optional status filter. */
+    Result<PageResult<Report>> getReportList(Integer status, Integer page, Integer size);
 }

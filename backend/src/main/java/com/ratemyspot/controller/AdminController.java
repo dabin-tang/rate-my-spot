@@ -5,6 +5,7 @@ import com.ratemyspot.dto.AdminUserQueryDTO;
 import com.ratemyspot.dto.SpotCategoryUpdateDTO;
 import com.ratemyspot.dto.SpotCreateDTO;
 import com.ratemyspot.entity.SpotCategory;
+import com.ratemyspot.entity.Report;
 import com.ratemyspot.response.AdminCommentResponse;
 import com.ratemyspot.response.AdminStatsResponse;
 import com.ratemyspot.response.AdminUserResponse;
@@ -286,5 +287,22 @@ public class AdminController {
             @PathVariable("id") Long id) {
         log.info("Admin force delete spot review: id={}", id);
         return adminService.deleteSpotReview(id);
+    }
+
+    /**
+     * Get paginated report list for admin handling.
+     *
+     * @param status Optional status filter (0:Pending, 1:Resolved, 2:Rejected)
+     * @param page   Page number, starts from 1 (default: 1)
+     * @param size   Page size (default: 10)
+     * @return Paginated list of ReportResponse
+     */
+    @GetMapping("/report/list")
+    @Operation(summary = "Get Report List (Admin)")
+    public Result<PageResult<Report>> getReportList(
+            @RequestParam(required = false) Integer status,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+        return adminService.getReportList(status, page, size);
     }
 }

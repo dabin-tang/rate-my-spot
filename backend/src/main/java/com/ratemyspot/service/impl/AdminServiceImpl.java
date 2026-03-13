@@ -5,12 +5,14 @@ import com.ratemyspot.dto.AdminUserQueryDTO;
 import com.ratemyspot.dto.SpotCategoryUpdateDTO;
 import com.ratemyspot.dto.SpotCreateDTO;
 import com.ratemyspot.entity.Admin;
+import com.ratemyspot.entity.Report;
 import com.ratemyspot.entity.Spot;
 import com.ratemyspot.entity.SpotCategory;
 import com.ratemyspot.exception.BusinessException;
 import com.ratemyspot.repository.AdminRepository;
 import com.ratemyspot.repository.PostCommentRepository;
 import com.ratemyspot.repository.PostRepository;
+import com.ratemyspot.repository.ReportRepository;
 import com.ratemyspot.repository.SpotCategoryRepository;
 import com.ratemyspot.repository.SpotRepository;
 import com.ratemyspot.repository.SpotReviewRepository;
@@ -56,6 +58,7 @@ public class AdminServiceImpl implements AdminService {
     private final SpotCategoryRepository spotCategoryRepository;
     private final SpotReviewRepository spotReviewRepository;
     private final SpotReviewService spotReviewService;
+    private final ReportRepository reportRepository;
     private final JwtUtil jwtUtil;
 
     /**
@@ -333,5 +336,23 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public Result<String> deleteSpotReview(Long reviewId) {
         return spotReviewService.deleteReview(reviewId);
+    }
+
+    /**
+     * Get paginated report list with optional status filter.
+     */
+    @Override
+    public Result<PageResult<Report>> getReportList(Integer status, Integer page, Integer size) {
+        PageRequest pageable = PageRequest.of(page - 1, size);
+        Page<Report> pageData = (status == null)
+                ? reportRepository.findAllByOrderByCreateTimeDesc(pageable)
+                : reportRepository.findByStatusOrderByCreateTimeDesc(status, pageable);
+        PageResult<Report> result = new PageResult<>(
+                page, size,
+                pageData.getTotalElements(),
+                pageData.getTotalPages(),
+                pageData.getContent()
+        );
+        return Result.ok(result);
     }
 }
