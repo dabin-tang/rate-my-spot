@@ -15,6 +15,7 @@ import com.ratemyspot.repository.SpotCategoryRepository;
 import com.ratemyspot.repository.SpotRepository;
 import com.ratemyspot.repository.SpotReviewRepository;
 import com.ratemyspot.repository.UserRepository;
+import com.ratemyspot.service.SpotReviewService;
 import com.ratemyspot.response.AdminCommentResponse;
 import com.ratemyspot.response.AdminStatsResponse;
 import com.ratemyspot.response.AdminUserResponse;
@@ -54,6 +55,7 @@ public class AdminServiceImpl implements AdminService {
     private final SpotRepository spotRepository;
     private final SpotCategoryRepository spotCategoryRepository;
     private final SpotReviewRepository spotReviewRepository;
+    private final SpotReviewService spotReviewService;
     private final JwtUtil jwtUtil;
 
     /**
@@ -322,5 +324,14 @@ public class AdminServiceImpl implements AdminService {
                 pageData.getContent()
         );
         return Result.ok(result);
+    }
+
+    /**
+     * Force delete a spot review by ID.
+     * Delegates to SpotReviewService.deleteReview which handles cache and rating update.
+     */
+    @Override
+    public Result<String> deleteSpotReview(Long reviewId) {
+        return spotReviewService.deleteReview(reviewId);
     }
 }

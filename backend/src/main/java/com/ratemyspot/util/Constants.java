@@ -45,6 +45,7 @@ public class Constants {
     public static final String MSG_USER_STATUS_UPDATED = "User status updated successfully";
     public static final String MSG_POST_DELETED = "Post deleted successfully";
     public static final String MSG_COMMENT_DELETED = "Comment deleted successfully";
+    public static final String MSG_REVIEW_DELETED = "Review deleted successfully";
 
     // Error Messages
     public static final String ERR_EMAIL_EXISTS = "Email is already registered";
@@ -59,6 +60,7 @@ public class Constants {
     public static final String ERR_CATEGORY_NOT_FOUND = "Spot category not found";
     public static final String ERR_POST_NOT_FOUND = "Post not found or unavailable";
     public static final String ERR_COMMENT_NOT_FOUND = "Comment not found";
+    public static final String ERR_REVIEW_NOT_FOUND = "Review not found";
     public static final String ERR_COMMENT_NO_PERMISSION = "No permission to delete this comment";
     public static final String ERR_FOLLOW_SELF = "You cannot follow yourself";
 }

@@ -66,4 +66,7 @@ public interface AdminService {
 
     /** Get paginated spot review list for admin review (optional spotReviewId filter). */
     Result<PageResult<SpotReviewResponse>> getSpotReviewList(Long spotReviewId, Integer page, Integer size);
+
+    /** Force delete a spot review by ID. */
+    Result<String> deleteSpotReview(Long reviewId);
 }

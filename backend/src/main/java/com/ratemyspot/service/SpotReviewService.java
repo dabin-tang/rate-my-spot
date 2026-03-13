@@ -18,4 +18,7 @@ public interface SpotReviewService {
      * Create a new spot review.
      */
     Result<SpotReviewResponse> createSpotReview(com.ratemyspot.dto.SpotReviewCreateDTO dto);
+
+    /** Force delete a review by ID (admin, bypasses ownership check). Updates spot rating after deletion. */
+    Result<String> deleteReview(Long reviewId);
 }

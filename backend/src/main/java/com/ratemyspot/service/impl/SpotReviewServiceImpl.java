@@ -4,6 +4,7 @@ import com.ratemyspot.dto.SpotReviewCreateDTO;
 import com.ratemyspot.dto.SpotReviewPageReq;
 import com.ratemyspot.dto.UserDTO;
 import com.ratemyspot.entity.SpotReview;
+import com.ratemyspot.exception.BusinessException;
 import com.ratemyspot.response.PageResult;
 import com.ratemyspot.response.SpotReviewResponse;
 import com.ratemyspot.repository.SpotReviewRepository;
@@ -129,5 +130,32 @@ public class SpotReviewServiceImpl implements SpotReviewService {
             page.getTotalPages(),
             page.getContent()
         );
+    }
+
+    /**
+     * Force delete a review by ID (admin). Updates spot rating after deletion.
+     */
+    @Override
+    @Transactional
+    public Result<String> deleteReview(Long reviewId) {
+        // Verify the review exists
+        SpotReview review = spotReviewRepository.findById(reviewId)
+                .orElseThrow(() -> new BusinessException(Constants.ERR_REVIEW_NOT_FOUND));
+        Long spotId = review.getSpotId();
+        // Delete the review
+        spotReviewRepository.deleteById(reviewId);
+        // Invalidate first-page cache for this spot's reviews
+        String cacheKey = Constants.CACHE_SPOT_REVIEW_KEY + spotId + ":p1";
+        redisTemplate.delete(cacheKey);
+        // Async update spot rating after commit
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        spotService.updateSpotRatingAsync(spotId);
+                    }
+                }
+        );
+        return Result.ok(Constants.MSG_REVIEW_DELETED);
     }
 }

@@ -272,4 +272,19 @@ public class AdminController {
             @RequestParam(defaultValue = "10") Integer size) {
         return adminService.getSpotReviewList(spotReviewId, page, size);
     }
+
+    /**
+     * Force delete a spot review that is malicious or fake.
+     *
+     * @param id Target review ID
+     * @return Result with success or failure message
+     */
+    @DeleteMapping("/spot-review/{id}")
+    @Operation(summary = "Force Delete Spot Review (Admin)")
+    public Result<String> deleteSpotReview(
+            @Parameter(description = "Target review ID", required = true)
+            @PathVariable("id") Long id) {
+        log.info("Admin force delete spot review: id={}", id);
+        return adminService.deleteSpotReview(id);
+    }
 }
