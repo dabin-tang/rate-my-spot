@@ -9,10 +9,12 @@ import com.ratemyspot.entity.Spot;
 import com.ratemyspot.entity.SpotCategory;
 import com.ratemyspot.exception.BusinessException;
 import com.ratemyspot.repository.AdminRepository;
+import com.ratemyspot.repository.PostCommentRepository;
 import com.ratemyspot.repository.PostRepository;
 import com.ratemyspot.repository.SpotCategoryRepository;
 import com.ratemyspot.repository.SpotRepository;
 import com.ratemyspot.repository.UserRepository;
+import com.ratemyspot.response.AdminCommentResponse;
 import com.ratemyspot.response.AdminStatsResponse;
 import com.ratemyspot.response.AdminUserResponse;
 import com.ratemyspot.response.PageResult;
@@ -46,6 +48,7 @@ public class AdminServiceImpl implements AdminService {
     private final AdminRepository adminRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    private final PostCommentRepository postCommentRepository;
     private final SpotRepository spotRepository;
     private final SpotCategoryRepository spotCategoryRepository;
     private final JwtUtil jwtUtil;
@@ -265,5 +268,23 @@ public class AdminServiceImpl implements AdminService {
         }
         postRepository.deleteById(postId);
         return Result.ok(Constants.MSG_POST_DELETED);
+    }
+
+    /**
+     * Get paginated comment list with optional postId and keyword filters.
+     */
+    @Override
+    public Result<PageResult<AdminCommentResponse>> getCommentList(Long postId, String keyword, Integer page, Integer size) {
+        // Convert empty strings to null so JPQL treats them as no filter
+        String keywordFilter = (keyword == null || keyword.isBlank()) ? null : keyword;
+        PageRequest pageable = PageRequest.of(page - 1, size);
+        Page<AdminCommentResponse> pageData = postCommentRepository.findAllForAdmin(postId, keywordFilter, pageable);
+        PageResult<AdminCommentResponse> result = new PageResult<>(
+                page, size,
+                pageData.getTotalElements(),
+                pageData.getTotalPages(),
+                pageData.getContent()
+        );
+        return Result.ok(result);
     }
 }

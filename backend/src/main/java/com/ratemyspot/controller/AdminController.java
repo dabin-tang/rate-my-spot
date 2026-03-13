@@ -5,6 +5,7 @@ import com.ratemyspot.dto.AdminUserQueryDTO;
 import com.ratemyspot.dto.SpotCategoryUpdateDTO;
 import com.ratemyspot.dto.SpotCreateDTO;
 import com.ratemyspot.entity.SpotCategory;
+import com.ratemyspot.response.AdminCommentResponse;
 import com.ratemyspot.response.AdminStatsResponse;
 import com.ratemyspot.response.AdminUserResponse;
 import com.ratemyspot.response.PageResult;
@@ -218,5 +219,24 @@ public class AdminController {
             @PathVariable("id") Long id) {
         log.info("Admin force delete post: id={}", id);
         return adminService.deletePost(id);
+    }
+
+    /**
+     * Get paginated comment list for admin content review.
+     *
+     * @param postId  Optional post ID to filter comments under a specific post
+     * @param keyword Optional keyword to fuzzy search comment content
+     * @param page    Page number, starts from 1 (default: 1)
+     * @param size    Page size (default: 10)
+     * @return Paginated list of AdminCommentResponse
+     */
+    @GetMapping("/post-comment/list")
+    @Operation(summary = "Get Comment List (Admin)")
+    public Result<PageResult<AdminCommentResponse>> getCommentList(
+            @RequestParam(required = false) Long postId,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+        return adminService.getCommentList(postId, keyword, page, size);
     }
 }

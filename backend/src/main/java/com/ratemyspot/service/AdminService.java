@@ -5,6 +5,7 @@ import com.ratemyspot.dto.AdminUserQueryDTO;
 import com.ratemyspot.dto.SpotCategoryUpdateDTO;
 import com.ratemyspot.dto.SpotCreateDTO;
 import com.ratemyspot.entity.SpotCategory;
+import com.ratemyspot.response.AdminCommentResponse;
 import com.ratemyspot.response.AdminStatsResponse;
 import com.ratemyspot.response.AdminUserResponse;
 import com.ratemyspot.response.PageResult;
@@ -55,4 +56,7 @@ public interface AdminService {
 
     /** Force delete a post by ID. */
     Result<String> deletePost(Long postId);
+
+    /** Get paginated comment list with optional postId and keyword filters. */
+    Result<PageResult<AdminCommentResponse>> getCommentList(Long postId, String keyword, Integer page, Integer size);
 }
