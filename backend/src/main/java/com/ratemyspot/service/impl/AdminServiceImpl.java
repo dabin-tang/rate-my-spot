@@ -2,6 +2,7 @@ package com.ratemyspot.service.impl;
 
 import com.ratemyspot.dto.AdminLoginDTO;
 import com.ratemyspot.dto.AdminUserQueryDTO;
+import com.ratemyspot.dto.ResolveReportDTO;
 import com.ratemyspot.dto.SpotCategoryUpdateDTO;
 import com.ratemyspot.dto.SpotCreateDTO;
 import com.ratemyspot.entity.Admin;
@@ -354,5 +355,52 @@ public class AdminServiceImpl implements AdminService {
                 pageData.getContent()
         );
         return Result.ok(result);
+    }
+
+    /**
+     * Resolve a report ticket.
+     * status=1(RESOLVED) → delete the content identified by report.targetType + report.targetId.
+     * status=2(REJECTED) → close the report without any content deletion.
+     */
+    @Override
+    @Transactional
+    public Result<String> resolveReport(Long reportId, ResolveReportDTO dto) {
+        Report report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new BusinessException(Constants.ERR_REPORT_NOT_FOUND));
+
+        int newStatus = dto.getStatus();
+
+        if (newStatus == Constants.REPORT_STATUS_RESOLVED) {
+            Long targetId = report.getTargetId();
+            // Determine what content to delete from the stored targetType
+            switch (report.getTargetType()) {
+                case "POST" -> {
+                    if (!postRepository.existsById(targetId)) {
+                        return Result.fail(Constants.ERR_POST_NOT_FOUND);
+                    }
+                    postRepository.deleteById(targetId);
+                }
+                case "COMMENT" -> {
+                    if (!postCommentRepository.existsById(targetId)) {
+                        return Result.fail(Constants.ERR_COMMENT_NOT_FOUND);
+                    }
+                    // Delete child replies first to avoid orphan records
+                    postCommentRepository.deleteAllByParentId(targetId);
+                    postCommentRepository.deleteById(targetId);
+                }
+                case "REVIEW" -> spotReviewService.deleteReview(targetId);
+                default -> {
+                    return Result.fail(Constants.ERR_INVALID_ACTION);
+                }
+            }
+        }
+        // status=REJECTED: no content action needed
+
+        report.setStatus(newStatus)
+              .setAdminRemark(dto.getAdminRemark())
+              .setUpdateTime(LocalDateTime.now());
+        reportRepository.save(report);
+
+        return Result.ok(Constants.MSG_REPORT_RESOLVED);
     }
 }

@@ -2,6 +2,7 @@ package com.ratemyspot.service;
 
 import com.ratemyspot.dto.AdminLoginDTO;
 import com.ratemyspot.dto.AdminUserQueryDTO;
+import com.ratemyspot.dto.ResolveReportDTO;
 import com.ratemyspot.dto.SpotCategoryUpdateDTO;
 import com.ratemyspot.dto.SpotCreateDTO;
 import com.ratemyspot.entity.SpotCategory;
@@ -73,4 +74,7 @@ public interface AdminService {
 
     /** Get paginated report list with optional status filter. */
     Result<PageResult<Report>> getReportList(Integer status, Integer page, Integer size);
+
+    /** Resolve a report ticket: execute action and update status + remark. */
+    Result<String> resolveReport(Long reportId, ResolveReportDTO dto);
 }

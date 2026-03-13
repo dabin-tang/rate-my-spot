@@ -2,6 +2,7 @@ package com.ratemyspot.controller;
 
 import com.ratemyspot.dto.AdminLoginDTO;
 import com.ratemyspot.dto.AdminUserQueryDTO;
+import com.ratemyspot.dto.ResolveReportDTO;
 import com.ratemyspot.dto.SpotCategoryUpdateDTO;
 import com.ratemyspot.dto.SpotCreateDTO;
 import com.ratemyspot.entity.SpotCategory;
@@ -304,5 +305,22 @@ public class AdminController {
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
         return adminService.getReportList(status, page, size);
+    }
+
+    /**
+     * Resolve a report ticket by executing the specified action.
+     *
+     * @param id  Target report ID
+     * @param dto Action (RESOLVE: delete content by targetType / REJECT: ignore) + admin remark
+     * @return Result with success or failure message
+     */
+    @PutMapping("/report/{id}/resolve")
+    @Operation(summary = "Resolve Report Ticket (Admin)")
+    public Result<String> resolveReport(
+            @Parameter(description = "Target report ID", required = true)
+            @PathVariable("id") Long id,
+            @RequestBody @Valid ResolveReportDTO dto) {
+        log.info("Admin resolve report: id={}, status={}", id, dto.getStatus());
+        return adminService.resolveReport(id, dto);
     }
 }

@@ -31,6 +31,11 @@ public class Constants {
     // Follow Set Cache (Redis Set: members = followUserId that current user follows)
     public static final String CACHE_USER_FOLLOWING_KEY = "cache:user:following:";
 
+    // Report Status
+    public static final int REPORT_STATUS_PENDING  = 0;
+    public static final int REPORT_STATUS_RESOLVED = 1; // Reported content deleted
+    public static final int REPORT_STATUS_REJECTED = 2; // Report ignored
+
     // Email Config (Temporary, ideally in application.yml)
     public static final String EMAIL_FROM = "your-email@gmail.com";
     public static final String EMAIL_SUBJECT = "Rate My Spot Verification Code";
@@ -46,6 +51,7 @@ public class Constants {
     public static final String MSG_POST_DELETED = "Post deleted successfully";
     public static final String MSG_COMMENT_DELETED = "Comment deleted successfully";
     public static final String MSG_REVIEW_DELETED = "Review deleted successfully";
+    public static final String MSG_REPORT_RESOLVED = "Report resolved successfully";
 
     // Error Messages
     public static final String ERR_EMAIL_EXISTS = "Email is already registered";
@@ -61,6 +67,8 @@ public class Constants {
     public static final String ERR_POST_NOT_FOUND = "Post not found or unavailable";
     public static final String ERR_COMMENT_NOT_FOUND = "Comment not found";
     public static final String ERR_REVIEW_NOT_FOUND = "Review not found";
+    public static final String ERR_REPORT_NOT_FOUND = "Report not found";
+    public static final String ERR_INVALID_ACTION = "Invalid action type";
     public static final String ERR_COMMENT_NO_PERMISSION = "No permission to delete this comment";
     public static final String ERR_FOLLOW_SELF = "You cannot follow yourself";
 }
