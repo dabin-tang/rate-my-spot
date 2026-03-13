@@ -239,4 +239,19 @@ public class AdminController {
             @RequestParam(defaultValue = "10") Integer size) {
         return adminService.getCommentList(postId, keyword, page, size);
     }
+
+    /**
+     * Force delete a comment and all its child replies.
+     *
+     * @param id Target comment ID
+     * @return Result with success or failure message
+     */
+    @DeleteMapping("/post-comment/{id}")
+    @Operation(summary = "Force Delete Comment (Admin)")
+    public Result<String> deleteComment(
+            @Parameter(description = "Target comment ID", required = true)
+            @PathVariable("id") Long id) {
+        log.info("Admin force delete comment: id={}", id);
+        return adminService.deleteComment(id);
+    }
 }

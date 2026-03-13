@@ -59,4 +59,7 @@ public interface AdminService {
 
     /** Get paginated comment list with optional postId and keyword filters. */
     Result<PageResult<AdminCommentResponse>> getCommentList(Long postId, String keyword, Integer page, Integer size);
+
+    /** Force delete a comment (and its child replies) by ID. */
+    Result<String> deleteComment(Long commentId);
 }

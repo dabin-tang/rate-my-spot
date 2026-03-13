@@ -287,4 +287,20 @@ public class AdminServiceImpl implements AdminService {
         );
         return Result.ok(result);
     }
+
+    /**
+     * Force delete a comment and its child replies by ID.
+     */
+    @Override
+    @Transactional
+    public Result<String> deleteComment(Long commentId) {
+        // Verify that the comment exists
+        if (!postCommentRepository.existsById(commentId)) {
+            return Result.fail(Constants.ERR_COMMENT_NOT_FOUND);
+        }
+        // Delete all child replies first to avoid orphan records
+        postCommentRepository.deleteAllByParentId(commentId);
+        postCommentRepository.deleteById(commentId);
+        return Result.ok(Constants.MSG_COMMENT_DELETED);
+    }
 }
