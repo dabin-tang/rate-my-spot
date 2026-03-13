@@ -30,4 +30,17 @@ public interface SpotReviewRepository extends JpaRepository<SpotReview, Long> {
             "WHERE r.spotId = :spotId " +
             "ORDER BY r.createTime DESC")
     Page<SpotReviewResponse> findSpotReviewsPage(@Param("spotId") Long spotId, Pageable pageable);
+
+    /**
+     * Admin: find all reviews with optional spotReviewId filter, ordered by create time DESC.
+     */
+    @Query("SELECT new com.ratemyspot.response.SpotReviewResponse(" +
+            "r.id, r.userId, u.nickname, u.icon, r.rating, r.content, r.images, r.createTime) " +
+            "FROM SpotReview r " +
+            "LEFT JOIN User u ON r.userId = u.id " +
+            "WHERE (:spotReviewId IS NULL OR r.id = :spotReviewId) " +
+            "ORDER BY r.createTime DESC")
+    Page<SpotReviewResponse> findAllForAdmin(
+            @Param("spotReviewId") Long spotReviewId,
+            Pageable pageable);
 }

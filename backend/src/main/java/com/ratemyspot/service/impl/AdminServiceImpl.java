@@ -13,6 +13,7 @@ import com.ratemyspot.repository.PostCommentRepository;
 import com.ratemyspot.repository.PostRepository;
 import com.ratemyspot.repository.SpotCategoryRepository;
 import com.ratemyspot.repository.SpotRepository;
+import com.ratemyspot.repository.SpotReviewRepository;
 import com.ratemyspot.repository.UserRepository;
 import com.ratemyspot.response.AdminCommentResponse;
 import com.ratemyspot.response.AdminStatsResponse;
@@ -20,6 +21,7 @@ import com.ratemyspot.response.AdminUserResponse;
 import com.ratemyspot.response.PageResult;
 import com.ratemyspot.response.PostResponse;
 import com.ratemyspot.response.SpotResponse;
+import com.ratemyspot.response.SpotReviewResponse;
 import com.ratemyspot.service.AdminService;
 import com.ratemyspot.util.Constants;
 import com.ratemyspot.util.JwtUtil;
@@ -51,6 +53,7 @@ public class AdminServiceImpl implements AdminService {
     private final PostCommentRepository postCommentRepository;
     private final SpotRepository spotRepository;
     private final SpotCategoryRepository spotCategoryRepository;
+    private final SpotReviewRepository spotReviewRepository;
     private final JwtUtil jwtUtil;
 
     /**
@@ -290,17 +293,34 @@ public class AdminServiceImpl implements AdminService {
 
     /**
      * Force delete a comment and its child replies by ID.
+     * Note: bypasses ownership check intentionally — admin has authority to delete any comment.
      */
     @Override
     @Transactional
     public Result<String> deleteComment(Long commentId) {
-        // Verify that the comment exists
         if (!postCommentRepository.existsById(commentId)) {
             return Result.fail(Constants.ERR_COMMENT_NOT_FOUND);
         }
-        // Delete all child replies first to avoid orphan records
+        // Delete child replies first to avoid orphan records
         postCommentRepository.deleteAllByParentId(commentId);
         postCommentRepository.deleteById(commentId);
         return Result.ok(Constants.MSG_COMMENT_DELETED);
+    }
+
+    /**
+     * Get paginated spot review list for admin review.
+     * Directly calls SpotReviewRepository to bypass user-level caching in SpotReviewService.
+     */
+    @Override
+    public Result<PageResult<SpotReviewResponse>> getSpotReviewList(Long spotReviewId, Integer page, Integer size) {
+        PageRequest pageable = PageRequest.of(page - 1, size);
+        Page<SpotReviewResponse> pageData = spotReviewRepository.findAllForAdmin(spotReviewId, pageable);
+        PageResult<SpotReviewResponse> result = new PageResult<>(
+                page, size,
+                pageData.getTotalElements(),
+                pageData.getTotalPages(),
+                pageData.getContent()
+        );
+        return Result.ok(result);
     }
 }

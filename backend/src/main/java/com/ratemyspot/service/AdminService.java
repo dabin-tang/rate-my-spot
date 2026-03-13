@@ -11,6 +11,7 @@ import com.ratemyspot.response.AdminUserResponse;
 import com.ratemyspot.response.PageResult;
 import com.ratemyspot.response.PostResponse;
 import com.ratemyspot.response.SpotResponse;
+import com.ratemyspot.response.SpotReviewResponse;
 import com.ratemyspot.util.Result;
 
 import java.util.List;
@@ -62,4 +63,7 @@ public interface AdminService {
 
     /** Force delete a comment (and its child replies) by ID. */
     Result<String> deleteComment(Long commentId);
+
+    /** Get paginated spot review list for admin review (optional spotReviewId filter). */
+    Result<PageResult<SpotReviewResponse>> getSpotReviewList(Long spotReviewId, Integer page, Integer size);
 }

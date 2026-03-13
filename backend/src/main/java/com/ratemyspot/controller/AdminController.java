@@ -11,6 +11,7 @@ import com.ratemyspot.response.AdminUserResponse;
 import com.ratemyspot.response.PageResult;
 import com.ratemyspot.response.PostResponse;
 import com.ratemyspot.response.SpotResponse;
+import com.ratemyspot.response.SpotReviewResponse;
 import com.ratemyspot.service.AdminService;
 import com.ratemyspot.util.Result;
 import io.swagger.v3.oas.annotations.Operation;
@@ -253,5 +254,22 @@ public class AdminController {
             @PathVariable("id") Long id) {
         log.info("Admin force delete comment: id={}", id);
         return adminService.deleteComment(id);
+    }
+
+    /**
+     * Get paginated spot review list for admin content review.
+     *
+     * @param spotReviewId Optional review ID filter
+     * @param page         Page number, starts from 1 (default: 1)
+     * @param size         Page size (default: 10)
+     * @return Paginated list of SpotReviewResponse
+     */
+    @GetMapping("/spot-review/list")
+    @Operation(summary = "Get Spot Review List (Admin)")
+    public Result<PageResult<SpotReviewResponse>> getSpotReviewList(
+            @RequestParam(required = false) Long spotReviewId,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+        return adminService.getSpotReviewList(spotReviewId, page, size);
     }
 }
