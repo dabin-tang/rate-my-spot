@@ -1,0 +1,39 @@
+.container {
+  padding: 24px;
+}
+
+.header {
+  margin-bottom: 24px;
+  
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+  }
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.statCard {
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+
+  h3 {
+    margin: 0 0 8px 0;
+    color: #666;
+    font-size: 14px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+  }
+}

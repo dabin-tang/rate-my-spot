@@ -1,0 +1,28 @@
+.button {
+  font-weight: 600;
+  min-width: 100px;
+}
+
+.following {
+  background-color: #f0f2f5;
+  color: #666;
+  border-color: #d9d9d9;
+
+  &:hover {
+    color: #ff4d4f;
+    border-color: #ff4d4f;
+    background-color: #fff1f0;
+    
+    &::after {
+      content: 'Unfollow';
+    }
+    
+    // Hide the default text on hover
+    font-size: 0;
+    &::after {
+      font-size: 14px;
+    }
+  }
+}
+
+

@@ -11,3 +11,16 @@ export interface SpotReviewPageReq {
   page?: number;
   size?: number;
 }
+
+export interface SpotReviewResponse {
+  id: number;
+  userId: number;
+  spotId: number;
+  rating: number;
+  content: string;
+  images?: string;
+  liked: number;
+  createTime: string;
+  userNickname: string;
+  userIcon: string;
+}

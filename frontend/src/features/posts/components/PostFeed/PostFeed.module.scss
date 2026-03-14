@@ -1,0 +1,23 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  width: 100%;
+  align-content: start;
+}
+
+.itemWrapper {
+  break-inside: avoid;
+}
+
+.loadingContainer {
+  padding: 0 24px;
+}
+
+.skeletonWrapper {
+  flex: 1;
+}
+
+.emptyContainer {
+  padding: 40px;
+}
