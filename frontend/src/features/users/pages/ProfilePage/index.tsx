@@ -1,7 +1,8 @@
 import React from 'react';
-import { Flex, Typography, Empty, Tabs } from 'antd';
+import { Flex, Typography, Empty, Tabs, Skeleton } from 'antd';
 import { useAuthStore } from '../../../auth/stores/useAuthStore';
 import { UserProfileCard } from '../../components/UserProfileCard';
+import { useCurrentUserProfile } from '../../hooks/useCurrentUserProfile';
 
 import styles from './ProfilePage.module.scss';
 
@@ -9,6 +10,7 @@ const { Title, Text } = Typography;
 
 export const ProfilePage: React.FC = () => {
   const { user, token } = useAuthStore();
+  const { data: profileData, isLoading } = useCurrentUserProfile();
 
   if (!token || !user) {
     return (
@@ -52,7 +54,13 @@ export const ProfilePage: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        <UserProfileCard user={user as Exclude<typeof user, null>} isCurrentUser={true} />
+        {isLoading || !profileData ? (
+          <div style={{ padding: '32px' }}>
+             <Skeleton avatar active paragraph={{ rows: 3 }} />
+          </div>
+        ) : (
+          <UserProfileCard user={profileData} isCurrentUser={true} />
+        )}
         
         <div className={styles.tabsContainer}>
           <Tabs 

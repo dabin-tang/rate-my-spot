@@ -1,42 +1,88 @@
-.card {
-  box-shadow: 0 4px 20px -2px rgba(0,0,0,0.05);
-  border-radius: 16px;
-  overflow: hidden;
+.cardWrapper {
+  padding: 32px;
+  background: rgba(30, 30, 35, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  margin-bottom: 24px;
+}
+
+.mainLayout {
+  width: 100%;
 }
 
 .avatar {
-  background-color: #ff2442;
-  font-size: 32px;
-  border: 2px solid white;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  flex-shrink: 0;
+  width: 100px;
+  height: 100px;
+  background-color: #1677ff;
+  font-size: 36px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-.info {
+.rightSection {
   flex: 1;
+  min-width: 0;
+}
+
+.headerRow {
+  width: 100%;
+  margin-bottom: 20px;
 }
 
 .name {
   margin: 0 !important;
-  font-weight: 800 !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  font-size: 28px !important;
+  letter-spacing: -0.5px;
 }
 
-.meta {
-  color: #666;
-}
-
-.stat {
+.intro {
+  color: rgba(255, 255, 255, 0.65);
   font-size: 14px;
+  margin-top: 4px;
+}
+
+.actionArea {
+  flex-shrink: 0;
+}
+
+.editBtn {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-weight: 500;
   
-  strong {
-    color: #111;
+  &:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    color: white !important;
   }
 }
 
-.divider {
-  margin: 0 8px;
-  color: #ddd;
+.statsRow {
+  margin-top: 12px;
 }
 
-.action {
-  margin-left: 'auto';
+.statBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  .statNumber {
+    color: #fff;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .statLabel {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 13px;
+    font-weight: 500;
+  }
 }
