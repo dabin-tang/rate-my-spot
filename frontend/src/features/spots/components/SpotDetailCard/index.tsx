@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { CloseOutlined, LeftOutlined, EnvironmentOutlined, StarFilled, HeartOutlined, MessageOutlined } from '@ant-design/icons';
 import { Spin } from 'antd';
 import { useSpotDetail } from './useSpotDetail';
+import { ReviewList } from '../../../reviews/components/ReviewList';
+import { ReviewForm } from '../../../reviews/components/ReviewForm';
 import styles from './SpotDetailCard.module.scss';
 
 export interface SpotDetailCardProps {
@@ -131,6 +133,12 @@ export const SpotDetailCard: React.FC<SpotDetailCardProps> = ({ spotId, isOpen, 
                 ) : (
                   <div className={styles.emptyPosts}>No recent posts for this spot yet.</div>
                 )}
+              </div>
+
+              {/* Review Section */}
+              <div className={styles.reviewSection}>
+                <ReviewForm spotId={spotId} />
+                <ReviewList spotId={spotId} />
               </div>
             </>
           ) : null}

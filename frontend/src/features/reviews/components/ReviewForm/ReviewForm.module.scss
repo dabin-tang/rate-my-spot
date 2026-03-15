@@ -1,5 +1,58 @@
-.container {
-  padding: 16px;
+.reviewForm {
   background: #fff;
-  border-radius: 12px;
+  border-top: 1px solid #f0f0f0;
+  padding: 24px;
+  margin-top: 16px;
+
+  .title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 16px;
+  }
+
+  .ratingRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+
+    .label {
+      font-size: 14px;
+      font-weight: 500;
+      color: #555;
+    }
+
+    .stars {
+      font-size: 20px;
+    }
+  }
+
+  .textArea {
+    border-radius: 8px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+
+    &:hover, &:focus {
+      border-color: #ff2442;
+      box-shadow: 0 0 0 2px rgba(255, 36, 66, 0.1);
+    }
+  }
+
+  .actionRow {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+
+    .submitButton {
+      background-color: #ff2442;
+      border-radius: 8px;
+      font-weight: 500;
+      padding: 0 24px;
+      height: 40px;
+
+      &:hover, &:focus {
+        background-color: #ff4d6a;
+      }
+    }
+  }
 }

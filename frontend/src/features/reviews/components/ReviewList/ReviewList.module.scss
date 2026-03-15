@@ -1,3 +1,137 @@
-.container {
-  padding: 16px 0;
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+  color: #888;
+  gap: 16px;
+}
+
+.errorText {
+  text-align: center;
+  color: #ff4d4f;
+  padding: 24px 0;
+}
+
+.reviewList {
+  margin-top: 16px;
+
+  .title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 16px;
+  }
+
+  .emptyState {
+    text-align: center;
+    padding: 32px 0;
+    color: #999;
+    font-size: 14px;
+    background: #fafafa;
+    border-radius: 8px;
+  }
+
+  .listContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .reviewCard {
+      padding: 16px;
+      background: #fafafa;
+      border-radius: 12px;
+      transition: background 0.2s;
+
+      &:hover {
+        background: #f5f5f5;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+
+        .userInfo {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+
+          .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #e0e0e0;
+          }
+
+          .userName {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+          }
+        }
+
+        .rating {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          color: #fa8c16;
+          font-weight: 600;
+          font-size: 13px;
+        }
+      }
+
+      .content {
+        font-size: 14px;
+        color: #555;
+        line-height: 1.6;
+        margin: 0 0 12px 0;
+      }
+
+      .imageGrid {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 8px;
+        margin-bottom: 8px;
+        scrollbar-width: none;
+        
+        &::-webkit-scrollbar {
+          display: none;
+        }
+
+        .reviewImage {
+          flex: 0 0 80px;
+          height: 80px;
+          border-radius: 8px;
+          background-size: cover;
+          background-position: center;
+          background-color: #eee;
+        }
+      }
+
+      .footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 12px;
+        color: #999;
+
+        .likes {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          cursor: pointer;
+          transition: color 0.2s;
+
+          &:hover {
+            color: #ff4d4f;
+          }
+        }
+      }
+    }
+  }
 }
