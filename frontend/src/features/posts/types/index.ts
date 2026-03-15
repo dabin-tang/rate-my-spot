@@ -30,3 +30,29 @@ export interface PostFeedRequestDTO {
   page?: number;
   size?: number;
 }
+
+export interface PostCommentCreateDTO {
+  postId: number;
+  userId: number;
+  parentId?: number;
+  replyToUserId?: number;
+  content: string;
+  image?: string;
+}
+
+export interface PostCommentResponse {
+  id: number;
+  postId: number;
+  userId: number;
+  parentId?: number;
+  replyToUserId?: number;
+  content: string;
+  image?: string;
+  liked: number;
+  createTime: string;
+  children: PostCommentResponse[];
+  // Assuming backend join or frontend population might add these:
+  userNickname?: string;
+  userIcon?: string;
+  replyToUserNickname?: string;
+}

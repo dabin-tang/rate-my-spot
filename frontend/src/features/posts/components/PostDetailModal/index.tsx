@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Avatar, Empty, message } from 'antd';
-import { HeartOutlined, MessageOutlined, HeartFilled } from '@ant-design/icons';
+import { Avatar, message } from 'antd';
 import { useQuery } from '@tanstack/react-query';
 import { getPostById } from '../../api/getPostById';
 import { useAuthStore } from '../../../auth/stores/useAuthStore';
-import { useToggleLike } from '../../hooks/useToggleLike';
+import { CommentSection } from '../CommentSection';
 import './PostDetailModal.scss';
 
 interface PostDetailModalProps {
@@ -24,16 +23,6 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ postId, visibl
   const post = data?.data;
   const { token } = useAuthStore();
   const isLoggedIn = !!token;
-
-  const toggleLikeMutation = useToggleLike([['postDetail', postId]]);
-
-  const handleLike = () => {
-    requireAuth(() => {
-      if (postId) {
-        toggleLikeMutation.mutate(postId);
-      }
-    });
-  };
 
   const requireAuth = (action: () => void) => {
     if (!isLoggedIn) {
@@ -184,35 +173,9 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ postId, visibl
                 </div>
               </div>
 
-              {/* Comments Section */}
-              <div className="comments-section">
-                <div className="title">
-                  Comments
-                </div>
-                <Empty 
-                  image={Empty.PRESENTED_IMAGE_SIMPLE} 
-                  description={<span className="empty-desc">No comments yet.</span>} 
-                />
-              </div>
-
-              {/* Footer Actions */}
-              <div className="footer-actions">
-                <div className="actions-container">
-                  <span 
-                    className="action-item"
-                    onClick={handleLike}
-                  >
-                    {post.isLiked ? <HeartFilled className="like-icon active" /> : <HeartOutlined className="like-icon" />}
-                    <span style={{ marginLeft: 6 }}>{post.liked || 0}</span>
-                  </span>
-                  <span 
-                    className="action-item"
-                    onClick={() => requireAuth(() => console.log('Comment clicked'))}
-                  >
-                    <MessageOutlined className="comment-icon" />
-                    Comment
-                  </span>
-                </div>
+              {/* Comments Section & Input Form */}
+              <div className="comments-wrapper">
+                <CommentSection postId={post.id} />
               </div>
 
             </div>

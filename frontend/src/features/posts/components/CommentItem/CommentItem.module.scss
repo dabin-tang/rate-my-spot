@@ -1,0 +1,90 @@
+.commentWrapper {
+  margin-bottom: 16px;
+  position: relative;
+  
+  &.depth1 { margin-left: 32px; }
+  &.depth2 { margin-left: 32px; }
+  &.depth3 { margin-left: 32px; }
+
+  .commentBody {
+    position: relative;
+  }
+
+  .avatar {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .contentArea {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .headerRow {
+    font-size: 13px;
+    line-height: 1.2;
+    flex-wrap: wrap;
+
+    .nickname {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .replyTo {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .time {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.45);
+      margin-left: auto;
+    }
+  }
+
+  .contentText {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 14px;
+    line-height: 1.5;
+    word-break: break-word;
+    margin-top: 2px;
+  }
+
+  .actionRow {
+    margin-top: 4px;
+    
+    .actionBtn {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      transition: color 0.2s ease;
+      font-weight: 500;
+
+      &:hover {
+        color: rgba(255, 255, 255, 0.85);
+      }
+    }
+  }
+
+  .childrenContainer {
+    margin-top: 12px;
+    position: relative;
+    
+    /* Optional: Draw a subtle hierarchy line */
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 16px;
+      left: 15px; /* Adjust based on avatar size */
+      width: 1px;
+      background: rgba(255, 255, 255, 0.1);
+      z-index: 1;
+    }
+    
+    /* Make embedded children appear above the line */
+    > div {
+      position: relative;
+      z-index: 2;
+    }
+  }
+}

@@ -184,7 +184,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 16px;
+      margin-bottom: 0; /* Removed margin-bottom since comments are right below */
       cursor: pointer;
 
       .icon {
@@ -206,58 +206,15 @@
     }
   }
 
-  .comments-section {
+  .comments-wrapper {
+    flex: 1;
+    min-height: 0;
+    margin-top: 16px;
     border-top: 1px solid #eee;
     padding-top: 16px;
-    margin-top: 16px;
-
-    .title {
-      font-weight: bold;
-      font-size: 14px;
-      margin-bottom: 12px;
-      color: #333;
-    }
-
-    .empty-desc {
-      color: #aaa;
-      font-size: 13px;
-    }
-  }
-
-  .footer-actions {
-    border-top: 1px solid #eee;
-    padding-top: 10px;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: auto;
-
-    .actions-container {
-      display: flex;
-      gap: 24px;
-
-      .action-item {
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        color: #666;
-        font-size: 14px;
-        user-select: none;
-
-        .like-icon {
-          font-size: 16px;
-
-          &.active {
-            color: #ff2442;
-          }
-        }
-
-        .comment-icon {
-          font-size: 16px;
-          color: #ccc;
-        }
-      }
-    }
+    flex-direction: column;
+    /* Since CommentSection has its own dark theme styling from advanced-ui, 
+       we'll let it maintain its internal scrolling. */
   }
 }
