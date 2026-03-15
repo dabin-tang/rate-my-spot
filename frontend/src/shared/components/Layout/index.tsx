@@ -5,6 +5,8 @@ import Sidebar from '../Sidebar';
 import { Input, Spin } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useGlobalSearch } from './useGlobalSearch';
+import { SpotListDrawer } from '../../../features/spots/components/SpotListDrawer';
+import { useState } from 'react';
 import styles from './Layout.module.scss';
 
 const { Content, Header } = AntLayout;
@@ -21,6 +23,8 @@ const Layout: React.FC = () => {
     handleFocus,
     handleResultClick,
   } = useGlobalSearch();
+
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   return (
     <AntLayout className={styles.layout}>
@@ -66,7 +70,10 @@ const Layout: React.FC = () => {
           </div>
           
           <div className={styles.headerRight}>
-            <button className={styles.spotButton}>
+            <button 
+              className={styles.spotButton} 
+              onClick={() => setIsDrawerOpen(true)}
+            >
               <span className={styles.spotIcon}>□</span> Spot
             </button>
           </div>
@@ -77,6 +84,11 @@ const Layout: React.FC = () => {
           <div key={location.pathname} className={styles.pageTransitionContainer}>
             <Outlet />
           </div>
+
+          <SpotListDrawer 
+            isOpen={isDrawerOpen} 
+            onClose={() => setIsDrawerOpen(false)} 
+          />
         </Content>
       </AntLayout>
     </AntLayout>
