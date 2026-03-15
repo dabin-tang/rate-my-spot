@@ -7,12 +7,16 @@ import com.ratemyspot.entity.User;
 import com.ratemyspot.exception.BusinessException;
 import com.ratemyspot.repository.FollowRepository;
 import com.ratemyspot.repository.UserRepository;
+import com.ratemyspot.response.PageResult;
 import com.ratemyspot.response.UserProfileResponse;
+import com.ratemyspot.response.UserSearchResponse;
 import com.ratemyspot.service.UserService;
 import com.ratemyspot.util.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
@@ -22,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -232,5 +237,31 @@ public class UserServiceImpl implements UserService {
         }
 
         return Result.ok(response);
+    }
+
+    @Override
+    public Result<PageResult<UserSearchResponse>> searchUsers(String keyword, Integer page, Integer size) {
+        PageRequest pageable = PageRequest.of(page - 1, size);
+        Page<UserSearchResponse> pageData = userRepository.searchByNickname(keyword, pageable);
+        
+        List<UserSearchResponse> content = pageData.getContent();
+        
+        // Fill isFollowing if current user is logged in
+        Long currentUserId = UserContext.getCurrentUserId();
+        if (currentUserId != null && !content.isEmpty()) {
+            String followingKey = Constants.CACHE_USER_FOLLOWING_KEY + currentUserId;
+            for (UserSearchResponse user : content) {
+                Boolean isFollowing = redisTemplateObj.opsForSet().isMember(followingKey, user.getId());
+                user.setIsFollowing(Boolean.TRUE.equals(isFollowing));
+            }
+        }
+
+        PageResult<UserSearchResponse> result = new PageResult<>(
+                page, size,
+                pageData.getTotalElements(),
+                pageData.getTotalPages(),
+                content
+        );
+        return Result.ok(result);
     }
 }

@@ -4,7 +4,9 @@ import com.ratemyspot.dto.UserDTO;
 import com.ratemyspot.dto.UserLoginDTO;
 import com.ratemyspot.dto.UserRegisterDTO;
 import com.ratemyspot.entity.User;
+import com.ratemyspot.response.PageResult;
 import com.ratemyspot.response.UserProfileResponse;
+import com.ratemyspot.response.UserSearchResponse;
 import com.ratemyspot.util.Result;
 
 import java.util.Map;
@@ -87,4 +89,7 @@ public interface UserService {
      * @return Result containing the UserProfileResponse
      */
     Result<UserProfileResponse> getUserProfile(Long targetUserId);
+
+    /** Search users by nickname (fuzzy match) with pagination. */
+    Result<PageResult<UserSearchResponse>> searchUsers(String keyword, Integer page, Integer size);
 }

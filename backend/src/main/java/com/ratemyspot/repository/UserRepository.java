@@ -2,6 +2,7 @@ package com.ratemyspot.repository;
 
 import com.ratemyspot.entity.User;
 import com.ratemyspot.response.AdminUserResponse;
+import com.ratemyspot.response.UserSearchResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -40,4 +41,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
             @Param("nickname") String nickname,
             @Param("email") String email,
             Pageable pageable);
+
+    /**
+     * C-side user search by nickname (fuzzy match).
+     * Returns only public search fields mapped directly to UserSearchResponse.
+     */
+    @Query("SELECT new com.ratemyspot.response.UserSearchResponse(u.id, u.nickname, u.icon, u.gender, u.createTime) " +
+            "FROM User u " +
+            "WHERE u.nickname LIKE CONCAT('%', :keyword, '%') " +
+            "ORDER BY u.nickname ASC")
+    Page<UserSearchResponse> searchByNickname(@Param("keyword") String keyword, Pageable pageable);
 }

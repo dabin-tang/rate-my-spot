@@ -4,7 +4,9 @@ import com.ratemyspot.dto.UserDTO;
 import com.ratemyspot.dto.UserLoginDTO;
 import com.ratemyspot.dto.UserRegisterDTO;
 import com.ratemyspot.entity.User;
+import com.ratemyspot.response.PageResult;
 import com.ratemyspot.response.UserProfileResponse;
+import com.ratemyspot.response.UserSearchResponse;
 import com.ratemyspot.service.UserService;
 import com.ratemyspot.util.Result;
 import io.swagger.v3.oas.annotations.Operation;
@@ -127,5 +129,23 @@ public class UserController {
             @PathVariable("id") Long id) {
         log.info("Request to get public profile for user: {}", id);
         return userService.getUserProfile(id);
+    }
+
+    /**
+     * Search users by nickname (fuzzy match).
+     *
+     * @param keyword Required search keyword
+     * @param page    Page number, starts from 1 (default: 1)
+     * @param size    Page size (default: 10)
+     * @return Paginated list of UserSearchResponse
+     */
+    @Operation(summary = "Search Users by Nickname")
+    @GetMapping("/search")
+    public Result<PageResult<UserSearchResponse>> searchUsers(
+            @Parameter(description = "Search keyword for nickname", required = true)
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+        return userService.searchUsers(keyword, page, size);
     }
 }
