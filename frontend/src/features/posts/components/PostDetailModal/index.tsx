@@ -5,6 +5,7 @@ import { HeartOutlined, MessageOutlined, HeartFilled } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { getPostById } from '../../api/getPostById';
 import { useAuthStore } from '../../../auth/stores/useAuthStore';
+import { useToggleLike } from '../../hooks/useToggleLike';
 import './PostDetailModal.scss';
 
 interface PostDetailModalProps {
@@ -24,6 +25,16 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ postId, visibl
   const { token } = useAuthStore();
   const isLoggedIn = !!token;
 
+  const toggleLikeMutation = useToggleLike([['postDetail', postId]]);
+
+  const handleLike = () => {
+    requireAuth(() => {
+      if (postId) {
+        toggleLikeMutation.mutate(postId);
+      }
+    });
+  };
+
   const requireAuth = (action: () => void) => {
     if (!isLoggedIn) {
       message.warning('Please log in to continue.');
@@ -42,8 +53,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ postId, visibl
       requestAnimationFrame(() => setIsAnimating(true));
     } else {
       document.body.style.overflow = 'auto';
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      setIsAnimating(false);
+      setTimeout(() => setIsAnimating(false), 0);
     }
     return () => {
       document.body.style.overflow = 'auto';
@@ -190,11 +200,11 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ postId, visibl
                 <div className="actions-container">
                   <span 
                     className="action-item"
-                    onClick={() => requireAuth(() => console.log('Like clicked'))}
+                    onClick={handleLike}
                   >
                     {post.isLiked ? <HeartFilled className="like-icon active" /> : <HeartOutlined className="like-icon" />}
-                    Like
-                    </span>
+                    <span style={{ marginLeft: 6 }}>{post.liked || 0}</span>
+                  </span>
                   <span 
                     className="action-item"
                     onClick={() => requireAuth(() => console.log('Comment clicked'))}

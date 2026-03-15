@@ -9,22 +9,25 @@ export const useFollowUser = (userId: number, initialIsFollowing: boolean) => {
   const { token } = useAuthStore();
 
   const mutation = useMutation({
-    mutationFn: (follow: boolean) => followUser(userId, follow),
-    onSuccess: (_, variables) => {
-      setIsFollowing(variables);
-      message.success(variables ? 'Successfully followed user' : 'Unfollowed user');
+    mutationFn: () => followUser(userId),
+    onSuccess: () => {
+      // Toggle the local state optimistically
+      const newStatus = !isFollowing;
+      setIsFollowing(newStatus);
+      message.success(newStatus ? 'Successfully followed user' : 'Unfollowed user');
     },
     onError: () => {
       message.error('Failed to update follow status');
     }
   });
 
-  const toggleFollow = () => {
+  const toggleFollow = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     if (!token) {
       message.warning('Please log in to follow users');
       return;
     }
-    mutation.mutate(!isFollowing);
+    mutation.mutate();
   };
 
   return {

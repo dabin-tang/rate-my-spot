@@ -3,7 +3,7 @@ export interface SpotReviewCreateDTO {
   spotId: number;
   rating: number;
   content?: string;
-  images?: string[];
+  images?: string[]; // Array of strings per api-docs
 }
 
 export interface SpotReviewPageReq {

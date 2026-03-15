@@ -9,9 +9,10 @@ const { Text } = Typography;
 interface PostItemProps {
   post: PostResponse;
   onClick: (postId: number) => void;
+  onLike?: (postId: number) => void;
 }
 
-export const PostItem: React.FC<PostItemProps> = ({ post, onClick }) => {
+export const PostItem: React.FC<PostItemProps> = ({ post, onClick, onLike }) => {
   const firstImage = post.images ? post.images.split(',')[0] : '';
 
   return (
@@ -52,9 +53,21 @@ export const PostItem: React.FC<PostItemProps> = ({ post, onClick }) => {
 
           <div className={styles.stats}>
             {post.isLiked ? (
-              <HeartFilled className={`${styles.likeIcon} ${styles.liked}`} />
+              <HeartFilled 
+                className={`${styles.likeIcon} ${styles.liked}`} 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onLike?.(post.id);
+                }}
+              />
             ) : (
-              <HeartOutlined className={`${styles.likeIcon} ${styles.unliked}`} />
+              <HeartOutlined 
+                className={`${styles.likeIcon} ${styles.unliked}`} 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onLike?.(post.id);
+                }}
+              />
             )}
             <span className={styles.likeCount}>
               {post.liked || 0}

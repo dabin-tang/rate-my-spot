@@ -2,10 +2,13 @@
 export interface UserProfileDTO {
   id: number;
   phone?: string;
+  email?: string;
   password?: string;
   nickname: string;
   icon?: string;
-  userInfo?: string;
+  intro?: string;
+  credit?: number;
+  status?: number;
   createTime?: string;
   updateTime?: string;
   fans?: number;
@@ -17,7 +20,6 @@ export interface UserProfileDTO {
 }
 
 export interface UserLoginDTO {
-  phone?: string;
   email?: string;
   password?: string;
   code?: string;
@@ -32,10 +34,13 @@ export interface UserRegisterDTO {
 export interface User {
   id: number;
   phone?: string;
+  email?: string;
   password?: string;
   nickname: string;
   icon?: string;
-  userInfo?: string;
+  intro?: string;
+  credit?: number;
+  status?: number;
   createTime?: string;
   updateTime?: string;
   fans?: number;
@@ -43,15 +48,13 @@ export interface User {
   gender?: number;
   birthday?: string;
   city?: string;
-  introduce?: string;
 }
 
 export interface UserUpdateDTO {
   nickname?: string;
   icon?: string;
-  userInfo?: string;
+  intro?: string;
   gender?: number;
   birthday?: string;
   city?: string;
-  introduce?: string;
 }
