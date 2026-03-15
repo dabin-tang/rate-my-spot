@@ -6,9 +6,10 @@ import styles from './SpotListDrawer.module.scss';
 interface SpotListDrawerProps {
   isOpen: boolean;
   onClose: () => void;
+  onSpotSelect?: (spotId: number) => void;
 }
 
-export const SpotListDrawer: React.FC<SpotListDrawerProps> = ({ isOpen, onClose }) => {
+export const SpotListDrawer: React.FC<SpotListDrawerProps> = ({ isOpen, onClose, onSpotSelect }) => {
   const [isRendered, setIsRendered] = useState(isOpen);
 
   if (isOpen && !isRendered) {
@@ -92,7 +93,11 @@ export const SpotListDrawer: React.FC<SpotListDrawerProps> = ({ isOpen, onClose 
             ) : spots.length > 0 ? (
               <ul className={styles.spotList}>
                 {spots.map((spot) => (
-                  <li key={spot.id} className={styles.spotItem}>
+                  <li 
+                    key={spot.id} 
+                    className={styles.spotItem}
+                    onClick={() => onSpotSelect?.(spot.id)}
+                  >
                     <div className={styles.spotTitleRow}>
                       <span className={styles.spotName}>{spot.name}</span>
                       <div className={styles.spotScore}>

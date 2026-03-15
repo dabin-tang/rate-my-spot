@@ -6,6 +6,7 @@ import { Input, Spin } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useGlobalSearch } from './useGlobalSearch';
 import { SpotListDrawer } from '../../../features/spots/components/SpotListDrawer';
+import { SpotDetailCard } from '../../../features/spots/components/SpotDetailCard';
 import { useState } from 'react';
 import styles from './Layout.module.scss';
 
@@ -25,6 +26,15 @@ const Layout: React.FC = () => {
   } = useGlobalSearch();
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [selectedSpotId, setSelectedSpotId] = useState<number | null>(null);
+
+  const handleSpotSelect = (spotId: number) => {
+    setSelectedSpotId(spotId);
+  };
+
+  const handleCloseDetail = () => {
+    setSelectedSpotId(null);
+  };
 
   return (
     <AntLayout className={styles.layout}>
@@ -88,6 +98,13 @@ const Layout: React.FC = () => {
           <SpotListDrawer 
             isOpen={isDrawerOpen} 
             onClose={() => setIsDrawerOpen(false)} 
+            onSpotSelect={handleSpotSelect}
+          />
+
+          <SpotDetailCard 
+            spotId={selectedSpotId}
+            isOpen={!!selectedSpotId}
+            onClose={handleCloseDetail}
           />
         </Content>
       </AntLayout>
