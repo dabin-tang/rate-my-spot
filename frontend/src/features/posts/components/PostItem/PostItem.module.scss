@@ -21,8 +21,9 @@
 .image {
   display: block;
   width: 100%;
-  aspect-ratio: 3/4;
-  object-fit: cover;
+  height: auto;
+  border-radius: 16px 16px 0 0;
+  object-fit: contain; /* ensures varied heights */
 }
 
 .imagePlaceholder {

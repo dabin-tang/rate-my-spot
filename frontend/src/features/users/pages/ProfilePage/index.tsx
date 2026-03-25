@@ -3,14 +3,17 @@ import { Flex, Tabs, Skeleton, Row, Col } from 'antd';
 import { useAuthStore } from '../../../auth/stores/useAuthStore';
 import { UserProfileCard } from '../../components/UserProfileCard';
 import { useCurrentUserProfile } from '../../hooks/useCurrentUserProfile';
+import { UserPostFeed } from '../../../posts/components/UserPostFeed';
+import { UserLikeFeed } from '../../../posts/components/UserLikeFeed';
 
 import styles from './ProfilePage.module.scss';
 
-const PostGridSkeleton = () => (
-  <div className={styles.tabContent}>
-    <Row gutter={[16, 24]}>
-      {Array.from({ length: 6 }).map((_, index) => (
-        <Col xs={12} sm={12} md={8} lg={8} key={index}>
+const PostGridSkeleton = ({ columns = 5 }: { columns?: 3 | 5 }) => {
+  const count = columns === 5 ? 10 : 6;
+  return (
+    <Row gutter={columns === 5 ? [16, 16] : [24, 24]}>
+      {Array.from({ length: count }).map((_, index) => (
+        <Col xs={12} sm={12} md={columns === 5 ? 6 : 8} lg={columns === 5 ? 4 : 8} key={index}>
           <div className={styles.skeletonCard}>
             <div className={styles.skeletonImageWrapper}>
               <Skeleton.Image active />
@@ -22,8 +25,8 @@ const PostGridSkeleton = () => (
         </Col>
       ))}
     </Row>
-  </div>
-);
+  );
+};
 
 export const ProfilePage: React.FC = () => {
   const { user, token } = useAuthStore();
@@ -41,12 +44,20 @@ export const ProfilePage: React.FC = () => {
     {
       label: 'My Posts',
       key: 'posts',
-      children: <PostGridSkeleton />,
+      children: (
+        <div className={styles.tabContent}>
+          <UserPostFeed userId={profileData?.id || 0} columns={3} skeletonGrid={<PostGridSkeleton columns={3} />} />
+        </div>
+      ),
     },
     {
       label: 'My Likes',
       key: 'liked',
-      children: <PostGridSkeleton />,
+      children: (
+        <div className={styles.tabContent}>
+          <UserLikeFeed columns={5} skeletonGrid={<PostGridSkeleton columns={5} />} />
+        </div>
+      ),
     },
   ];
 
