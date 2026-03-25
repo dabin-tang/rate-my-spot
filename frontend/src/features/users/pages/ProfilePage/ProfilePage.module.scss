@@ -57,3 +57,26 @@
   background: #fcfcfc;
   min-height: 500px;
 }
+
+.skeletonCard {
+  width: 100%;
+}
+
+.skeletonImageWrapper {
+  width: 100%;
+  aspect-ratio: 4 / 5; /* Popular mobile poster / Instagram portrait ratio */
+  border-radius: 12px;
+  overflow: hidden;
+
+  /* Force Ant Design Skeleton Image to fill our container perfectly */
+  :global(.ant-skeleton.ant-skeleton-element) {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  :global(.ant-skeleton-image) {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 12px !important;
+  }
+}

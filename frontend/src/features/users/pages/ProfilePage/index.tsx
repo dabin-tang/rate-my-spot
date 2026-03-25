@@ -1,12 +1,29 @@
 import React from 'react';
-import { Flex, Typography, Empty, Tabs, Skeleton } from 'antd';
+import { Flex, Tabs, Skeleton, Row, Col } from 'antd';
 import { useAuthStore } from '../../../auth/stores/useAuthStore';
 import { UserProfileCard } from '../../components/UserProfileCard';
 import { useCurrentUserProfile } from '../../hooks/useCurrentUserProfile';
 
 import styles from './ProfilePage.module.scss';
 
-const { Title, Text } = Typography;
+const PostGridSkeleton = () => (
+  <div className={styles.tabContent}>
+    <Row gutter={[16, 24]}>
+      {Array.from({ length: 6 }).map((_, index) => (
+        <Col xs={12} sm={12} md={8} lg={8} key={index}>
+          <div className={styles.skeletonCard}>
+            <div className={styles.skeletonImageWrapper}>
+              <Skeleton.Image active />
+            </div>
+            <div style={{ marginTop: '12px' }}>
+              <Skeleton active title={false} paragraph={{ rows: 2, width: ['100%', '60%'] }} />
+            </div>
+          </div>
+        </Col>
+      ))}
+    </Row>
+  </div>
+);
 
 export const ProfilePage: React.FC = () => {
   const { user, token } = useAuthStore();
@@ -15,7 +32,7 @@ export const ProfilePage: React.FC = () => {
   if (!token || !user) {
     return (
       <Flex justify="center" align="center" className={styles.emptyContainer}>
-        <Title level={4}>Please log in to view your profile.</Title>
+        <h3>Please log in to view your profile.</h3>
       </Flex>
     );
   }
@@ -24,20 +41,12 @@ export const ProfilePage: React.FC = () => {
     {
       label: 'My Posts',
       key: 'posts',
-      children: (
-        <div className={styles.tabContent}>
-           <Text type="secondary">User posts API integration coming soon...</Text>
-        </div>
-      ),
+      children: <PostGridSkeleton />,
     },
     {
       label: 'My Likes',
       key: 'liked',
-      children: (
-        <div className={styles.tabContent}>
-          <Text type="secondary">Liked posts API integration coming soon...</Text>
-        </div>
-      ),
+      children: <PostGridSkeleton />,
     },
   ];
 
