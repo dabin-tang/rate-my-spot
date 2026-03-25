@@ -4,6 +4,8 @@ import com.ratemyspot.dto.PostCommentCreateDTO;
 import com.ratemyspot.entity.PostComment;
 import com.ratemyspot.exception.BusinessException;
 import com.ratemyspot.repository.PostCommentRepository;
+import com.ratemyspot.repository.UserRepository;
+import com.ratemyspot.entity.User;
 import com.ratemyspot.response.PostCommentResponse;
 import com.ratemyspot.service.PostCommentService;
 import com.ratemyspot.util.Constants;
@@ -29,6 +31,7 @@ import java.util.stream.Collectors;
 public class PostCommentServiceImpl implements PostCommentService {
 
     private final PostCommentRepository postCommentRepository;
+    private final UserRepository userRepository;
     private final RedisTemplate<String, Object> redisTemplate;
 
     /**
@@ -79,11 +82,37 @@ public class PostCommentServiceImpl implements PostCommentService {
      * Assemble a flat comment list into a Parent→Children tree.
      */
     private List<PostCommentResponse> buildTree(List<PostComment> flatList) {
+        if (flatList.isEmpty()) return new ArrayList<>();
+
+        // Batch fetch users (authors and replied-to users)
+        List<Long> authorIds = flatList.stream().map(PostComment::getUserId).collect(Collectors.toList());
+        List<Long> replyIds = flatList.stream().map(PostComment::getReplyToUserId).filter(id -> id != null && id > 0).collect(Collectors.toList());
+        List<Long> allUserIds = new ArrayList<>(authorIds);
+        allUserIds.addAll(replyIds);
+        allUserIds = allUserIds.stream().distinct().collect(Collectors.toList());
+
+        Map<Long, User> userMap = userRepository.findAllById(allUserIds).stream()
+                .collect(Collectors.toMap(User::getId, u -> u));
+
         // Convert all entities to VO nodes first
         Map<Long, PostCommentResponse> nodeMap = flatList.stream()
                 .collect(Collectors.toMap(PostComment::getId, c -> {
                     PostCommentResponse r = new PostCommentResponse();
                     BeanUtils.copyProperties(c, r);
+                    
+                    User u = userMap.get(c.getUserId());
+                    if (u != null) {
+                        r.setUserNickname(u.getNickname());
+                        r.setUserIcon(u.getIcon());
+                    }
+
+                    if (c.getReplyToUserId() != null && c.getReplyToUserId() > 0) {
+                        User replyUser = userMap.get(c.getReplyToUserId());
+                        if (replyUser != null) {
+                            r.setReplyToUserNickname(replyUser.getNickname());
+                        }
+                    }
+                    
                     return r;
                 }));
 

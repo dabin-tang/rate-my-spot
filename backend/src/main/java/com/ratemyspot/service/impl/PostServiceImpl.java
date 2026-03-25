@@ -70,6 +70,7 @@ public class PostServiceImpl implements PostService {
             Boolean follow = redisTemplate.opsForSet().isMember(Constants.CACHE_USER_FOLLOWING_KEY + userId, response.getUserId());
             response.setIsLiked(Boolean.TRUE.equals(liked));
             response.setIsFollow(Boolean.TRUE.equals(follow));
+            
         }
 
         return Result.ok(response);

@@ -1,15 +1,13 @@
 import React from 'react';
-import { message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import { useUIStore } from '../../stores/useUIStore';
 import styles from './NeumorphicSpotButton.module.scss';
 
 export const NeumorphicSpotButton: React.FC = () => {
+  const setDrawerOpen = useUIStore((state) => state.setDrawerOpen);
+
   const handleClick = () => {
-    message.info({ 
-      content: 'The Spot feature is currently under development.', 
-      duration: 3, 
-      style: { marginTop: '10vh' } 
-    });
+    setDrawerOpen(true);
   };
 
   return (

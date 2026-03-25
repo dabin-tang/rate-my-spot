@@ -24,14 +24,19 @@ export const useSpotDetail = (spotId: number | null) => {
       setError(null);
       
       try {
-        const [spotRes, postsRes] = await Promise.all([
-          getSpotById(spotId),
-          getSpotPosts(spotId)
-        ]);
+        const spotRes = await getSpotById(spotId);
+        
+        let posts: PostResponse[] = [];
+        try {
+          const postsRes = await getSpotPosts(spotId);
+          posts = postsRes.data || [];
+        } catch (postErr) {
+          console.warn('Failed to fetch recent posts for spot:', postErr);
+        }
         
         if (isMounted) {
           setSpot(spotRes.data || null);
-          setRecentPosts(postsRes.data || []);
+          setRecentPosts(posts);
         }
       } catch (err) {
         if (isMounted) {

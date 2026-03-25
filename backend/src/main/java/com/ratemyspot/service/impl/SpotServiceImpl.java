@@ -44,19 +44,19 @@ public class SpotServiceImpl implements SpotService {
      * Retrieves a paginated list of spots with dynamic sorting strategies.
      */
     @Override
-    public Result<PageResult<SpotResponse>> getSpotList(Long categoryId, String sort, Double lat, Double lon, Integer page) {
+    public Result<PageResult<SpotResponse>> getSpotList(Long categoryId, String sort, Double lat, Double lon, Integer page, String keyword) {
         Pageable pageable = PageRequest.of(page - 1, 20); 
         Page<Spot> spotPage;
 
         if ("distance".equalsIgnoreCase(sort)) {
             // Sort by distance 
-            spotPage = spotRepository.findByFilterOrderByDistance(categoryId, lat, lon, pageable);
+            spotPage = spotRepository.findByFilterOrderByDistance(categoryId, keyword, lat, lon, pageable);
         } else if ("score".equalsIgnoreCase(sort)) {
             // Sort by score descending
-            spotPage = spotRepository.findByFilterOrderByScore(categoryId, pageable);
+            spotPage = spotRepository.findByFilterOrderByScore(categoryId, keyword, pageable);
         } else {
             // Default sort 
-            spotPage = spotRepository.findByFilterDefault(categoryId, pageable);
+            spotPage = spotRepository.findByFilterDefault(categoryId, keyword, pageable);
         }
 
         List<SpotResponse> responseList = spotPage.stream().map(spot -> {
@@ -81,7 +81,7 @@ public class SpotServiceImpl implements SpotService {
      */
     @Override
     public Result<List<SpotResponse>> search(String keyword) {
-        List<Spot> spotList = spotRepository.findByNameContainingOrDescriptionContaining(keyword, keyword);
+        List<Spot> spotList = spotRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(keyword, keyword);
 
         List<SpotResponse> responseList = spotList.stream().map(spot -> {
             SpotResponse response = new SpotResponse();
@@ -98,23 +98,32 @@ public class SpotServiceImpl implements SpotService {
     @Override
     public Result<SpotResponse> getSpotDetail(Long id) {
         String key = Constants.CACHE_SPOT_KEY + id;
+        SpotResponse spotResponse = null;
 
-        // Use Pass-Through Protection instead of Logical Expiration
-        SpotResponse spotResponse = cacheUtil.queryWithPassThrough(
-                key,
-                SpotResponse.class,
-                Constants.CACHE_SPOT_TTL,
-                TimeUnit.MINUTES,
-                k -> {
-                    Spot spot = spotRepository.findById(id).orElse(null);
-                    if (spot == null) {
-                        return null;
+        try {
+            // Try to use Redis Cache first
+            spotResponse = cacheUtil.queryWithPassThrough(
+                    key,
+                    SpotResponse.class,
+                    Constants.CACHE_SPOT_TTL,
+                    TimeUnit.MINUTES,
+                    k -> {
+                        Spot spot = spotRepository.findById(id).orElse(null);
+                        if (spot == null) return null;
+                        SpotResponse response = new SpotResponse();
+                        BeanUtils.copyProperties(spot, response);
+                        return response;
                     }
-                    SpotResponse response = new SpotResponse();
-                    BeanUtils.copyProperties(spot, response);
-                    return response;
-                }
-        );
+            );
+        } catch (Exception e) {
+            log.warn("Redis cache failed for spot {}, falling back to database. Error: {}", id, e.getMessage());
+            // Fallback to direct DB query if Redis fails (e.g. connection refused)
+            Spot spot = spotRepository.findById(id).orElse(null);
+            if (spot != null) {
+                spotResponse = new SpotResponse();
+                BeanUtils.copyProperties(spot, spotResponse);
+            }
+        }
 
         if (spotResponse == null) {
             return Result.fail(Constants.ERR_SPOT_NOT_FOUND);

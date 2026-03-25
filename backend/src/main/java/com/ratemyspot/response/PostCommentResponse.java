@@ -29,11 +29,20 @@ public class PostCommentResponse implements Serializable {
     @Schema(description = "Commenter User ID", example = "2002")
     private Long userId;
 
+    @Schema(description = "Commenter Nickname", example = "Dabin")
+    private String userNickname;
+
+    @Schema(description = "Commenter Icon URL", example = "img.jpg")
+    private String userIcon;
+
     @Schema(description = "Parent Comment ID (0 or null if root)", example = "0")
     private Long parentId;
 
     @Schema(description = "Target User ID being replied to", example = "2003")
     private Long replyToUserId;
+
+    @Schema(description = "Target User Nickname being replied to", example = "Alice")
+    private String replyToUserNickname;
 
     @Schema(description = "Comment Content", example = "Great spot!")
     private String content;

@@ -151,7 +151,11 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
             >
               <Flex align="center" gap={12} className={styles.userMenu}>
                 <div className={styles.userAvatar}>
-                  {user?.nickname?.charAt(0)?.toUpperCase() || 'Me'}
+                  {user?.icon ? (
+                    <img src={user.icon} alt="user avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                  ) : (
+                    user?.nickname?.charAt(0)?.toUpperCase() || 'Me'
+                  )}
                 </div>
                 <Text strong className={styles.userName}>
                   {user?.nickname || 'My Account'}

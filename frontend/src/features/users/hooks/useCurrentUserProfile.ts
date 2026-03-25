@@ -9,11 +9,13 @@ export const useCurrentUserProfile = () => {
   return useQuery({
     queryKey: ['currentUserProfile', user?.id],
     queryFn: async () => {
-      // Fetch latest profile stats from the server
-      const response = await getUserProfile();
+      if (!user?.id) throw new Error("User ID is required");
+      // Fetch full profile stats from the correctly mapped server endpoint
+      const response = await getUserProfile(user.id);
       return response.data;
     },
-    enabled: isLoggedIn, // Only run the query if the user is logged in
+    enabled: isLoggedIn && !!user?.id, // Only run the query if the user is logged in
+
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 };

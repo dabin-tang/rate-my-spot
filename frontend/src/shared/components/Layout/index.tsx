@@ -2,31 +2,21 @@ import React from 'react';
 import { Layout as AntLayout } from 'antd';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from '../Sidebar';
-import { Input, Spin } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
-import { useGlobalSearch } from './useGlobalSearch';
 import { SpotListDrawer } from '../../../features/spots/components/SpotListDrawer';
 import { SpotDetailCard } from '../../../features/spots/components/SpotDetailCard';
-import { useState } from 'react';
+import { PostDetailModal } from '../../../features/posts/components/PostDetailModal';
+import { useUIStore } from '../../stores/useUIStore';
 import styles from './Layout.module.scss';
 
-const { Content, Header } = AntLayout;
+const { Content } = AntLayout;
 
 const Layout: React.FC = () => {
   const location = useLocation();
-  const {
-    keyword,
-    results,
-    isDropdownVisible,
-    isLoading,
-    dropdownRef,
-    handleInputChange,
-    handleFocus,
-    handleResultClick,
-  } = useGlobalSearch();
 
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [selectedSpotId, setSelectedSpotId] = useState<number | null>(null);
+  const isDrawerOpen = useUIStore((state) => state.isDrawerOpen);
+  const selectedSpotId = useUIStore((state) => state.selectedSpotId);
+  const setDrawerOpen = useUIStore((state) => state.setDrawerOpen);
+  const setSelectedSpotId = useUIStore((state) => state.setSelectedSpotId);
 
   const handleSpotSelect = (spotId: number) => {
     setSelectedSpotId(spotId);
@@ -36,6 +26,9 @@ const Layout: React.FC = () => {
     setSelectedSpotId(null);
   };
 
+  const selectedPostId = useUIStore((state) => state.selectedPostId);
+  const setSelectedPostId = useUIStore((state) => state.setSelectedPostId);
+
   return (
     <AntLayout className={styles.layout}>
       {/* Fixed Sidebar */}
@@ -43,52 +36,6 @@ const Layout: React.FC = () => {
       
       {/* Main Content Area */}
       <AntLayout className={styles.mainLayout}>
-        <Header className={styles.header}>
-          <div className={styles.searchContainer} ref={dropdownRef}>
-            <Input
-              className={styles.searchInput}
-              placeholder="Search posts or spots..."
-              prefix={<SearchOutlined style={{ color: '#0066ff' }} />}
-              value={keyword}
-              onChange={handleInputChange}
-              onFocus={handleFocus}
-              allowClear
-            />
-            
-            {isDropdownVisible && keyword.trim() !== '' && (
-              <div className={styles.searchDropdown}>
-                {isLoading ? (
-                  <div className={styles.dropdownState}><Spin size="small" /> Loading...</div>
-                ) : results.length > 0 ? (
-                  <ul className={styles.resultList}>
-                    {results.map((spot) => (
-                      <li 
-                        key={spot.id} 
-                        className={styles.resultItem}
-                        onClick={() => handleResultClick(spot.id)}
-                      >
-                        <div className={styles.spotName}>{spot.name}</div>
-                        <div className={styles.spotAddress}>{spot.address}</div>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <div className={styles.dropdownState}>No results found</div>
-                )}
-              </div>
-            )}
-          </div>
-          
-          <div className={styles.headerRight}>
-            <button 
-              className={styles.spotButton} 
-              onClick={() => setIsDrawerOpen(true)}
-            >
-              <span className={styles.spotIcon}>□</span> Spot
-            </button>
-          </div>
-        </Header>
-
         <Content className={styles.content}>
           {/* Child routes matching the URL will render here, animated on location change */}
           <div key={location.pathname} className={styles.pageTransitionContainer}>
@@ -97,7 +44,7 @@ const Layout: React.FC = () => {
 
           <SpotListDrawer 
             isOpen={isDrawerOpen} 
-            onClose={() => setIsDrawerOpen(false)} 
+            onClose={() => setDrawerOpen(false)} 
             onSpotSelect={handleSpotSelect}
           />
 
@@ -105,6 +52,12 @@ const Layout: React.FC = () => {
             spotId={selectedSpotId}
             isOpen={!!selectedSpotId}
             onClose={handleCloseDetail}
+          />
+          <PostDetailModal 
+            key={selectedPostId || 'close'}
+            postId={selectedPostId}
+            visible={!!selectedPostId} 
+            onClose={() => setSelectedPostId(null)} 
           />
         </Content>
       </AntLayout>

@@ -10,7 +10,7 @@ public interface SpotService {
     /**
      * Get a paginated list of spots based on filters and sorting strategy.
      */
-    Result<PageResult<SpotResponse>> getSpotList(Long categoryId, String sort, Double lat, Double lon, Integer page);
+    Result<PageResult<SpotResponse>> getSpotList(Long categoryId, String sort, Double lat, Double lon, Integer page, String keyword);
 
     /**
      * Search spots by keyword.

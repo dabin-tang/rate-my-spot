@@ -43,11 +43,12 @@ public class SpotController {
             @RequestParam(required = false) String sort,
             @RequestParam @NotNull(message = "Latitude is required") Double latitude,
             @RequestParam @NotNull(message = "Longitude is required") Double longitude,
-            @RequestParam(defaultValue = "1") Integer page) {
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(required = false) String keyword) {
 
-        log.info("Get Spot List: categoryId={}, sort={}, latitude={}, longitude={}, page={}",
-                categoryId, sort, latitude, longitude, page);
-        return spotService.getSpotList(categoryId, sort, latitude, longitude, page);
+        log.info("Get Spot List: categoryId={}, sort={}, latitude={}, longitude={}, page={}, keyword={}",
+                categoryId, sort, latitude, longitude, page, keyword);
+        return spotService.getSpotList(categoryId, sort, latitude, longitude, page, keyword);
     }
 
     /**

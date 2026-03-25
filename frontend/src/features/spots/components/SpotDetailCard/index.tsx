@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { CloseOutlined, LeftOutlined, EnvironmentOutlined, StarFilled, HeartOutlined, MessageOutlined } from '@ant-design/icons';
+import { CloseOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import { Spin } from 'antd';
 import { useSpotDetail } from './useSpotDetail';
 import { ReviewList } from '../../../reviews/components/ReviewList';
 import { ReviewForm } from '../../../reviews/components/ReviewForm';
 import styles from './SpotDetailCard.module.scss';
+import { useUIStore } from '../../../../shared/stores/useUIStore';
 
 export interface SpotDetailCardProps {
   spotId: number | null;
@@ -14,6 +15,7 @@ export interface SpotDetailCardProps {
 
 export const SpotDetailCard: React.FC<SpotDetailCardProps> = ({ spotId, isOpen, onClose }) => {
   const [isRendered, setIsRendered] = useState(isOpen);
+  const setSelectedPostId = useUIStore((state) => state.setSelectedPostId);
 
   if (isOpen && !isRendered) {
     setIsRendered(true);
@@ -33,115 +35,78 @@ export const SpotDetailCard: React.FC<SpotDetailCardProps> = ({ spotId, isOpen, 
         className={`${styles.backdrop} ${isOpen ? styles.fadeIn : styles.fadeOut}`} 
         onClick={onClose} 
       />
-      <div 
-        className={`${styles.panelContainer} ${isOpen ? styles.slideIn : styles.slideOut}`}
-        onAnimationEnd={onAnimationEnd}
-      >
-        <div className={styles.header}>
-          <button className={styles.backButton} onClick={onClose}>
-            <LeftOutlined style={{ fontSize: '16px', marginRight: '8px' }} />
-            Back
-          </button>
-          
-          <div className={styles.headerActions}>
-            <button className={styles.iconButton} onClick={onClose} aria-label="Close detail">
-              <CloseOutlined />
-            </button>
+      <div className={styles.panelStack}>
+        <div 
+          className={`${styles.panelContainer} ${isOpen ? styles.slideIn : styles.slideOut}`}
+          onAnimationEnd={onAnimationEnd}
+        >
+          <div className={styles.panelHeader}>
+            <span>{spot?.name || 'Loading Spot...'}</span>
+            <CloseOutlined className={styles.closeBtn} onClick={onClose} />
           </div>
-        </div>
 
-        <div className={styles.content}>
-          {isLoading ? (
-            <div className={styles.loadingContainer}>
-              <Spin size="large" />
-              <p>Loading spot details...</p>
-            </div>
-          ) : error ? (
-            <div className={styles.errorContainer}>
-              <p>Failed to load spot details.</p>
-            </div>
-          ) : spot ? (
-            <>
-              <div 
-                className={styles.imageHeader}
-                style={{ backgroundImage: `url(${spot.images?.split(',')[0] || 'https://via.placeholder.com/500x300'})` }}
-              >
-                <div className={styles.imageOverlay}>
-                  <h2 className={styles.spotName}>{spot.name}</h2>
-                  <div className={styles.spotMetaContainer}>
-                    <div className={styles.scoreBadge}>
-                      <StarFilled /> {spot.score?.toFixed(1) || '0.0'}
-                    </div>
-                    <span>({spot.reviewCount} reviews)</span>
+          <div className={styles.panelBody}>
+            {isLoading ? (
+              <div className={styles.loadingContainer}>
+                <Spin size="large" />
+                <p>Loading spot details...</p>
+              </div>
+            ) : error ? (
+              <div className={styles.errorContainer}>
+                <p>Failed to load spot details.</p>
+              </div>
+            ) : spot ? (
+              <>
+                <div 
+                  className={styles.spotHero}
+                  style={{ backgroundImage: `url(${(Array.isArray(spot.images) ? spot.images[0] : spot.images?.split(',')[0]) || 'https://via.placeholder.com/500x300'})` }}
+                >
+                  <div className={styles.heroScoreBadge}>
+                    {spot.score?.toFixed(1) || '0.0'} ★
                   </div>
                 </div>
-              </div>
-
-              <div className={styles.detailsSection}>
-                <div className={styles.addressRow}>
-                  <EnvironmentOutlined />
-                  <span>{spot.address}</span>
-                </div>
-                <div className={styles.descriptionBlock}>
-                  <h3>About</h3>
-                  <p>{spot.description}</p>
-                </div>
-              </div>
-
-              <div className={styles.postsSection}>
-                <div className={styles.sectionHeader}>
-                  <h3>Recent Posts</h3>
-                </div>
                 
-                {recentPosts && recentPosts.length > 0 ? (
-                  <div className={styles.postList}>
-                    {recentPosts.map(post => (
-                      <div key={post.id} className={styles.postCard}>
-                        <div className={styles.postHeader}>
-                          <div className={styles.userInfo}>
-                            <img src={post.userIcon || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + post.userId} alt="avatar" className={styles.avatar} />
-                            <span className={styles.userName}>{post.userNickname}</span>
-                          </div>
-                          <span className={styles.postDate}>
-                            {new Date(post.createTime).toLocaleDateString()}
-                          </span>
-                        </div>
-                        
-                        {post.images && (
-                          <div 
-                            className={styles.postImage}
-                            style={{ backgroundImage: `url(${post.images.split(',')[0]})` }}
-                          />
-                        )}
-                        
-                        <div className={styles.postContent}>
-                          <h4 className={styles.postTitle}>{post.title}</h4>
-                          <p className={styles.postText}>{post.content}</p>
-                        </div>
-                        
-                        <div className={styles.postFooter}>
-                          <div className={styles.actionItem}>
-                            <HeartOutlined /> {post.liked}
-                          </div>
-                          <div className={styles.actionItem}>
-                            <MessageOutlined /> Reply
+                <p className={styles.spotAddressInfo}>
+                  <EnvironmentOutlined />
+                  {spot.address} • 1.2 mi away
+                </p>
+
+                <button className={styles.quickPostBtn} onClick={() => console.log('post')}>
+                  <span role="img" aria-label="camera">📷</span> Post Here
+                </button>
+
+                <div className={styles.recentPostsList}>
+                  <div className={styles.sectionTitle}>Recent Posts</div>
+                  
+                  {recentPosts && recentPosts.length > 0 ? (
+                    recentPosts.map(post => (
+                      <div key={post.id} className={styles.miniPostItem} onClick={() => setSelectedPostId(post.id)}>
+                        <div 
+                          className={styles.postImgPlaceholder} 
+                          style={{ backgroundImage: `url(${(Array.isArray(post.images) ? post.images[0] : post.images?.split(',')[0]) || 'https://via.placeholder.com/40'})` }}
+                        />
+                        <div className={styles.postItemInfo}>
+                          <div className={styles.postTitle}>{post.title}</div>
+                          <div className={styles.postMeta}>
+                            By {post.userNickname} • {post.liked} Likes
                           </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className={styles.emptyPosts}>No recent posts for this spot yet.</div>
-                )}
-              </div>
+                    ))
+                  ) : (
+                    <div className={styles.emptyPosts}>No recent posts for this spot yet.</div>
+                  )}
+                </div>
 
-              {/* Review Section */}
-              <div className={styles.reviewSection}>
-                <ReviewForm spotId={spotId} />
-                <ReviewList spotId={spotId} />
-              </div>
-            </>
-          ) : null}
+                {/* Review Section */}
+                <div className={styles.spotReviewsSection}>
+                  <div className={styles.sectionTitle}>Reviews</div>
+                  <ReviewForm spotId={spotId} />
+                  <ReviewList spotId={spotId} />
+                </div>
+              </>
+            ) : null}
+          </div>
         </div>
       </div>
     </>

@@ -148,7 +148,7 @@ public class AdminServiceImpl implements AdminService {
     public Result<PageResult<SpotResponse>> getSpotList(Long categoryId, Integer page, Integer size) {
         PageRequest pageable = PageRequest.of(page - 1, size);
         // Reuse existing JPQL: categoryId=null means no filter
-        Page<Spot> pageData = spotRepository.findByFilterDefault(categoryId, pageable);
+        Page<Spot> pageData = spotRepository.findByFilterDefault(categoryId, null, pageable);
         // Map Spot entities to SpotResponse VOs
         List<SpotResponse> list = pageData.getContent().stream().map(spot -> {
             SpotResponse vo = new SpotResponse();

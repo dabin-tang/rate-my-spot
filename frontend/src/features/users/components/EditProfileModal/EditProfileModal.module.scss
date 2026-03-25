@@ -1,0 +1,190 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(2px);
+  will-change: opacity;
+}
+
+.modalOverlay.visible {
+  opacity: 1;
+}
+
+.modalCard {
+  width: 480px;
+  border-radius: 20px;
+  padding: 32px;
+  position: relative;
+  
+  /* CRITICAL: Subtle TikTok gradient localized entirely to the top-left corner */
+  background: radial-gradient(circle at 0% 0%, #c4fdf4 0%, #effeff 15%, #ffffff 32%);
+  
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  
+  transform-origin: center;
+  /* Premium initial state: slightly smaller and lower for a smooth float-up entrance */
+  transform: scale(0.96) translateY(20px) translateZ(0);
+  opacity: 0;
+  /* Apple/Stripe-like fluid cubic-bezier for a hyper-smooth, non-bouncy deceleration */
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease-out;
+  will-change: transform, opacity;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.modalCard.visible {
+  transform: scale(1) translateY(0) translateZ(0);
+  opacity: 1;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #999;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s, color 0.2s;
+
+  &:hover {
+    background: rgba(0,0,0,0.05);
+    color: #333;
+  }
+}
+
+.modalTitle {
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  color: #333;
+  margin-bottom: 24px;
+}
+
+.avatarSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.avatarWrapper {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 3px solid #fff;
+  transition: all 0.2s ease;
+
+  &:hover {
+    .avatarOverlay {
+      opacity: 1;
+    }
+  }
+}
+
+.avatarPreview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarPlaceholder {
+  width: 100%;
+  height: 100%;
+  background-color: #1677ff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  font-weight: bold;
+}
+
+.avatarOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.cameraIcon {
+  color: white;
+  font-size: 24px;
+}
+
+.avatarHint {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #999;
+}
+
+.form {
+  :global {
+    .ant-form-item-label > label {
+      font-weight: 600;
+      color: #555;
+    }
+  }
+}
+
+.inputField, .selectField {
+  border-radius: 8px !important;
+}
+
+.actionRow {
+  margin-top: 32px;
+  margin-bottom: 0;
+  
+  :global(.ant-form-item-control-input-content) {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+  }
+}
+
+.cancelBtn {
+  border-radius: 8px !important;
+  border-color: #ddd !important;
+  color: #666 !important;
+  flex: 1;
+}
+
+.saveBtn {
+  border-radius: 8px !important;
+  background-color: #ff2442 !important;
+  border: none !important;
+  flex: 2;
+  box-shadow: 0 4px 14px rgba(255, 36, 66, 0.3) !important;
+
+  &:hover {
+    background-color: #ff0022 !important;
+    opacity: 0.9 !important;
+  }
+}

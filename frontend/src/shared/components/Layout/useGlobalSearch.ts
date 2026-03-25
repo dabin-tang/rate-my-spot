@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { searchSpots } from '../../../features/spots/api/searchSpots';
 import type { SpotResponse } from '../../../features/spots/types';
+import { useUIStore } from '../../stores/useUIStore';
 
 export const useGlobalSearch = () => {
   const [keyword, setKeyword] = useState('');
@@ -35,7 +36,7 @@ export const useGlobalSearch = () => {
       
       setIsLoading(true);
       try {
-        const response = await searchSpots(keyword);
+        const response = await searchSpots(keyword.trim());
         // The cast in searchSpots api defines this is returning Result<SpotResponse[]>
         setResults(response.data || []);
       } catch (error) {
@@ -64,10 +65,9 @@ export const useGlobalSearch = () => {
   const handleResultClick = (spotId: number) => {
     setIsDropdownVisible(false);
     setKeyword('');
-    // TODO: Depending on your routing setup, navigate to spot detail or open modal.
-    // Navigate to a dedicated spot detail page if it exists:
-    // navigate(`/spot/${spotId}`);
-    console.log('Navigate to spot ID:', spotId);
+    const { setDrawerOpen, setSelectedSpotId } = useUIStore.getState();
+    setDrawerOpen(true);
+    setSelectedSpotId(spotId);
   };
 
   return {

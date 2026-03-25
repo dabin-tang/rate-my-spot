@@ -51,8 +51,8 @@ public class JwtInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String requestURI = request.getRequestURI();
 
-        // Allow viewing post details by ID (/api/post/1)
-        if (requestURI.matches("^/api/post/\\d+$")) {
+        // Allow viewing post details and spot details by ID (/api/post/1, /api/spot/1)
+        if (requestURI.matches("^/api/post/\\d+$") || requestURI.matches("^/api/spot/\\d+$")) {
             return true;
         }
 

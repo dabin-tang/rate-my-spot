@@ -1,6 +1,6 @@
 import React from 'react';
 import { Spin } from 'antd';
-import { StarFilled, HeartOutlined } from '@ant-design/icons';
+import { StarFilled } from '@ant-design/icons';
 import { useSpotReviews } from '../../hooks/useSpotReviews';
 import styles from './ReviewList.module.scss';
 import type { SpotReviewResponse } from '../../types';
@@ -48,7 +48,7 @@ export const ReviewList: React.FC<ReviewListProps> = ({ spotId }) => {
               
               {review.images && (
                 <div className={styles.imageGrid}>
-                  {review.images.split(',').map((imgUrl, idx) => (
+                  {(Array.isArray(review.images) ? review.images : review.images.split(',')).map((imgUrl, idx) => (
                     <div 
                       key={idx} 
                       className={styles.reviewImage}
@@ -60,9 +60,6 @@ export const ReviewList: React.FC<ReviewListProps> = ({ spotId }) => {
               
               <div className={styles.footer}>
                 <span className={styles.date}>{new Date(review.createTime).toLocaleDateString()}</span>
-                <span className={styles.likes}>
-                  <HeartOutlined /> {review.liked || 0}
-                </span>
               </div>
             </div>
           ))}

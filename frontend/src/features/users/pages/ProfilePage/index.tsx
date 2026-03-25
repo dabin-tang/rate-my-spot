@@ -26,50 +26,40 @@ export const ProfilePage: React.FC = () => {
       key: 'posts',
       children: (
         <div className={styles.tabContent}>
-           <Text type="secondary" className={styles.comingSoon}>User posts API integration coming soon...</Text>
-           {/* Replace with actual UserPostsFeed when API is ready */}
+           <Text type="secondary">User posts API integration coming soon...</Text>
         </div>
       ),
     },
     {
-      label: 'Liked',
+      label: 'My Likes',
       key: 'liked',
       children: (
         <div className={styles.tabContent}>
-          <Text type="secondary" className={styles.comingSoon}>Liked posts API integration coming soon...</Text>
-        </div>
-      ),
-    },
-    {
-      label: 'Collections',
-      key: 'collections',
-      children: (
-        <div className={styles.tabContent}>
-          <Empty description="No collections found" />
+          <Text type="secondary">Liked posts API integration coming soon...</Text>
         </div>
       ),
     },
   ];
 
   return (
-    <div className={styles.container}>
-      <div className={styles.content}>
+    <div className={styles.pageContainer}>
+      <div className={styles.profileHeaderSection}>
         {isLoading || !profileData ? (
-          <div style={{ padding: '32px' }}>
+          <div style={{ padding: '40px' }}>
              <Skeleton avatar active paragraph={{ rows: 3 }} />
           </div>
         ) : (
           <UserProfileCard user={profileData} isCurrentUser={true} />
         )}
-        
-        <div className={styles.tabsContainer}>
-          <Tabs 
-            defaultActiveKey="posts" 
-            items={tabItems}
-            size="large"
-            tabBarStyle={{ padding: '0 16px', fontWeight: 600 }}
-          />
-        </div>
+      </div>
+
+      <div className={styles.tabsSection}>
+        <Tabs 
+          defaultActiveKey="posts" 
+          items={tabItems}
+          className={styles.profileTabs}
+          centered
+        />
       </div>
     </div>
   );

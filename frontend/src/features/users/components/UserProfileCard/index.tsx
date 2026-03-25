@@ -1,6 +1,8 @@
-import React from 'react';
-import { Avatar, Typography, Flex, Button } from 'antd';
+import React, { useState } from 'react';
+import { Typography, Flex } from 'antd';
+import { ManOutlined, WomanOutlined } from '@ant-design/icons';
 import { FollowButton } from '../FollowButton';
+import { EditProfileModal } from '../EditProfileModal';
 import type { UserProfileDTO } from '../../types';
 import styles from './UserProfileCard.module.scss';
 
@@ -15,54 +17,71 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
   user,
   isCurrentUser = false
 }) => {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  // Use actual info, fallback to subtle text if empty
+  const introText = user.intro || "This user hasn't written a bio yet.";
+
   return (
     <div className={styles.cardWrapper}>
-      <Flex gap={24} align="flex-start" className={styles.mainLayout}>
-        <Avatar 
-          src={user.icon} 
-          className={styles.avatar}
-        >
-          {user.nickname?.charAt(0).toUpperCase()}
-        </Avatar>
+      <Flex gap={40} align="flex-start" className={styles.mainLayout}>
+        <div className={styles.avatarContainer}>
+          {user.icon ? (
+            <img src={user.icon} alt="user avatar" className={styles.avatarImg} />
+          ) : (
+            <div className={styles.avatarPlaceholder}>
+              {user.nickname?.substring(0, 2).toUpperCase() || 'ME'}
+            </div>
+          )}
+        </div>
         
         <Flex vertical className={styles.rightSection}>
-          <Flex justify="space-between" align="flex-start" className={styles.headerRow}>
-            <Flex vertical>
-              <Title level={2} className={styles.name}>
-                {user.nickname}
-              </Title>
-              <Text className={styles.intro}>
-                {user.intro || 'This person is lazy and wrote nothing.'}
-              </Text>
-            </Flex>
-            
-            <div className={styles.actionArea}>
-              {isCurrentUser ? (
-                <Button shape="round" className={styles.editBtn}>
-                  Edit Profile
-                </Button>
-              ) : (
-                <FollowButton userId={user.id} />
-              )}
-            </div>
-          </Flex>
+          <div className={styles.headerRow}>
+            <Title level={2} className={styles.name}>
+              {user.nickname || 'My Account'}
+              {user.gender === 1 && <ManOutlined className={styles.genderIconMale} />}
+              {user.gender === 2 && <WomanOutlined className={styles.genderIconFemale} />}
+            </Title>
+          </div>
+          <div className={styles.idLabel}>ID: {user.id}</div>
+          
+          <Text className={styles.intro}>
+            {introText}
+          </Text>
 
-          <Flex gap={32} className={styles.statsRow}>
+          <Flex gap={40} className={styles.statsRow}>
             <div className={styles.statBlock}>
-              <Text className={styles.statNumber}>{user.followee || 0}</Text>
+              <Text className={styles.statNumber}>{user.followingCount ?? user.followee ?? 0}</Text>
               <Text className={styles.statLabel}>Following</Text>
             </div>
             <div className={styles.statBlock}>
-              <Text className={styles.statNumber}>{user.fans || 0}</Text>
+              <Text className={styles.statNumber}>{user.followersCount ?? user.fans ?? 0}</Text>
               <Text className={styles.statLabel}>Followers</Text>
             </div>
             <div className={styles.statBlock}>
               <Text className={styles.statNumber}>{user.credit || 0}</Text>
-              <Text className={styles.statLabel}>Credit</Text>
+              <Text className={styles.statLabel}>Likes</Text> 
             </div>
           </Flex>
+
+          <div className={styles.actionArea}>
+            {isCurrentUser ? (
+              <button className={styles.editBtn} onClick={() => setIsEditModalOpen(true)}>
+                Edit Profile
+              </button>
+            ) : (
+              <FollowButton userId={user.id} />
+            )}
+          </div>
         </Flex>
       </Flex>
+      {isCurrentUser && (
+        <EditProfileModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          currentUser={user}
+        />
+      )}
     </div>
   );
 };

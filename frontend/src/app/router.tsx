@@ -13,8 +13,7 @@ const PlaceholderPage = ({ title }: { title: string }) => (
 import { CreatePostPage } from '../features/posts/pages/CreatePostPage';
 
 import { DiscoverFeedPage } from '../features/posts/pages/DiscoverFeedPage';
-
-const UserProfile = () => <PlaceholderPage title="My Profile" />;
+import { ProfilePage } from '../features/users/pages/ProfilePage';
 
 const router = createBrowserRouter([
   {
@@ -31,7 +30,7 @@ const router = createBrowserRouter([
       },
       {
         path: 'profile',
-        element: <UserProfile />,
+        element: <ProfilePage />,
       },
       {
         path: '*',

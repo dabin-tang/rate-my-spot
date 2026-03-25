@@ -28,4 +28,5 @@ export interface SpotPageReq {
   latitude: number;
   longitude: number;
   page?: number;
+  keyword?: string;
 }

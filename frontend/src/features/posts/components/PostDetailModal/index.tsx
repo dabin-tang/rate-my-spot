@@ -21,8 +21,9 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ postId, visibl
   });
 
   const post = data?.data;
-  const { token } = useAuthStore();
+  const { token, user } = useAuthStore();
   const isLoggedIn = !!token;
+  const isMe = isLoggedIn && user && post && user.id === post.userId;
 
   const requireAuth = (action: () => void) => {
     if (!isLoggedIn) {
@@ -147,12 +148,14 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ postId, visibl
                   </Avatar>
                   <span className="nickname">{post.userNickname}</span>
                 </div>
-                <button 
-                  className="follow-btn"
-                  onClick={() => requireAuth(() => console.log('Follow clicked'))}
-                >
-                  Follow
-                </button>
+                {!isMe && (
+                  <button 
+                    className="follow-btn"
+                    onClick={() => requireAuth(() => console.log('Follow clicked'))}
+                  >
+                    Follow
+                  </button>
+                )}
               </div>
 
               {/* Body */}

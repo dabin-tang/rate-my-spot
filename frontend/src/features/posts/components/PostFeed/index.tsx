@@ -2,7 +2,7 @@ import React from 'react';
 import { Flex, Skeleton, Typography } from 'antd';
 import { usePostFeed } from './usePostFeed';
 import { PostItem } from '../PostItem';
-import { PostDetailModal } from '../PostDetailModal';
+import { useUIStore } from '../../../../shared/stores/useUIStore';
 import styles from './PostFeed.module.scss';
 import type { PostResponse } from '../../types';
 
@@ -17,10 +17,10 @@ export const PostFeed: React.FC<PostFeedProps> = ({ categoryId, sort = 'latest' 
   const { 
     posts, 
     isLoading, 
-    isError, 
-    selectedPostId, 
-    setSelectedPostId 
+    isError 
   } = usePostFeed(categoryId, sort);
+  
+  const setSelectedPostId = useUIStore((state) => state.setSelectedPostId);
 
   if (isLoading) {
     return (
@@ -55,13 +55,6 @@ export const PostFeed: React.FC<PostFeedProps> = ({ categoryId, sort = 'latest' 
           </div>
         ))}
       </div>
-
-      <PostDetailModal 
-        key={selectedPostId || 'close'}
-        postId={selectedPostId}
-        visible={!!selectedPostId} 
-        onClose={() => setSelectedPostId(null)} 
-      />
     </>
   );
 };

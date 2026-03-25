@@ -1,10 +1,8 @@
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getFeed } from '../../api/getFeed';
 import type { PostResponse } from '../../types';
 
 export const usePostFeed = (categoryId?: number, sort: string = 'latest') => {
-  const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['postFeed', categoryId || 'all', sort],
@@ -16,8 +14,6 @@ export const usePostFeed = (categoryId?: number, sort: string = 'latest') => {
   return {
     posts,
     isLoading,
-    isError,
-    selectedPostId,
-    setSelectedPostId
+    isError
   };
 };
