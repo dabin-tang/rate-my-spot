@@ -128,4 +128,21 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Modifying
     @Query("UPDATE Post p SET p.liked = p.liked - 1 WHERE p.id = :postId AND p.liked > 0")
     void decrementLiked(@Param("postId") Long postId);
+
+    /**
+     * Search posts by keyword (fuzzy match on title or content).
+     * Only returns posts with status=0 (published), ordered by create time DESC.
+     */
+    @Query("SELECT new com.ratemyspot.response.PostResponse(" +
+            "p.id, p.spotId, p.userId, p.userNickname, p.userIcon, " +
+            "p.title, p.content, p.images, p.rating, p.liked, " +
+            "p.status, p.createTime, p.updateTime, " +
+            "s.name, c.name) " +
+            "FROM Post p " +
+            "LEFT JOIN Spot s ON p.spotId = s.id " +
+            "LEFT JOIN SpotCategory c ON s.categoryId = c.id " +
+            "WHERE p.status = 0 " +
+            "AND (p.title LIKE CONCAT('%', :keyword, '%') OR p.content LIKE CONCAT('%', :keyword, '%')) " +
+            "ORDER BY p.createTime DESC")
+    Page<PostResponse> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
 }

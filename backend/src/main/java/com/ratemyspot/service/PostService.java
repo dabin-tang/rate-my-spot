@@ -36,4 +36,7 @@ public interface PostService {
      * Get recent posts for a spot.
      */
     Result<List<RecentPostResponse>> getRecentPosts(Long spotId);
+
+    /** Search posts by keyword (fuzzy match on title or content). */
+    Result<PageResult<PostResponse>> searchPosts(String keyword, Integer page, Integer size);
 }

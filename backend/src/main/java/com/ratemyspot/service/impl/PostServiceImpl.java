@@ -176,4 +176,20 @@ public class PostServiceImpl implements PostService {
         return Result.ok(page.getContent());
     }
 
+    /**
+     * Search posts by keyword (fuzzy match on title or content).
+     */
+    @Override
+    public Result<PageResult<PostResponse>> searchPosts(String keyword, Integer page, Integer size) {
+        PageRequest pageable = PageRequest.of(page - 1, size);
+        Page<PostResponse> responsePage = postRepository.searchByKeyword(keyword, pageable);
+        PageResult<PostResponse> pageResult = new PageResult<>(
+                page,
+                size,
+                responsePage.getTotalElements(),
+                responsePage.getTotalPages(),
+                responsePage.getContent()
+        );
+        return Result.ok(pageResult);
+    }
 }

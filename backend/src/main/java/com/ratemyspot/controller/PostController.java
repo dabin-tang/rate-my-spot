@@ -13,7 +13,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -101,5 +100,23 @@ public class PostController {
     public Result<List<RecentPostResponse>> getRecentPosts(@PathVariable Long spotId) {
         log.info("Get Recent Posts: spotId={}", spotId);
         return postService.getRecentPosts(spotId);
+    }
+
+    /**
+     * Search posts by keyword (fuzzy match on title or content).
+     *
+     * @param keyword Required search keyword
+     * @param page    Page number, starts from 1 (default: 1)
+     * @param size    Page size (default: 10)
+     * @return Paginated list of matching posts
+     */
+    @GetMapping("/search")
+    @Operation(summary = "Search Posts", description = "Fuzzy search posts by title or content keyword")
+    public Result<PageResult<PostResponse>> searchPosts(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+        log.info("Search Posts: keyword={}, page={}, size={}", keyword, page, size);
+        return postService.searchPosts(keyword, page, size);
     }
 }
