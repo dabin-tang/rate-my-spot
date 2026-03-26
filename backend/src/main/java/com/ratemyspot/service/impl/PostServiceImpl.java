@@ -93,6 +93,8 @@ public class PostServiceImpl implements PostService {
             responsePage = postRepository.findFeedDefault(dto.getCategoryId(), pageable);
         }
 
+        fillUserInteractionMetadata(responsePage.getContent(), UserContext.getCurrentUserId());
+
         PageResult<PostResponse> pageResult = new PageResult<>(
                 dto.getPage(),
                 dto.getSize(),
@@ -154,6 +156,8 @@ public class PostServiceImpl implements PostService {
         PageRequest pageable = PageRequest.of(page - 1, size);
         Page<PostResponse> responsePage = postRepository.findUserPostsVO(userId, pageable);
 
+        fillUserInteractionMetadata(responsePage.getContent(), UserContext.getCurrentUserId());
+
         PageResult<PostResponse> pageResult = new PageResult<>(
                 page,
                 size,
@@ -183,6 +187,9 @@ public class PostServiceImpl implements PostService {
     public Result<PageResult<PostResponse>> searchPosts(String keyword, Integer page, Integer size) {
         PageRequest pageable = PageRequest.of(page - 1, size);
         Page<PostResponse> responsePage = postRepository.searchByKeyword(keyword, pageable);
+        
+        fillUserInteractionMetadata(responsePage.getContent(), UserContext.getCurrentUserId());
+        
         PageResult<PostResponse> pageResult = new PageResult<>(
                 page,
                 size,
@@ -191,5 +198,20 @@ public class PostServiceImpl implements PostService {
                 responsePage.getContent()
         );
         return Result.ok(pageResult);
+    }
+
+    /**
+     * Helper to populate dynamic interactions for a list of posts
+     */
+    private void fillUserInteractionMetadata(List<PostResponse> posts, Long currentUserId) {
+        if (currentUserId == null || posts == null || posts.isEmpty()) {
+            return;
+        }
+        for (PostResponse post : posts) {
+            Boolean liked = redisTemplate.opsForSet().isMember(Constants.CACHE_POST_LIKES_KEY + post.getId(), currentUserId);
+            Boolean follow = redisTemplate.opsForSet().isMember(Constants.CACHE_USER_FOLLOWING_KEY + currentUserId, post.getUserId());
+            post.setIsLiked(Boolean.TRUE.equals(liked));
+            post.setIsFollow(Boolean.TRUE.equals(follow));
+        }
     }
 }

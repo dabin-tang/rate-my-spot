@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Avatar, Typography, Flex } from 'antd';
 import { formatDistanceToNow } from 'date-fns';
 import type { PostCommentResponse } from '../../../posts/types';
@@ -13,12 +13,11 @@ interface CommentItemProps {
 }
 
 export const CommentItem: React.FC<CommentItemProps> = ({ comment, onReply, depth = 0 }) => {
-  // Indent based on depth. We cap nesting visual indent at depth 3 for better mobile UX.
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // We cap nesting visual indent at depth 1 for a flat Bilibili style look.
   const indentClass = useMemo(() => {
-    if (depth === 0) return '';
-    if (depth === 1) return styles.depth1;
-    if (depth === 2) return styles.depth2;
-    return styles.depth3;
+    return depth > 0 ? styles.depth1 : '';
   }, [depth]);
 
   const timeAgo = useMemo(() => {
@@ -32,12 +31,12 @@ export const CommentItem: React.FC<CommentItemProps> = ({ comment, onReply, dept
 
   return (
     <div className={`${styles.commentWrapper} ${indentClass}`}>
-      <Flex gap={12} align="flex-start" className={styles.commentBody}>
-        <Avatar src={comment.userIcon} className={styles.avatar}>
+      <Flex gap={8} align="flex-start" className={styles.commentBody}>
+        <Avatar src={comment.userIcon} className={styles.avatar} size={depth === 0 ? 32 : 24}>
           {comment.userNickname?.charAt(0)?.toUpperCase()}
         </Avatar>
         
-        <Flex vertical gap={4} className={styles.contentArea}>
+        <Flex vertical gap={2} className={styles.contentArea}>
           <Flex align="center" gap={8} className={styles.headerRow}>
             <Text strong className={styles.nickname}>{comment.userNickname}</Text>
             
@@ -59,22 +58,43 @@ export const CommentItem: React.FC<CommentItemProps> = ({ comment, onReply, dept
             >
               Reply
             </Text>
-            {/* Like button could be added here later */}
           </Flex>
         </Flex>
       </Flex>
 
-      {/* Recursive rendering for children */}
+      {/* Flattened rendering for children */}
       {comment.children && comment.children.length > 0 && (
         <div className={styles.childrenContainer}>
-          {comment.children.map(child => (
-            <CommentItem 
-              key={child.id} 
-              comment={child} 
-              onReply={onReply}
-              depth={depth + 1} 
-            />
-          ))}
+          {/* Always render first child */}
+          <CommentItem 
+            key={comment.children[0].id} 
+            comment={comment.children[0]} 
+            onReply={onReply}
+            depth={1} 
+          />
+
+          {/* Render the REST inside an animated container */}
+          {comment.children.length > 1 && (
+            <div className={`${styles.expandableWrapper} ${isExpanded ? styles.expanded : ''}`}>
+              <div className={styles.expandableInner}>
+                {comment.children.slice(1).map(child => (
+                  <CommentItem 
+                    key={child.id} 
+                    comment={child} 
+                    onReply={onReply}
+                    depth={1} 
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Toggle Button */}
+          {comment.children.length > 1 && (
+            <div className={styles.expandBtn} onClick={() => setIsExpanded(!isExpanded)}>
+              {isExpanded ? '―― Hide replies ⏶' : `―― View ${comment.children.length - 1} more replies ⏷`}
+            </div>
+          )}
         </div>
       )}
     </div>

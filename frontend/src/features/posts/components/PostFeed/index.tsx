@@ -1,6 +1,7 @@
 import React from 'react';
 import { Flex, Skeleton, Typography } from 'antd';
 import { usePostFeed } from './usePostFeed';
+import { useToggleLike } from '../../hooks/useToggleLike';
 import { PostItem } from '../PostItem';
 import { useUIStore } from '../../../../shared/stores/useUIStore';
 import styles from './PostFeed.module.scss';
@@ -21,6 +22,7 @@ export const PostFeed: React.FC<PostFeedProps> = ({ categoryId, sort = 'latest' 
   } = usePostFeed(categoryId, sort);
   
   const setSelectedPostId = useUIStore((state) => state.setSelectedPostId);
+  const { mutate: toggleLike } = useToggleLike([['postFeed', categoryId || 'all', sort]]);
 
   if (isLoading) {
     return (
@@ -50,7 +52,8 @@ export const PostFeed: React.FC<PostFeedProps> = ({ categoryId, sort = 'latest' 
           <div key={post.id} className={styles.itemWrapper}>
             <PostItem 
               post={post} 
-              onClick={(id: number) => setSelectedPostId(id)} 
+              onClick={(id: number) => setSelectedPostId(id)}
+              onLike={(id: number) => toggleLike(id)}
             />
           </div>
         ))}

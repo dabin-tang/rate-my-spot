@@ -28,6 +28,9 @@ public class Constants {
     // Post Like Set Cache (Redis Set: members = userIds who liked the post)
     public static final String CACHE_POST_LIKES_KEY = "cache:post:likes:";
 
+    // Comment Like Set Cache (Redis Set: members = userIds who liked the comment)
+    public static final String CACHE_COMMENT_LIKES_KEY = "cache:comment:likes:";
+
     // Follow Set Cache (Redis Set: members = followUserId that current user follows)
     public static final String CACHE_USER_FOLLOWING_KEY = "cache:user:following:";
 

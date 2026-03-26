@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Avatar, message } from 'antd';
+import { HeartOutlined, HeartFilled } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { getPostById } from '../../api/getPostById';
+import { useToggleLike } from '../../hooks/useToggleLike';
 import { useAuthStore } from '../../../auth/stores/useAuthStore';
 import { CommentSection } from '../CommentSection';
 import './PostDetailModal.scss';
@@ -19,6 +21,8 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ postId, visibl
     queryFn: () => getPostById(postId!),
     enabled: !!postId && visible,
   });
+
+  const { mutate: toggleLike } = useToggleLike([['postDetail', postId]]);
 
   const post = data?.data;
   const { token, user } = useAuthStore();
@@ -173,6 +177,17 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ postId, visibl
                   <span className="score">
                     {post.rating || 5.0} ★
                   </span>
+                </div>
+              </div>
+
+              {/* Actions Bar */}
+              <div className="actions-bar">
+                <div 
+                  className="action-btn" 
+                  onClick={() => requireAuth(() => toggleLike(post.id))}
+                >
+                  {post.isLiked ? <HeartFilled className="liked" /> : <HeartOutlined className="unliked" />}
+                  <span className="count">{post.liked || 0}</span>
                 </div>
               </div>
 

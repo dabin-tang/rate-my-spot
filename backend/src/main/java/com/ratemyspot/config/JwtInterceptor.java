@@ -31,6 +31,8 @@ public class JwtInterceptor implements HandlerInterceptor {
             "/api/spot/search",
             "/api/spot-category/list",
             "/api/post/feed",
+            "/api/post/search",       // Guests can search posts
+            "/api/user/search",       // Guests can search users
             "/api/spot-review/list",  // Guests can read reviews
             "/api/post-comment/list", // Guests can read comments
 
@@ -51,8 +53,26 @@ public class JwtInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String requestURI = request.getRequestURI();
 
-        // Allow viewing post details and spot details by ID (/api/post/1, /api/spot/1)
-        if (requestURI.matches("^/api/post/\\d+$") || requestURI.matches("^/api/spot/\\d+$")) {
+        // 1. Opportunistically try to extract and populate UserContext BEFORE checking whitelist,
+        // so that even public APIs can know who the logged-in user is.
+        String token = extractTokenFromRequest(request);
+        boolean hasValidUser = false;
+        if (token != null && jwtUtil.validateToken(token)) {
+            String userId = String.valueOf(jwtUtil.getUserIdFromToken(token));
+            String banKey = "BANNED:" + userId;
+            if (!Boolean.TRUE.equals(redisTemplate.hasKey(banKey))) {
+                UserDTO userDTO = jwtUtil.getUserInfoFromToken(token);
+                UserContext.setUser(userDTO);
+                hasValidUser = true;
+            }
+        }
+
+        // Allow viewing public IDs and lists
+        if (requestURI.matches("^/api/post/\\d+$") ||
+            requestURI.matches("^/api/spot/\\d+$") ||
+            requestURI.matches("^/api/user/\\d+$") ||
+            requestURI.matches("^/api/post/spot/\\d+$") ||
+            requestURI.matches("^/api/post/user/\\d+$")) {
             return true;
         }
 
@@ -77,37 +97,25 @@ public class JwtInterceptor implements HandlerInterceptor {
             }
         }
 
-        // 1. Get the token from the header
-        String token = extractTokenFromRequest(request);
+        // At this point, the path REQUIRES authentication.
         if (token == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json;charset=UTF-8");
             response.getWriter().write("{\"code\":401,\"msg\":\"Not logged in\"}");
             return false;
         }
-
-        // 2. Check if the token is valid or expired
         if (!jwtUtil.validateToken(token)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json;charset=UTF-8");
             response.getWriter().write("{\"code\":401,\"msg\":\"Token is invalid or expired\"}");
             return false;
         }
-
-        // 3. Redis check. If the user is banned, kick them out immediately
-        // We used String.valueOf because the ID is a Long
-        String userId = String.valueOf(jwtUtil.getUserIdFromToken(token));
-        String banKey = "BANNED:" + userId;
-        if (Boolean.TRUE.equals(redisTemplate.hasKey(banKey))) {
+        if (!hasValidUser) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json;charset=UTF-8");
             response.getWriter().write("{\"code\":401,\"msg\":\"You are banned\"}");
             return false;
         }
-
-        // 4. Save user info to context so we can use it later in Service
-        UserDTO userDTO = jwtUtil.getUserInfoFromToken(token);
-        UserContext.setUser(userDTO);
 
         return true;
     }

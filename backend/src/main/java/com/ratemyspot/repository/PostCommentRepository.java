@@ -34,5 +34,15 @@ public interface PostCommentRepository extends JpaRepository<PostComment, Long> 
             @Param("postId") Long postId,
             @Param("keyword") String keyword,
             Pageable pageable);
+
+    /** Increment liked count for a comment. */
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("UPDATE PostComment c SET c.liked = c.liked + 1 WHERE c.id = :commentId")
+    void incrementLiked(@Param("commentId") Long commentId);
+
+    /** Decrement liked count for a comment. */
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("UPDATE PostComment c SET c.liked = c.liked - 1 WHERE c.id = :commentId AND c.liked > 0")
+    void decrementLiked(@Param("commentId") Long commentId);
 }
 

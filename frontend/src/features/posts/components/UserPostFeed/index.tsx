@@ -1,6 +1,7 @@
 import React from 'react';
 import { Flex, Button, Typography } from 'antd';
 import { useUserPosts } from '../../hooks/useUserPosts';
+import { useToggleLike } from '../../hooks/useToggleLike';
 import { PostItem } from '../PostItem';
 import { useUIStore } from '../../../../shared/stores/useUIStore';
 import styles from '../PostFeed/PostFeed.module.scss';
@@ -25,6 +26,7 @@ export const UserPostFeed: React.FC<UserPostFeedProps> = ({ userId, skeletonGrid
   } = useUserPosts(userId);
   
   const setSelectedPostId = useUIStore((state) => state.setSelectedPostId);
+  const { mutate: toggleLike } = useToggleLike([['userPosts', userId]]);
 
   if (isLoading) {
     return <>{skeletonGrid}</>;
@@ -56,6 +58,7 @@ export const UserPostFeed: React.FC<UserPostFeedProps> = ({ userId, skeletonGrid
             <PostItem 
               post={post} 
               onClick={(id: number) => setSelectedPostId(id)} 
+              onLike={(id: number) => toggleLike(id)}
             />
           </div>
         ))}

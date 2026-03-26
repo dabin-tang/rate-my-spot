@@ -8,7 +8,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999; /* Ensure it covers everything, including the sidebar */
+  z-index: 1000; /* Overrides Sidebar (100) but stays beneath Antd Message (1010) */
   transition: background 0.3s ease;
 
   &.animating {
@@ -17,8 +17,8 @@
 }
 
 .post-detail-modal {
-  width: 800px;
-  height: 600px;
+  width: 840px;
+  height: 630px;
   background: white;
   border-radius: 16px;
   display: flex;
@@ -206,12 +206,47 @@
     }
   }
 
+  .actions-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: none;
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-size: 22px;
+      transition: opacity 0.2s;
+
+      &:hover {
+        opacity: 0.8;
+      }
+
+      .liked {
+        color: #ff2442;
+      }
+      .unliked {
+        color: #333;
+      }
+
+      .count {
+        font-size: 15px;
+        font-weight: 500;
+        color: #333;
+      }
+    }
+  }
+
   .comments-wrapper {
     flex: 1;
     min-height: 0;
     margin-top: 16px;
-    border-top: 1px solid #eee;
-    padding-top: 16px;
+    border-top: none;
+    padding-top: 0;
     display: flex;
     flex-direction: column;
     /* Since CommentSection has its own dark theme styling from advanced-ui, 

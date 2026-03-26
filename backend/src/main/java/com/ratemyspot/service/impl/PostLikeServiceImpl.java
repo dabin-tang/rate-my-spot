@@ -74,6 +74,9 @@ public class PostLikeServiceImpl implements PostLikeService {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<PostResponse> pageResult = postLikeRepository.findLikedPosts(userId, pageable);
 
+        // Manually set isLiked = true since these are explicitly the user's liked posts
+        pageResult.getContent().forEach(post -> post.setIsLiked(true));
+
         PageResult<PostResponse> result = new PageResult<>(
                 page,
                 size,
