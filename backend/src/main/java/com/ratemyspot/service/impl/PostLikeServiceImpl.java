@@ -66,16 +66,39 @@ public class PostLikeServiceImpl implements PostLikeService {
     }
 
     /**
-     * Get list of posts liked by current user.
+     * Get list of posts liked by target user.
+     * Respects the target user's privacy setting.
      */
     @Override
-    public Result<PageResult<PostResponse>> getLikedPosts(Integer page, Integer size) {
-        Long userId = UserContext.getCurrentUserId();
-        Pageable pageable = PageRequest.of(page - 1, size);
-        Page<PostResponse> pageResult = postLikeRepository.findLikedPosts(userId, pageable);
+    public Result<PageResult<PostResponse>> getLikedPosts(Long targetUserId, Integer page, Integer size) {
+        if (targetUserId == null) {
+            return Result.fail(Constants.ERR_USER_NOT_LOGIN);
+        }
 
-        // Manually set isLiked = true since these are explicitly the user's liked posts
-        pageResult.getContent().forEach(post -> post.setIsLiked(true));
+        Long currentUserId = UserContext.getCurrentUserId();
+
+        // Privacy check: if viewing someone else's list, check if target has set it to private
+        if (currentUserId == null || !currentUserId.equals(targetUserId)) {
+            String privacyKey = Constants.CACHE_USER_LIKES_PRIVACY_KEY + targetUserId;
+            Object privacy = redisTemplate.opsForValue().get(privacyKey);
+            if ("1".equals(privacy)) {
+                return Result.fail("This user's liked posts are private");
+            }
+        }
+
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<PostResponse> pageResult = postLikeRepository.findLikedPosts(targetUserId, pageable);
+
+        // If viewing someone else's liked posts, we must verify if the viewer also likes them
+        if (currentUserId != null && !currentUserId.equals(targetUserId)) {
+            for (PostResponse post : pageResult.getContent()) {
+                boolean isLiked = postLikeRepository.existsByUserIdAndPostId(currentUserId, post.getId());
+                post.setIsLiked(isLiked);
+            }
+        } else {
+            // My own liked posts: isLiked is always true
+            pageResult.getContent().forEach(post -> post.setIsLiked(true));
+        }
 
         PageResult<PostResponse> result = new PageResult<>(
                 page,
@@ -86,5 +109,22 @@ public class PostLikeServiceImpl implements PostLikeService {
         );
 
         return Result.ok(result);
+    }
+
+    /**
+     * Set the privacy of the current user's liked posts list.
+     * isPrivate=true  → store "1" in Redis (private)
+     * isPrivate=false → delete the key (public, default)
+     */
+    @Override
+    public Result<Void> setLikesPrivacy(Boolean isPrivate) {
+        Long userId = UserContext.getCurrentUserId();
+        String privacyKey = Constants.CACHE_USER_LIKES_PRIVACY_KEY + userId;
+        if (Boolean.TRUE.equals(isPrivate)) {
+            redisTemplate.opsForValue().set(privacyKey, "1");
+        } else {
+            redisTemplate.delete(privacyKey);
+        }
+        return Result.ok();
     }
 }

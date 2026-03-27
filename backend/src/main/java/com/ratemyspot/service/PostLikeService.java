@@ -14,7 +14,14 @@ public interface PostLikeService {
     Result<Void> toggle(Long postId);
 
     /**
-     * Get list of posts liked by current user.
+     * Get list of posts liked by a target user.
      */
-    Result<PageResult<PostResponse>> getLikedPosts(Integer page, Integer size);
+    Result<PageResult<PostResponse>> getLikedPosts(Long userId, Integer page, Integer size);
+
+    /**
+     * Set whether the current user's liked posts list is visible to others.
+     *
+     * @param isPrivate true = only self can see; false = public
+     */
+    Result<Void> setLikesPrivacy(Boolean isPrivate);
 }

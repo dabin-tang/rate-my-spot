@@ -10,11 +10,12 @@ import type { PostResponse } from '../../types';
 const { Text } = Typography;
 
 interface UserLikeFeedProps {
+  userId?: number;
   skeletonGrid?: React.ReactNode;
   columns?: 3 | 5 | 'auto';
 }
 
-export const UserLikeFeed: React.FC<UserLikeFeedProps> = ({ skeletonGrid, columns = 'auto' }) => {
+export const UserLikeFeed: React.FC<UserLikeFeedProps> = ({ userId, skeletonGrid, columns = 'auto' }) => {
   const { 
     posts, 
     isLoading, 
@@ -22,7 +23,7 @@ export const UserLikeFeed: React.FC<UserLikeFeedProps> = ({ skeletonGrid, column
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage
-  } = useUserLikes();
+  } = useUserLikes(userId);
   
   const setSelectedPostId = useUIStore((state) => state.setSelectedPostId);
   const { mutate: toggleLike } = useToggleLike([['userLikes']]);

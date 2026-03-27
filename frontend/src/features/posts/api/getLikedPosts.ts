@@ -6,8 +6,8 @@ export interface PageResult<T> {
   list: T[];
 }
 
-export const getLikedPosts = (page: number = 1, size: number = 15): Promise<Result<PageResult<PostResponse>>> => {
+export const getLikedPosts = (userId: number | undefined, page: number = 1, size: number = 15): Promise<Result<PageResult<PostResponse>>> => {
   return request.get('/api/post-like/list', {
-    params: { page, size }
+    params: { userId, page, size }
   });
 };

@@ -42,10 +42,24 @@ public class PostLikeController {
     @Operation(summary = "Get Liked Posts")
     @GetMapping("/list")
     public Result<PageResult<PostResponse>> getLikedPosts(
+            @RequestParam(required = false) Long userId,
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
-        Long userId = com.ratemyspot.util.UserContext.getCurrentUserId();
-        log.info("Get Liked Posts: userId={}, page={}, size={}", userId, page, size);
-        return postLikeService.getLikedPosts(page, size);
+        Long targetUserId = userId != null ? userId : com.ratemyspot.util.UserContext.getCurrentUserId();
+        log.info("Get Liked Posts: targetUserId={}, page={}, size={}", targetUserId, page, size);
+        return postLikeService.getLikedPosts(targetUserId, page, size);
+    }
+
+    /**
+     * Set privacy for the current user's liked posts list.
+     *
+     * @param isPrivate true = private (only self can see), false = public
+     * @return empty success result
+     */
+    @Operation(summary = "Set Likes Privacy", description = "Control whether other users can view your liked posts")
+    @PutMapping("/privacy")
+    public Result<Void> setLikesPrivacy(@RequestParam Boolean isPrivate) {
+        log.info("Set likes privacy: isPrivate={}", isPrivate);
+        return postLikeService.setLikesPrivacy(isPrivate);
     }
 }

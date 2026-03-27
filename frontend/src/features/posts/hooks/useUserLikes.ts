@@ -2,7 +2,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { getLikedPosts } from '../api/getLikedPosts';
 import type { PostResponse } from '../types';
 
-export const useUserLikes = (isEnabled: boolean = true) => {
+export const useUserLikes = (userId?: number, isEnabled: boolean = true) => {
   const {
     data,
     fetchNextPage,
@@ -11,9 +11,9 @@ export const useUserLikes = (isEnabled: boolean = true) => {
     isLoading,
     isError
   } = useInfiniteQuery({
-    queryKey: ['userLikes'],
+    queryKey: ['userLikes', userId],
     queryFn: async ({ pageParam = 1 }) => {
-      const response = await getLikedPosts(pageParam as number, 15);
+      const response = await getLikedPosts(userId, pageParam as number, 15);
       return response.data; // PageResult<PostResponse>
     },
     initialPageParam: 1,

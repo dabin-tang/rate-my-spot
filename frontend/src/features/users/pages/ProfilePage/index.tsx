@@ -1,8 +1,9 @@
 import React from 'react';
 import { Flex, Tabs, Skeleton, Row, Col } from 'antd';
+import { useParams } from 'react-router-dom';
 import { useAuthStore } from '../../../auth/stores/useAuthStore';
 import { UserProfileCard } from '../../components/UserProfileCard';
-import { useCurrentUserProfile } from '../../hooks/useCurrentUserProfile';
+import { useUserProfile } from '../../hooks/useUserProfile';
 import { UserPostFeed } from '../../../posts/components/UserPostFeed';
 import { UserLikeFeed } from '../../../posts/components/UserLikeFeed';
 
@@ -29,10 +30,18 @@ const PostGridSkeleton = ({ columns = 5 }: { columns?: 3 | 5 }) => {
 };
 
 export const ProfilePage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const routeUserId = id ? parseInt(id, 10) : undefined;
+  
   const { user, token } = useAuthStore();
-  const { data: profileData, isLoading } = useCurrentUserProfile();
+  
+  // Determine if viewing own profile based on URL matching
+  const isCurrentUser = !routeUserId || (user && user.id === routeUserId) || false;
+  const targetUserId = isCurrentUser ? user?.id : routeUserId;
 
-  if (!token || !user) {
+  const { data: profileData, isLoading } = useUserProfile(targetUserId);
+
+  if (isCurrentUser && (!token || !user) && !isLoading) {
     return (
       <Flex justify="center" align="center" className={styles.emptyContainer}>
         <h3>Please log in to view your profile.</h3>
@@ -40,9 +49,17 @@ export const ProfilePage: React.FC = () => {
     );
   }
 
+  if (!isCurrentUser && !profileData && !isLoading) {
+    return (
+      <Flex justify="center" align="center" className={styles.emptyContainer}>
+        <h3>User not found.</h3>
+      </Flex>
+    );
+  }
+
   const tabItems = [
     {
-      label: 'My Posts',
+      label: isCurrentUser ? 'My Posts' : 'Posts',
       key: 'posts',
       children: (
         <div className={styles.tabContent}>
@@ -51,11 +68,11 @@ export const ProfilePage: React.FC = () => {
       ),
     },
     {
-      label: 'My Likes',
+      label: isCurrentUser ? 'My Likes' : 'Likes',
       key: 'liked',
       children: (
         <div className={styles.tabContent}>
-          <UserLikeFeed columns={5} skeletonGrid={<PostGridSkeleton columns={5} />} />
+          <UserLikeFeed userId={targetUserId || 0} columns={5} skeletonGrid={<PostGridSkeleton columns={5} />} />
         </div>
       ),
     },
@@ -69,7 +86,7 @@ export const ProfilePage: React.FC = () => {
              <Skeleton avatar active paragraph={{ rows: 3 }} />
           </div>
         ) : (
-          <UserProfileCard user={profileData} isCurrentUser={true} />
+          <UserProfileCard user={profileData} isCurrentUser={isCurrentUser} />
         )}
       </div>
 
