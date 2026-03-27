@@ -162,7 +162,12 @@ export const SearchPage: React.FC = () => {
           users.length > 0 ? (
             <div className={styles.userList}>
               {users.map((user: UserResponse) => (
-                <div key={user.id} className={styles.userRow}>
+                <div 
+                  key={user.id} 
+                  className={styles.userRow}
+                  onClick={() => navigate(`/user/${user.id}`)} 
+                  style={{ cursor: 'pointer' }}
+                >
                   <Avatar src={user.icon} size={48} className={styles.avatar}>
                     {user.nickname?.charAt(0).toUpperCase() || 'U'}
                   </Avatar>
@@ -170,7 +175,7 @@ export const SearchPage: React.FC = () => {
                     <div className={styles.nickname}>{user.nickname}</div>
                     {user.intro && <div className={styles.intro}>{user.intro}</div>}
                   </div>
-                  <div className={styles.actionArea}>
+                  <div className={styles.actionArea} onClick={e => e.stopPropagation()}>
                     <FollowButton 
                       targetUserId={user.id} 
                       initialIsFollow={user.isFollowing ?? user.isFollow ?? false}

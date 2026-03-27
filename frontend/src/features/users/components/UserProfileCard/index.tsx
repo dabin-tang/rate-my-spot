@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Typography, Flex } from 'antd';
-import { ManOutlined, WomanOutlined, SettingOutlined } from '@ant-design/icons';
+import { ManOutlined, WomanOutlined, SettingOutlined, LeftOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import { FollowButton } from '../FollowButton';
 import { EditProfileModal } from '../EditProfileModal';
 import { SettingsModal } from '../SettingsModal';
@@ -25,12 +26,18 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
 
   // Use actual info, fallback to subtle text if empty
   const introText = user.intro || "This user hasn't written a bio yet.";
+  const navigate = useNavigate();
 
   return (
     <div className={styles.cardWrapper}>
       {isCurrentUser && (
         <div className={styles.settingsIconWrapper} onClick={() => setIsSettingsModalOpen(true)}>
           <SettingOutlined className={styles.settingsIcon} />
+        </div>
+      )}
+      {!isCurrentUser && (
+        <div className={styles.backIconWrapper} onClick={() => navigate(-1)}>
+          <LeftOutlined className={styles.backIcon} />
         </div>
       )}
       <Flex gap={40} align="flex-start" className={styles.mainLayout}>
@@ -75,7 +82,10 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
                 Edit Profile
               </button>
             ) : (
-              <FollowButton userId={user.id} />
+              <FollowButton 
+                userId={user.id} 
+                initialIsFollowing={user.isFollowing ?? user.isFollow ?? false} 
+              />
             )}
           </div>
         </Flex>

@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Avatar, Typography, Flex, Dropdown, message } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import type { MenuProps } from 'antd';
 import { HeartOutlined, HeartFilled, MoreOutlined } from '@ant-design/icons';
 import { formatDistanceToNow } from 'date-fns';
@@ -18,6 +19,7 @@ interface CommentItemProps {
 }
 
 export const CommentItem: React.FC<CommentItemProps> = ({ comment, onReply, onLike, onDelete, depth = 0 }) => {
+  const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const currentUser = useAuthStore(state => state.user);
@@ -59,16 +61,27 @@ export const CommentItem: React.FC<CommentItemProps> = ({ comment, onReply, onLi
     }
   }, [comment.createTime]);
 
+  const handleUserClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (comment.userId) {
+      navigate(`/user/${comment.userId}`);
+    }
+  };
+
   return (
     <div className={`${styles.commentWrapper} ${indentClass}`}>
       <Flex gap={8} align="flex-start" className={styles.commentBody}>
-        <Avatar src={comment.userIcon} className={styles.avatar} size={depth === 0 ? 32 : 24}>
-          {comment.userNickname?.charAt(0)?.toUpperCase()}
-        </Avatar>
+        <div onClick={handleUserClick} style={{ cursor: 'pointer' }}>
+          <Avatar src={comment.userIcon} className={styles.avatar} size={depth === 0 ? 32 : 24}>
+            {comment.userNickname?.charAt(0)?.toUpperCase()}
+          </Avatar>
+        </div>
         
         <Flex vertical gap={2} className={styles.contentArea}>
           <Flex align="center" gap={8} className={styles.headerRow}>
-            <Text strong className={styles.nickname}>{comment.userNickname}</Text>
+            <Text strong className={styles.nickname} onClick={handleUserClick} style={{ cursor: 'pointer' }}>
+              {comment.userNickname}
+            </Text>
             
             {comment.replyToUserId && comment.replyToUserNickname && (
               <Text type="secondary" className={styles.replyTo}>

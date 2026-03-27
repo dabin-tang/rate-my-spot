@@ -20,6 +20,8 @@ export interface UserProfileDTO {
   likesPrivate?: boolean;
   followersCount?: number;
   followingCount?: number;
+  isFollow?: boolean;
+  isFollowing?: boolean;
 }
 
 export interface UserLoginDTO {

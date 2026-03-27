@@ -1,5 +1,6 @@
 import React from 'react';
-import { Flex, Tabs, Skeleton, Row, Col } from 'antd';
+import { Flex, Tabs, Skeleton, Row, Col, Typography } from 'antd';
+import { LockOutlined } from '@ant-design/icons';
 import { useParams } from 'react-router-dom';
 import { useAuthStore } from '../../../auth/stores/useAuthStore';
 import { UserProfileCard } from '../../components/UserProfileCard';
@@ -66,8 +67,11 @@ export const ProfilePage: React.FC = () => {
           <UserPostFeed userId={profileData?.id || 0} columns={3} skeletonGrid={<PostGridSkeleton columns={3} />} />
         </div>
       ),
-    },
-    {
+    }
+  ];
+
+  if (isCurrentUser || !profileData?.likesPrivate) {
+    tabItems.push({
       label: isCurrentUser ? 'My Likes' : 'Likes',
       key: 'liked',
       children: (
@@ -75,8 +79,22 @@ export const ProfilePage: React.FC = () => {
           <UserLikeFeed userId={targetUserId || 0} columns={5} skeletonGrid={<PostGridSkeleton columns={5} />} />
         </div>
       ),
-    },
-  ];
+    });
+  } else {
+    tabItems.push({
+      label: 'Likes',
+      key: 'liked',
+      children: (
+        <div className={styles.tabContent}>
+          <Flex vertical justify="center" align="center" style={{ height: '300px', opacity: 0.6 }}>
+            <LockOutlined style={{ fontSize: '48px', marginBottom: '16px', color: '#888' }} />
+            <Typography.Title level={4} style={{ color: '#888', margin: 0 }}>Likes are Private</Typography.Title>
+            <Typography.Text type="secondary">This user has chosen to hide their liked posts.</Typography.Text>
+          </Flex>
+        </div>
+      ),
+    });
+  }
 
   return (
     <div className={styles.pageContainer}>

@@ -20,6 +20,7 @@ export interface PostResponse {
   userIcon: string;
   liked: number;
   isLiked: boolean;
+  isFollow?: boolean;
   commentCount?: number;
   createTime: string;
   updateTime: string;

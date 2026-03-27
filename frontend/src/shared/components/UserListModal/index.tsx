@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 import { Avatar, Typography, Spin } from 'antd';
 import { useFollowList } from '../../../features/users/hooks/useFollow';
 import { FollowButton } from '../FollowButton';
@@ -23,6 +24,7 @@ export const UserListModal: React.FC<UserListModalProps> = ({
   type, 
   userId 
 }) => {
+  const navigate = useNavigate();
   const isFollowers = type === 'followers';
 
   // Select the appropriate query hook
@@ -78,7 +80,12 @@ export const UserListModal: React.FC<UserListModalProps> = ({
           ) : (
             <>
               {users.map((user: UserResponse) => (
-                <div key={user.id} className={styles.userRow}>
+                <div 
+                  key={user.id} 
+                  className={styles.userRow} 
+                  onClick={() => { navigate(`/user/${user.id}`); onClose(); }} 
+                  style={{ cursor: 'pointer' }}
+                >
                   <Avatar src={user.icon} size={44} className={styles.avatar}>
                     {user.nickname?.charAt(0).toUpperCase()}
                   </Avatar>
@@ -86,7 +93,7 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                     <div className={styles.nickname}>{user.nickname}</div>
                     {user.intro && <div className={styles.intro}>{user.intro}</div>}
                   </div>
-                  <div className={styles.actionArea}>
+                  <div className={styles.actionArea} onClick={e => e.stopPropagation()}>
                     <FollowButton 
                       targetUserId={user.id} 
                       initialIsFollow={user.isFollow || false} 

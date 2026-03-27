@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -118,5 +119,21 @@ public class PostController {
             @RequestParam(defaultValue = "10") Integer size) {
         log.info("Search Posts: keyword={}, page={}, size={}", keyword, page, size);
         return postService.searchPosts(keyword, page, size);
+    }
+
+    /**
+     * Delete the current user's own post.
+     * Only the author can delete their own post.
+     *
+     * @param id post ID to delete
+     * @return success message
+     */
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete Own Post", description = "Delete the current user's own post. Only the author is allowed.")
+    public Result<String> deletePost(
+            @io.swagger.v3.oas.annotations.Parameter(description = "Post ID", required = true)
+            @PathVariable Long id) {
+        log.info("Delete Post: id={}", id);
+        return postService.deletePost(id);
     }
 }

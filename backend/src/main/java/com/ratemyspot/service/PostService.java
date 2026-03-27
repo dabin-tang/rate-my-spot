@@ -39,4 +39,7 @@ public interface PostService {
 
     /** Search posts by keyword (fuzzy match on title or content). */
     Result<PageResult<PostResponse>> searchPosts(String keyword, Integer page, Integer size);
+
+    /** Delete the current user's own post by ID. Ownership is verified in the service layer. */
+    Result<String> deletePost(Long postId);
 }

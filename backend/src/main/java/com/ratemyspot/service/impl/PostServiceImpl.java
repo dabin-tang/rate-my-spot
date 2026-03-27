@@ -2,10 +2,12 @@ package com.ratemyspot.service.impl;
 
 import com.ratemyspot.dto.PostCreateDTO;
 import com.ratemyspot.dto.PostFeedRequestDTO;
+import com.ratemyspot.exception.BusinessException;
 import com.ratemyspot.response.PageResult;
 import com.ratemyspot.response.PostResponse;
 import com.ratemyspot.entity.Post;
 import com.ratemyspot.repository.PostCommentRepository;
+import com.ratemyspot.repository.PostLikeRepository;
 import com.ratemyspot.repository.PostRepository;
 import com.ratemyspot.response.RecentPostResponse;
 import com.ratemyspot.service.PostService;
@@ -36,6 +38,7 @@ public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
     private final PostCommentRepository postCommentRepository;
+    private final PostLikeRepository postLikeRepository;
     private final CacheUtil cacheUtil;
     private final SpotService spotService;
     private final RedisTemplate<String, Object> redisTemplate;
@@ -217,5 +220,33 @@ public class PostServiceImpl implements PostService {
             post.setIsLiked(Boolean.TRUE.equals(liked));
             post.setIsFollow(Boolean.TRUE.equals(follow));
         }
+    }
+
+    /**
+     * Delete the current user's own post.
+     * Verifies ownership before deleting.
+     */
+    @Override
+    @Transactional
+    public Result<String> deletePost(Long postId) {
+        Long currentUserId = UserContext.getCurrentUserId();
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new BusinessException(Constants.ERR_POST_NOT_FOUND));
+
+        // Ownership check: only the author can delete their own post
+        if (!post.getUserId().equals(currentUserId)) {
+            throw new BusinessException("No permission to delete this post");
+        }
+
+        postCommentRepository.deleteAllByPostId(postId);
+        postLikeRepository.deleteAllByPostId(postId);
+        postRepository.deleteById(postId);
+
+        // Clean up Redis caches
+        redisTemplate.delete(Constants.CACHE_POST_KEY + postId);
+        redisTemplate.delete(Constants.CACHE_POST_COMMENTS_KEY + postId);
+
+        return Result.ok(Constants.MSG_POST_DELETED);
     }
 }

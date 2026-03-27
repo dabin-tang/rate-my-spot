@@ -23,6 +23,9 @@ public interface PostCommentRepository extends JpaRepository<PostComment, Long> 
     /** Delete all child replies of a given parent comment. */
     void deleteAllByParentId(Long parentId);
 
+    /** Delete all comments belonging to a post (used when deleting the post). */
+    void deleteAllByPostId(Long postId);
+
     /**
      * Admin paginated comment list with optional postId and keyword filters.
      * Uses IS NULL OR pattern so null params are treated as no filter.

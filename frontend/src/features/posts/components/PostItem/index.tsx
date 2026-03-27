@@ -1,5 +1,5 @@
-import React from 'react';
 import { Typography, Flex } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import { HeartOutlined, HeartFilled } from '@ant-design/icons';
 import type { PostResponse } from '../../types';
 import styles from './PostItem.module.scss';
@@ -13,7 +13,15 @@ interface PostItemProps {
 }
 
 export const PostItem: React.FC<PostItemProps> = ({ post, onClick, onLike }) => {
+  const navigate = useNavigate();
   const firstImage = post.images ? post.images.split(',')[0] : '';
+
+  const handleUserClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (post.userId) {
+      navigate(`/user/${post.userId}`);
+    }
+  };
 
   return (
     <div
@@ -38,7 +46,7 @@ export const PostItem: React.FC<PostItemProps> = ({ post, onClick, onLike }) => 
         </Text>
         
         <Flex justify="space-between" align="center">
-          <div className={styles.authorContainer}>
+          <div className={styles.authorContainer} onClick={handleUserClick} style={{ cursor: 'pointer' }}>
             <div className={styles.avatarContainer}>
               {post.userIcon ? (
                 <img src={post.userIcon} alt="avatar" className={styles.avatarImage} />

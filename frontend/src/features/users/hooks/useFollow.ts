@@ -29,6 +29,14 @@ export const useToggleFollow = (onSuccessCallback?: () => void) => {
         queryKey: ['currentUser'],
       });
 
+      // Clear Feed caches universally to ensure Posts update their isFollow states dynamically
+      queryClient.invalidateQueries({
+        queryKey: ['feed'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['postDetail'],
+      });
+
       if (onSuccessCallback) {
         onSuccessCallback();
       }

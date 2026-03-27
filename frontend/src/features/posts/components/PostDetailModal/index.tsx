@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Avatar, message } from 'antd';
+import { Avatar } from 'antd';
 
 import { useQuery } from '@tanstack/react-query';
 import { getPostById } from '../../api/getPostById';
 import { useToggleLike } from '../../hooks/useToggleLike';
 import { useAuthStore } from '../../../auth/stores/useAuthStore';
 import { CommentSection } from '../CommentSection';
+import { FollowButton } from '../../../../shared/components/FollowButton';
 import './PostDetailModal.scss';
 
 interface PostDetailModalProps {
@@ -28,14 +29,6 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ postId, visibl
   const { token, user } = useAuthStore();
   const isLoggedIn = !!token;
   const isMe = isLoggedIn && user && post && user.id === post.userId;
-
-  const requireAuth = (action: () => void) => {
-    if (!isLoggedIn) {
-      message.warning('Please log in to continue.');
-      return;
-    }
-    action();
-  };
 
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -153,12 +146,11 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ postId, visibl
                   <span className="nickname">{post.userNickname}</span>
                 </div>
                 {!isMe && (
-                  <button 
+                  <FollowButton 
+                    targetUserId={post.userId}
+                    initialIsFollow={post.isFollow || false}
                     className="follow-btn"
-                    onClick={() => requireAuth(() => console.log('Follow clicked'))}
-                  >
-                    Follow
-                  </button>
+                  />
                 )}
               </div>
 
