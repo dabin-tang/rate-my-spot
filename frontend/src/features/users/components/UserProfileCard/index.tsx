@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Typography, Flex } from 'antd';
-import { ManOutlined, WomanOutlined } from '@ant-design/icons';
+import { ManOutlined, WomanOutlined, SettingOutlined } from '@ant-design/icons';
 import { FollowButton } from '../FollowButton';
 import { EditProfileModal } from '../EditProfileModal';
+import { SettingsModal } from '../SettingsModal';
 import { UserListModal } from '../../../../shared/components/UserListModal';
 import type { UserProfileDTO } from '../../types';
 import styles from './UserProfileCard.module.scss';
@@ -19,6 +20,7 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
   isCurrentUser = false
 }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'followers' | 'following' | null>(null);
 
   // Use actual info, fallback to subtle text if empty
@@ -26,6 +28,11 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
 
   return (
     <div className={styles.cardWrapper}>
+      {isCurrentUser && (
+        <div className={styles.settingsIconWrapper} onClick={() => setIsSettingsModalOpen(true)}>
+          <SettingOutlined className={styles.settingsIcon} />
+        </div>
+      )}
       <Flex gap={40} align="flex-start" className={styles.mainLayout}>
         <div className={styles.avatarContainer}>
           {user.icon ? (
@@ -78,11 +85,18 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
         </Flex>
       </Flex>
       {isCurrentUser && (
-        <EditProfileModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          currentUser={user}
-        />
+        <>
+          <EditProfileModal
+            isOpen={isEditModalOpen}
+            onClose={() => setIsEditModalOpen(false)}
+            currentUser={user}
+          />
+          <SettingsModal
+            isOpen={isSettingsModalOpen}
+            onClose={() => setIsSettingsModalOpen(false)}
+            initialPrivacy={user.likesPrivate}
+          />
+        </>
       )}
       <UserListModal 
         isOpen={!!modalType}

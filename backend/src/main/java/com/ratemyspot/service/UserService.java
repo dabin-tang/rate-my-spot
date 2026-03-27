@@ -59,12 +59,13 @@ public interface UserService {
 
     /**
      * Update the password for the current user.
-     * User must be logged in to perform this action.
+     * Requires a valid email verification code to authorize the change.
      *
      * @param newPassword The new password string
+     * @param code        The email verification code
      * @return Result with success message
      */
-    Result<String> updatePassword(String newPassword);
+    Result<String> updatePassword(String newPassword, String code);
 
     /**
      * Reset password using email and verification code.

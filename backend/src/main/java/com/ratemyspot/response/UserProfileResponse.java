@@ -47,4 +47,7 @@ public class UserProfileResponse implements Serializable {
 
     @Schema(description = "Whether the current user is following this profile user", example = "false")
     private Boolean isFollowing = false;
+
+    @Schema(description = "Whether the user's liked posts are private", example = "false")
+    private Boolean likesPrivate = false;
 }

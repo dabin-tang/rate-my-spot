@@ -90,9 +90,9 @@ public class UserController {
      */
     @Operation(summary = "Update Password (Logged In)")
     @PutMapping("/update-password")
-    public Result<String> updatePassword(@RequestParam String newPassword) {
-        log.info("Request to update password: {}", newPassword);
-        return userService.updatePassword(newPassword);
+    public Result<String> updatePassword(@RequestParam String newPassword, @RequestParam String code) {
+        log.info("Request to update password for current user");
+        return userService.updatePassword(newPassword, code);
     }
 
     /**

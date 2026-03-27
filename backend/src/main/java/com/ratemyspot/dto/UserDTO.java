@@ -22,4 +22,7 @@ public class UserDTO {
 
     @Schema(description = "User Icon/Avatar URL", example = "https://example.com/avatar.jpg")
     private String icon;
+
+    @Schema(description = "Does user hide their liked posts?", example = "true")
+    private Boolean likesPrivate;
 }

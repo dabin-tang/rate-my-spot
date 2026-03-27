@@ -17,6 +17,7 @@ export interface UserProfileDTO {
   birthday?: string;
   city?: string;
   introduce?: string;
+  likesPrivate?: boolean;
 }
 
 export interface UserLoginDTO {

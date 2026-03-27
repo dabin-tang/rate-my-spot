@@ -142,8 +142,15 @@ public class UserServiceImpl implements UserService {
         }
         User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new BusinessException(Constants.ERR_USER_NOT_FOUND));
+        
         UserDTO userDTO = new UserDTO();
         BeanUtils.copyProperties(user, userDTO);
+
+        // Fetch User Likes Privacy from Redis
+        String privacyKey = Constants.CACHE_USER_LIKES_PRIVACY_KEY + currentUserId;
+        Object privacy = redisTemplateObj.opsForValue().get(privacyKey);
+        userDTO.setLikesPrivate("1".equals(privacy));
+
         return Result.ok(userDTO);
     }
 
@@ -179,13 +186,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public Result<String> updatePassword(String newPassword) {
+    public Result<String> updatePassword(String newPassword, String code) {
         Long currentUserId = UserContext.getCurrentUserId();
         User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new BusinessException(Constants.ERR_USER_NOT_FOUND));
+
+        // Validate verification code against the current user's email
+        String redisKey = Constants.REDIS_VERIFY_CODE_PREFIX + user.getEmail();
+        String cacheCode = redisTemplate.opsForValue().get(redisKey);
+        if (cacheCode == null || !cacheCode.equals(code)) {
+            return Result.fail(Constants.ERR_CODE_INVALID);
+        }
+
         user.setPassword(PasswordUtil.hashPassword(newPassword))
                 .setUpdateTime(LocalDateTime.now());
         userRepository.save(user);
+
+        // Invalidate the code after successful use
+        redisTemplate.delete(redisKey);
         return Result.ok(Constants.MSG_PASSWORD_UPDATED);
     }
 
@@ -235,6 +253,11 @@ public class UserServiceImpl implements UserService {
             Boolean isFollowing = redisTemplateObj.opsForSet().isMember(followingKey, targetUserId);
             response.setIsFollowing(Boolean.TRUE.equals(isFollowing));
         }
+
+        // Fetch Target User Likes Privacy from Redis
+        String privacyKey = Constants.CACHE_USER_LIKES_PRIVACY_KEY + targetUserId;
+        Object privacy = redisTemplateObj.opsForValue().get(privacyKey);
+        response.setLikesPrivate("1".equals(privacy));
 
         return Result.ok(response);
     }
