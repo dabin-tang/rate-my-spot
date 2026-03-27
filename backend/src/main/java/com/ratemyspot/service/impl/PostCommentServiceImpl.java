@@ -37,26 +37,52 @@ public class PostCommentServiceImpl implements PostCommentService {
     /**
      * Get all comments for a post and assemble them into a Parent→Children tree structure.
      */
-    @Override
     public Result<List<PostCommentResponse>> getPostCommentTree(Long postId) {
         String cacheKey = Constants.CACHE_POST_COMMENTS_KEY + postId;
+        List<PostCommentResponse> tree;
 
         // 1. Try Redis cache first
         Object cached = redisTemplate.opsForValue().get(cacheKey);
         if (cached != null) {
-            return Result.ok((List<PostCommentResponse>) cached);
+            tree = (List<PostCommentResponse>) cached;
+        } else {
+            // 2. Cache miss, fetch all comments for this post from DB
+            List<PostComment> allComments = postCommentRepository.findAllByPostIdOrderByCreateTimeAsc(postId);
+
+            // 3. Build comment tree in memory (Parent → Children)
+            tree = buildTree(allComments);
+
+            // 4. Write assembled tree into Redis with TTL
+            redisTemplate.opsForValue().set(cacheKey, tree, Constants.CACHE_POST_COMMENTS_TTL, TimeUnit.MINUTES);
         }
 
-        // 2. Cache miss, fetch all comments for this post from DB
-        List<PostComment> allComments = postCommentRepository.findAllByPostIdOrderByCreateTimeAsc(postId);
-
-        // 3. Build comment tree in memory (Parent → Children)
-        List<PostCommentResponse> tree = buildTree(allComments);
-
-        // 4. Write assembled tree into Redis with TTL
-        redisTemplate.opsForValue().set(cacheKey, tree, Constants.CACHE_POST_COMMENTS_TTL, TimeUnit.MINUTES);
+        // 5. Recursively populate isLiked status for the current user
+        Long currentUserId = UserContext.getCurrentUserId();
+        if (currentUserId != null) {
+            populateIsLiked(tree, currentUserId);
+        } else {
+            clearIsLiked(tree);
+        }
 
         return Result.ok(tree);
+    }
+
+    private void populateIsLiked(List<PostCommentResponse> list, Long userId) {
+        if (list == null || list.isEmpty()) return;
+        for (PostCommentResponse comment : list) {
+            String likesKey = Constants.CACHE_COMMENT_LIKES_KEY + comment.getId();
+            Boolean isLiked = redisTemplate.opsForSet().isMember(likesKey, userId);
+            comment.setIsLiked(Boolean.TRUE.equals(isLiked));
+            populateIsLiked(comment.getChildren(), userId);
+        }
+    }
+
+    private void clearIsLiked(List<PostCommentResponse> list) {
+        if (list == null || list.isEmpty()) return;
+        for (PostCommentResponse comment : list) {
+            comment.setIsLiked(false);
+            clearIsLiked(comment.getChildren());
+        }
     }
 
     @Override

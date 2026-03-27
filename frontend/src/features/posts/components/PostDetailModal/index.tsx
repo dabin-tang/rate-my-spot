@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Avatar, message } from 'antd';
-import { HeartOutlined, HeartFilled } from '@ant-design/icons';
+
 import { useQuery } from '@tanstack/react-query';
 import { getPostById } from '../../api/getPostById';
 import { useToggleLike } from '../../hooks/useToggleLike';
@@ -22,7 +22,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ postId, visibl
     enabled: !!postId && visible,
   });
 
-  const { mutate: toggleLike } = useToggleLike([['postDetail', postId]]);
+  const { mutate: toggleLike } = useToggleLike();
 
   const post = data?.data;
   const { token, user } = useAuthStore();
@@ -180,20 +180,14 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ postId, visibl
                 </div>
               </div>
 
-              {/* Actions Bar */}
-              <div className="actions-bar">
-                <div 
-                  className="action-btn" 
-                  onClick={() => requireAuth(() => toggleLike(post.id))}
-                >
-                  {post.isLiked ? <HeartFilled className="liked" /> : <HeartOutlined className="unliked" />}
-                  <span className="count">{post.liked || 0}</span>
-                </div>
-              </div>
-
               {/* Comments Section & Input Form */}
               <div className="comments-wrapper">
-                <CommentSection postId={post.id} />
+                <CommentSection 
+                  postId={post.id} 
+                  postLiked={post.liked}
+                  postIsLiked={post.isLiked}
+                  onTogglePostLike={() => toggleLike(post.id)}
+                />
               </div>
 
             </div>

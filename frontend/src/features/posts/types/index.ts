@@ -49,6 +49,7 @@ export interface PostCommentResponse {
   content: string;
   image?: string;
   liked: number;
+  isLiked: boolean;
   createTime: string;
   children: PostCommentResponse[];
   // Assuming backend join or frontend population might add these:

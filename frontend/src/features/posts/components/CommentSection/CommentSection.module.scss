@@ -12,11 +12,29 @@
   padding: 0 0 16px 0;
   border-bottom: 1px solid #eee;
   flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
   .title {
     margin: 0 !important;
     color: #333;
     font-size: 16px;
+  }
+
+  .postLikeBtn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 20px;
+    transition: opacity 0.2s;
+
+    &:hover { opacity: 0.8; }
+
+    .liked { color: #ff2442; }
+    .unliked { color: #333; }
+    .count { font-size: 15px; font-weight: 500; color: #333; }
   }
 }
 

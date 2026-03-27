@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Avatar, Typography, Flex } from 'antd';
+import { HeartOutlined, HeartFilled } from '@ant-design/icons';
 import { formatDistanceToNow } from 'date-fns';
 import type { PostCommentResponse } from '../../../posts/types';
 import styles from './CommentItem.module.scss';
@@ -9,10 +10,11 @@ const { Text } = Typography;
 interface CommentItemProps {
   comment: PostCommentResponse;
   onReply: (comment: PostCommentResponse) => void;
+  onLike: (commentId: number) => void;
   depth?: number;
 }
 
-export const CommentItem: React.FC<CommentItemProps> = ({ comment, onReply, depth = 0 }) => {
+export const CommentItem: React.FC<CommentItemProps> = ({ comment, onReply, onLike, depth = 0 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   // We cap nesting visual indent at depth 1 for a flat Bilibili style look.
@@ -58,6 +60,10 @@ export const CommentItem: React.FC<CommentItemProps> = ({ comment, onReply, dept
             >
               Reply
             </Text>
+            <Flex gap={4} align="center" className={styles.actionBtn} onClick={() => onLike(comment.id)}>
+              {comment.isLiked ? <HeartFilled style={{ color: '#ff2442' }} /> : <HeartOutlined />}
+              <span>{comment.liked || 0}</span>
+            </Flex>
           </Flex>
         </Flex>
       </Flex>
@@ -70,6 +76,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({ comment, onReply, dept
             key={comment.children[0].id} 
             comment={comment.children[0]} 
             onReply={onReply}
+            onLike={onLike}
             depth={1} 
           />
 
@@ -82,6 +89,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({ comment, onReply, dept
                     key={child.id} 
                     comment={child} 
                     onReply={onReply}
+                    onLike={onLike}
                     depth={1} 
                   />
                 ))}

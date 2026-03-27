@@ -53,6 +53,9 @@ public class PostCommentResponse implements Serializable {
     @Schema(description = "Like Count", example = "5")
     private Integer liked;
 
+    @Schema(description = "Whether current user has liked this comment", example = "true")
+    private Boolean isLiked;
+
     @Schema(description = "Comment Time")
     private LocalDateTime createTime;
 

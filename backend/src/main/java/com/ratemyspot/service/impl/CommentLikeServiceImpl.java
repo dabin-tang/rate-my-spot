@@ -1,6 +1,7 @@
 package com.ratemyspot.service.impl;
 
 import com.ratemyspot.entity.CommentLike;
+import com.ratemyspot.entity.PostComment;
 import com.ratemyspot.exception.BusinessException;
 import com.ratemyspot.repository.CommentLikeRepository;
 import com.ratemyspot.repository.PostCommentRepository;
@@ -35,10 +36,9 @@ public class CommentLikeServiceImpl implements CommentLikeService {
         Long userId = UserContext.getCurrentUserId();
         String likesKey = Constants.CACHE_COMMENT_LIKES_KEY + commentId;
 
-        // Verify comment exists
-        if (!postCommentRepository.existsById(commentId)) {
-            throw new BusinessException(Constants.ERR_COMMENT_NOT_FOUND);
-        }
+        // Verify comment exists and get its postId for cache invalidation
+        PostComment comment = postCommentRepository.findById(commentId)
+                .orElseThrow(() -> new BusinessException(Constants.ERR_COMMENT_NOT_FOUND));
 
         // Check like status from Redis Set
         Boolean isLiked = redisTemplate.opsForSet().isMember(likesKey, userId);
@@ -58,6 +58,9 @@ public class CommentLikeServiceImpl implements CommentLikeService {
             postCommentRepository.incrementLiked(commentId);
             redisTemplate.opsForSet().add(likesKey, userId);
         }
+
+        // Invalidate the post's comment tree cache so the `liked` count updates
+        redisTemplate.delete(Constants.CACHE_POST_COMMENTS_KEY + comment.getPostId());
 
         return Result.ok();
     }

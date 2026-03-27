@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Typography, Spin, Empty } from 'antd';
+import { HeartOutlined, HeartFilled } from '@ant-design/icons';
 import { usePostCommentsQuery } from '../../hooks/usePostComments';
+import { useToggleCommentLike } from '../../hooks/useToggleCommentLike';
 import { CommentItem } from '../CommentItem';
 import { CommentForm } from '../CommentForm';
 import type { PostCommentResponse } from '../../types';
@@ -10,10 +12,16 @@ const { Title } = Typography;
 
 interface CommentSectionProps {
   postId: number;
+  postLiked?: number;
+  postIsLiked?: boolean;
+  onTogglePostLike?: () => void;
 }
 
-export const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
+export const CommentSection: React.FC<CommentSectionProps> = ({ 
+  postId, postLiked = 0, postIsLiked = false, onTogglePostLike 
+}) => {
   const { data: comments, isLoading, isError } = usePostCommentsQuery(postId);
+  const { mutate: toggleCommentLike } = useToggleCommentLike(postId);
   
   // Track who the user is currently replying to, if anyone
   const [replyingTo, setReplyingTo] = useState<PostCommentResponse | null>(null);
@@ -35,6 +43,12 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
     <div className={styles.sectionContainer}>
       <div className={styles.header}>
         <Title level={5} className={styles.title}>Comments</Title>
+        {onTogglePostLike && (
+          <div className={styles.postLikeBtn} onClick={onTogglePostLike}>
+            {postIsLiked ? <HeartFilled className={styles.liked} /> : <HeartOutlined className={styles.unliked} />}
+            <span className={styles.count}>{postLiked}</span>
+          </div>
+        )}
       </div>
 
       <div className={styles.listContainer}>
@@ -60,6 +74,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
                 key={comment.id}
                 comment={comment}
                 onReply={handleReplyClick}
+                onLike={() => toggleCommentLike(comment.id)}
               />
             ))}
           </div>
