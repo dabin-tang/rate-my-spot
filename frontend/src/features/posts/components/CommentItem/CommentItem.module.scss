@@ -51,6 +51,31 @@
       flex-shrink: 0;
       white-space: nowrap;
     }
+
+    .moreIconWrapper {
+      cursor: pointer;
+      color: #999;
+      margin-left: 4px;
+      display: flex;
+      align-items: center;
+      opacity: 0;
+      transform: translateX(4px);
+      transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease;
+      
+      &:hover, &.active {
+        color: #333;
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+  }
+
+  /* Reveal actions on parent hover */
+  &:hover {
+    .moreIconWrapper {
+      opacity: 1;
+      transform: translateX(0);
+    }
   }
 
   .contentText {
@@ -68,11 +93,21 @@
       font-size: 12px;
       color: #999;
       cursor: pointer;
-      transition: color 0.2s ease;
+      transition: color 0.2s ease, opacity 0.2s ease;
       font-weight: 500;
+      display: inline-block; /* Required for transform scale */
 
       &:hover {
         color: #333;
+      }
+
+      &.confirmState {
+        color: #ff2442;
+        animation: pulseText 1.5s infinite;
+
+        &:hover {
+          color: #d1142f;
+        }
       }
     }
   }

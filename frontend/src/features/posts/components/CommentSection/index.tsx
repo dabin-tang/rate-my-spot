@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Typography, Spin, Empty } from 'antd';
 import { usePostCommentsQuery } from '../../hooks/usePostComments';
 import { useToggleCommentLike } from '../../hooks/useToggleCommentLike';
+import { useDeleteComment } from '../../hooks/useDeleteComment';
 import { CommentItem } from '../CommentItem';
 import { CommentForm } from '../CommentForm';
 import type { PostCommentResponse } from '../../types';
@@ -22,6 +23,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 }) => {
   const { data: comments, isLoading, isError } = usePostCommentsQuery(postId);
   const { mutate: toggleCommentLike } = useToggleCommentLike(postId);
+  const { mutate: deleteComment } = useDeleteComment(postId);
   
   // Track who the user is currently replying to, if anyone
   const [replyingTo, setReplyingTo] = useState<PostCommentResponse | null>(null);
@@ -69,6 +71,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                 comment={comment}
                 onReply={handleReplyClick}
                 onLike={() => toggleCommentLike(comment.id)}
+                onDelete={deleteComment}
               />
             ))}
           </div>

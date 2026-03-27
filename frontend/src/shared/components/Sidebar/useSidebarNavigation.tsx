@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Modal } from 'antd';
 import { useAuthStore } from '../../../features/auth/stores/useAuthStore';
 import { runAuthTransition } from '../../utils/authTransition';
-
+import { useUIStore } from '../../stores/useUIStore';
 
 export const useSidebarNavigation = () => {
   const navigate = useNavigate();
@@ -12,6 +12,12 @@ export const useSidebarNavigation = () => {
   
   const { user, token, logout } = useAuthStore();
   const isLoggedIn = !!token;
+  const setDrawerOpen = useUIStore(state => state.setDrawerOpen);
+
+  // Architecture Fix: Immediately demount floating UI modals if navigating routes natively
+  useEffect(() => {
+    setDrawerOpen(false);
+  }, [location.pathname, setDrawerOpen]);
 
   const handleLogout = () => {
     Modal.confirm({

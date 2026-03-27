@@ -1,7 +1,9 @@
 import React, { useMemo, useState } from 'react';
-import { Avatar, Typography, Flex } from 'antd';
-import { HeartOutlined, HeartFilled } from '@ant-design/icons';
+import { Avatar, Typography, Flex, Dropdown, message } from 'antd';
+import type { MenuProps } from 'antd';
+import { HeartOutlined, HeartFilled, MoreOutlined } from '@ant-design/icons';
 import { formatDistanceToNow } from 'date-fns';
+import { useAuthStore } from '../../../auth/stores/useAuthStore';
 import type { PostCommentResponse } from '../../../posts/types';
 import styles from './CommentItem.module.scss';
 
@@ -11,11 +13,37 @@ interface CommentItemProps {
   comment: PostCommentResponse;
   onReply: (comment: PostCommentResponse) => void;
   onLike: (commentId: number) => void;
+  onDelete?: (commentId: number) => void;
   depth?: number;
 }
 
-export const CommentItem: React.FC<CommentItemProps> = ({ comment, onReply, onLike, depth = 0 }) => {
+export const CommentItem: React.FC<CommentItemProps> = ({ comment, onReply, onLike, onDelete, depth = 0 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const currentUser = useAuthStore(state => state.user);
+
+  const isOwner = currentUser?.id === comment.userId;
+
+  const menuItems = useMemo<MenuProps['items']>(() => {
+    const items: MenuProps['items'] = [
+      {
+        key: 'report',
+        label: 'Report',
+        onClick: () => message.info('Report functionality coming soon'),
+      }
+    ];
+
+    if (isOwner && onDelete) {
+      items.push({
+        key: 'delete',
+        label: 'Delete',
+        danger: true,
+        onClick: () => onDelete(comment.id)
+      });
+    }
+
+    return items;
+  }, [isOwner, onDelete, comment.id]);
 
   // We cap nesting visual indent at depth 1 for a flat Bilibili style look.
   const indentClass = useMemo(() => {
@@ -49,11 +77,22 @@ export const CommentItem: React.FC<CommentItemProps> = ({ comment, onReply, onLi
             )}
             
             <Text className={styles.time}>{timeAgo}</Text>
+            
+            <Dropdown 
+              menu={{ items: menuItems }} 
+              trigger={['click']} 
+              placement="bottomRight"
+              onOpenChange={(open) => setIsDropdownOpen(open)}
+            >
+              <span className={`${styles.moreIconWrapper} ${isDropdownOpen ? styles.active : ''}`}>
+                <MoreOutlined style={{ transform: 'rotate(90deg)' }} />
+              </span>
+            </Dropdown>
           </Flex>
 
           <Text className={styles.contentText}>{comment.content}</Text>
           
-          <Flex gap={16} className={styles.actionRow}>
+          <Flex gap={16} className={styles.actionRow} align="center">
             <Text 
               className={styles.actionBtn} 
               onClick={() => onReply(comment)}
@@ -77,6 +116,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({ comment, onReply, onLi
             comment={comment.children[0]} 
             onReply={onReply}
             onLike={onLike}
+            onDelete={onDelete}
             depth={1} 
           />
 
@@ -90,6 +130,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({ comment, onReply, onLi
                     comment={child} 
                     onReply={onReply}
                     onLike={onLike}
+                    onDelete={onDelete}
                     depth={1} 
                   />
                 ))}
