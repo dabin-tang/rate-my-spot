@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface FollowRepository extends JpaRepository<Follow, Long> {
 
@@ -23,6 +25,10 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
 
     /** Count the number of users a given user is following. */
     long countByUserId(Long userId);
+
+    /** Find which target users out of a given list the current user is following (Solves N+1 problem). */
+    @Query("SELECT f.followUserId FROM Follow f WHERE f.userId = :userId AND f.followUserId IN :targetUserIds")
+    List<Long> findFollowingIds(@Param("userId") Long userId, @Param("targetUserIds") List<Long> targetUserIds);
 
     /** Get paginated list of followers for a given user using Constructor Projection. */
     @Query("SELECT new com.ratemyspot.response.UserResponse(" +

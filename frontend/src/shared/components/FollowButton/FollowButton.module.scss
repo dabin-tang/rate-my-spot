@@ -1,0 +1,40 @@
+.followBtn {
+  min-width: 84px;
+  height: 32px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  user-select: none;
+  border: 1px solid transparent;
+  outline: none;
+  padding: 0 16px;
+
+  &.following {
+    background: #f5f5f5;
+    color: #666;
+    border-color: #eee;
+    
+    &:hover {
+      background: #ebebeb;
+    }
+  }
+
+  &.follow {
+    background: #ff2442;
+    color: #fff;
+    
+    &:hover {
+      background: #e01f3b;
+    }
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}

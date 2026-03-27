@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Typography, Spin, Empty } from 'antd';
-import { HeartOutlined, HeartFilled } from '@ant-design/icons';
 import { usePostCommentsQuery } from '../../hooks/usePostComments';
 import { useToggleCommentLike } from '../../hooks/useToggleCommentLike';
 import { CommentItem } from '../CommentItem';
@@ -14,11 +13,12 @@ interface CommentSectionProps {
   postId: number;
   postLiked?: number;
   postIsLiked?: boolean;
+  postCommentCount?: number;
   onTogglePostLike?: () => void;
 }
 
 export const CommentSection: React.FC<CommentSectionProps> = ({ 
-  postId, postLiked = 0, postIsLiked = false, onTogglePostLike 
+  postId, postLiked = 0, postIsLiked = false, postCommentCount = 0, onTogglePostLike 
 }) => {
   const { data: comments, isLoading, isError } = usePostCommentsQuery(postId);
   const { mutate: toggleCommentLike } = useToggleCommentLike(postId);
@@ -43,12 +43,6 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
     <div className={styles.sectionContainer}>
       <div className={styles.header}>
         <Title level={5} className={styles.title}>Comments</Title>
-        {onTogglePostLike && (
-          <div className={styles.postLikeBtn} onClick={onTogglePostLike}>
-            {postIsLiked ? <HeartFilled className={styles.liked} /> : <HeartOutlined className={styles.unliked} />}
-            <span className={styles.count}>{postLiked}</span>
-          </div>
-        )}
       </div>
 
       <div className={styles.listContainer}>
@@ -87,6 +81,10 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
         replyingTo={replyingTo}
         onCancelReply={handleCancelReply}
         onCommentSubmitted={handleCommentSubmitted}
+        postLiked={postLiked}
+        postIsLiked={postIsLiked}
+        postCommentCount={postCommentCount}
+        onTogglePostLike={onTogglePostLike}
       />
     </div>
   );

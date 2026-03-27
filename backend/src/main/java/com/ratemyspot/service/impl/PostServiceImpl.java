@@ -5,6 +5,7 @@ import com.ratemyspot.dto.PostFeedRequestDTO;
 import com.ratemyspot.response.PageResult;
 import com.ratemyspot.response.PostResponse;
 import com.ratemyspot.entity.Post;
+import com.ratemyspot.repository.PostCommentRepository;
 import com.ratemyspot.repository.PostRepository;
 import com.ratemyspot.response.RecentPostResponse;
 import com.ratemyspot.service.PostService;
@@ -34,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
+    private final PostCommentRepository postCommentRepository;
     private final CacheUtil cacheUtil;
     private final SpotService spotService;
     private final RedisTemplate<String, Object> redisTemplate;
@@ -70,8 +72,10 @@ public class PostServiceImpl implements PostService {
             Boolean follow = redisTemplate.opsForSet().isMember(Constants.CACHE_USER_FOLLOWING_KEY + userId, response.getUserId());
             response.setIsLiked(Boolean.TRUE.equals(liked));
             response.setIsFollow(Boolean.TRUE.equals(follow));
-            
         }
+
+        // Fetch comment count (only for detail view, not cached to stay accurate)
+        response.setCommentCount(postCommentRepository.countByPostId(id));
 
         return Result.ok(response);
     }

@@ -17,6 +17,9 @@ public interface PostCommentRepository extends JpaRepository<PostComment, Long> 
     /** Retrieve all comments belonging to a given post, ordered by creation time ascending. */
     List<PostComment> findAllByPostIdOrderByCreateTimeAsc(Long postId);
 
+    /** Count all comments for a given post (used in post detail response). */
+    long countByPostId(Long postId);
+
     /** Delete all child replies of a given parent comment. */
     void deleteAllByParentId(Long parentId);
 

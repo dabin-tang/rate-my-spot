@@ -186,6 +186,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ postId, visibl
                   postId={post.id} 
                   postLiked={post.liked}
                   postIsLiked={post.isLiked}
+                  postCommentCount={post.commentCount}
                   onTogglePostLike={() => toggleLike(post.id)}
                 />
               </div>

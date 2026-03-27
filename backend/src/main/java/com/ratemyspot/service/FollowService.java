@@ -9,9 +9,9 @@ public interface FollowService {
     /** Toggle follow status for a target user. */
     Result<Void> toggle(Long targetUserId);
 
-    /** Get paginated list of followers for the current user. */
-    Result<PageResult<UserResponse>> getFollowers(Integer pageNum, Integer pageSize);
+    /** Get paginated list of followers for a user. */
+    Result<PageResult<UserResponse>> getFollowers(Long targetUserId, Integer pageNum, Integer pageSize);
 
-    /** Get paginated list of users the current user is following. */
-    Result<PageResult<UserResponse>> getFollowing(Integer pageNum, Integer pageSize);
+    /** Get paginated list of users a user is following. */
+    Result<PageResult<UserResponse>> getFollowing(Long targetUserId, Integer pageNum, Integer pageSize);
 }

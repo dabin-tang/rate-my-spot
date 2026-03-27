@@ -18,6 +18,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -64,13 +68,19 @@ public class FollowServiceImpl implements FollowService {
     }
 
     /**
-     * Get paginated list of followers for the current user.
+     * Get paginated list of followers for the given user.
      */
     @Override
-    public Result<PageResult<UserResponse>> getFollowers(Integer pageNum, Integer pageSize) {
-        Long currentUserId = UserContext.getCurrentUserId();
+    public Result<PageResult<UserResponse>> getFollowers(Long userId, Integer pageNum, Integer pageSize) {
+        Long targetUserId = userId != null ? userId : UserContext.getCurrentUserId();
+        if (targetUserId == null) {
+            throw new BusinessException(Constants.ERR_USER_NOT_LOGIN);
+        }
         PageRequest pageable = PageRequest.of(pageNum - 1, pageSize);
-        Page<UserResponse> page = followRepository.findFollowersVO(currentUserId, pageable);
+        Page<UserResponse> page = followRepository.findFollowersVO(targetUserId, pageable);
+        
+        injectFollowStatus(page.getContent(), UserContext.getCurrentUserId());
+
         PageResult<UserResponse> result = new PageResult<>(
                 pageNum, pageSize,
                 page.getTotalElements(),
@@ -81,13 +91,19 @@ public class FollowServiceImpl implements FollowService {
     }
 
     /**
-     * Get paginated list of users the current user is following.
+     * Get paginated list of users the given user is following.
      */
     @Override
-    public Result<PageResult<UserResponse>> getFollowing(Integer pageNum, Integer pageSize) {
-        Long currentUserId = UserContext.getCurrentUserId();
+    public Result<PageResult<UserResponse>> getFollowing(Long userId, Integer pageNum, Integer pageSize) {
+        Long targetUserId = userId != null ? userId : UserContext.getCurrentUserId();
+        if (targetUserId == null) {
+            throw new BusinessException(Constants.ERR_USER_NOT_LOGIN);
+        }
         PageRequest pageable = PageRequest.of(pageNum - 1, pageSize);
-        Page<UserResponse> page = followRepository.findFollowingVO(currentUserId, pageable);
+        Page<UserResponse> page = followRepository.findFollowingVO(targetUserId, pageable);
+        
+        injectFollowStatus(page.getContent(), UserContext.getCurrentUserId());
+
         PageResult<UserResponse> result = new PageResult<>(
                 pageNum, pageSize,
                 page.getTotalElements(),
@@ -95,5 +111,29 @@ public class FollowServiceImpl implements FollowService {
                 page.getContent()
         );
         return Result.ok(result);
+    }
+
+    /**
+     * Injects the "isFollow" status into a list of UserResponse.
+     */
+    private void injectFollowStatus(List<UserResponse> users, Long currentUserId) {
+        if (currentUserId == null || users == null || users.isEmpty()) {
+            return;
+        }
+
+        // Extract a flat list of target IDs for all users currently displayed in the pagination result
+        List<Long> targetUserIds = users.stream()
+                .map(UserResponse::getId)
+                .collect(Collectors.toList());
+
+        // This returns ONLY the subset of IDs that the current user is actively following.
+        List<Long> followedIds = followRepository.findFollowingIds(currentUserId, targetUserIds);
+
+        Set<Long> followedIdSet = new HashSet<>(followedIds);
+
+        // Iterate through the paginated user list and set isFollow.
+        for (UserResponse user : users) {
+             user.setIsFollow(followedIdSet.contains(user.getId()));
+        }
     }
 }

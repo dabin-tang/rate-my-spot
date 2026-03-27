@@ -31,4 +31,16 @@ public class UserResponse implements Serializable {
 
     @Schema(description = "Self Introduction", example = "CS Student @ QC")
     private String intro;
+
+    @Schema(description = "Whether the current logged-in user follows this user", example = "false")
+    private Boolean isFollow = false;
+
+    /** Constructor utilized by FollowRepository projections omitting isFollow */
+    public UserResponse(Long id, String nickname, String icon, String city, String intro) {
+        this.id = id;
+        this.nickname = nickname;
+        this.icon = icon;
+        this.city = city;
+        this.intro = intro;
+    }
 }

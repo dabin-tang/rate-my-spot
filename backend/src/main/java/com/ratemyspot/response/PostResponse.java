@@ -65,6 +65,10 @@ public class PostResponse {
     @Schema(description = "Whether the current user is following the author", example = "false")
     private Boolean isFollow = false;
 
+    // Only populated in getPostDetail; null in list/feed endpoints.
+    @Schema(description = "Total number of comments on this post", example = "42")
+    private Long commentCount;
+
 
     /**
      * Constructor specifically for JPQL projection.

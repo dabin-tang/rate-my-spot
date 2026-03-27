@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Input, Button, Avatar, Flex, Typography, message } from 'antd';
-import { CloseOutlined, SendOutlined } from '@ant-design/icons';
+import { CloseOutlined, SendOutlined, HeartOutlined, HeartFilled, CommentOutlined } from '@ant-design/icons';
 import { useAuthStore } from '../../../auth/stores/useAuthStore';
 import { useCreatePostComment } from '../../hooks/usePostComments';
 import type { PostCommentResponse } from '../../types';
@@ -13,13 +13,21 @@ interface CommentFormProps {
   replyingTo: PostCommentResponse | null;
   onCancelReply: () => void;
   onCommentSubmitted: () => void;
+  postLiked?: number;
+  postIsLiked?: boolean;
+  postCommentCount?: number;
+  onTogglePostLike?: () => void;
 }
 
 export const CommentForm: React.FC<CommentFormProps> = ({ 
   postId, 
   replyingTo, 
   onCancelReply,
-  onCommentSubmitted
+  onCommentSubmitted,
+  postLiked = 0,
+  postIsLiked = false,
+  postCommentCount = 0,
+  onTogglePostLike
 }) => {
   const { user } = useAuthStore();
   const [content, setContent] = useState('');
@@ -94,7 +102,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
         </Flex>
       )}
 
-      <Flex gap={12} align="flex-end" className={styles.inputArea}>
+      <Flex gap={12} align="center" className={styles.inputArea}>
         <Avatar src={user.icon} className={styles.avatar}>
           {user.nickname?.charAt(0)?.toUpperCase()}
         </Avatar>
@@ -112,15 +120,22 @@ export const CommentForm: React.FC<CommentFormProps> = ({
           />
         </div>
         
-        <Button 
-          type="primary" 
-          shape="circle" 
-          icon={<SendOutlined />} 
-          onClick={handleSubmit}
-          loading={createMutation.isPending}
-          disabled={!content.trim()}
-          className={styles.sendBtn}
-        />
+        <Flex gap={4} align="center" className={styles.actionButtons}>
+          <div 
+            className={`${styles.capsuleBtn} ${styles.iconOnly} ${!content.trim() ? styles.disabled : ''}`}
+            onClick={handleSubmit}
+          >
+            <SendOutlined />
+          </div>
+          <div className={styles.capsuleBtn} onClick={onTogglePostLike}>
+            {postIsLiked ? <HeartFilled className={styles.liked} /> : <HeartOutlined />}
+            <span className={styles.count}>{postLiked}</span>
+          </div>
+          <div className={styles.capsuleBtn}>
+            <CommentOutlined />
+            <span className={styles.count}>{postCommentCount}</span>
+          </div>
+        </Flex>
       </Flex>
     </div>
   );

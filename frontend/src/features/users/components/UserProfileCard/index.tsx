@@ -3,6 +3,7 @@ import { Typography, Flex } from 'antd';
 import { ManOutlined, WomanOutlined } from '@ant-design/icons';
 import { FollowButton } from '../FollowButton';
 import { EditProfileModal } from '../EditProfileModal';
+import { UserListModal } from '../../../../shared/components/UserListModal';
 import type { UserProfileDTO } from '../../types';
 import styles from './UserProfileCard.module.scss';
 
@@ -18,6 +19,7 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
   isCurrentUser = false
 }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<'followers' | 'following' | null>(null);
 
   // Use actual info, fallback to subtle text if empty
   const introText = user.intro || "This user hasn't written a bio yet.";
@@ -50,12 +52,12 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
           </Text>
 
           <Flex gap={40} className={styles.statsRow}>
-            <div className={styles.statBlock}>
-              <Text className={styles.statNumber}>{user.followingCount ?? user.followee ?? 0}</Text>
+            <div className={styles.statBlock} onClick={() => setModalType('following')}>
+              <Text className={styles.statNumber}>{user.followee ?? 0}</Text>
               <Text className={styles.statLabel}>Following</Text>
             </div>
-            <div className={styles.statBlock}>
-              <Text className={styles.statNumber}>{user.followersCount ?? user.fans ?? 0}</Text>
+            <div className={styles.statBlock} onClick={() => setModalType('followers')}>
+              <Text className={styles.statNumber}>{user.fans ?? 0}</Text>
               <Text className={styles.statLabel}>Followers</Text>
             </div>
             <div className={styles.statBlock}>
@@ -82,6 +84,13 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
           currentUser={user}
         />
       )}
+      <UserListModal 
+        isOpen={!!modalType}
+        onClose={() => setModalType(null)}
+        type={modalType || 'followers'}
+        title={modalType === 'followers' ? 'Followers' : 'Following'}
+        userId={user.id}
+      />
     </div>
   );
 };

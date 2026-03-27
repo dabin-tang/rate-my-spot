@@ -38,10 +38,10 @@ public class PostLikeServiceImpl implements PostLikeService {
         Long userId = UserContext.getCurrentUserId();
         String likesKey = Constants.CACHE_POST_LIKES_KEY + postId;
 
-        // 1. Check like status from Redis Set first
-        Boolean isLiked = redisTemplate.opsForSet().isMember(likesKey, userId);
+        // 1. Check like status from DB directly to survive Redis flushes
+        boolean isLiked = postLikeRepository.existsByUserIdAndPostId(userId, postId);
 
-        if (Boolean.TRUE.equals(isLiked)) {
+        if (isLiked) {
             // 2. Unlike: delete record from DB, decrement liked count
             postLikeRepository.deleteByUserIdAndPostId(userId, postId);
             postRepository.decrementLiked(postId);

@@ -29,6 +29,10 @@ export const useCreatePostComment = (postId: number) => {
       queryClient.invalidateQueries({
         queryKey: commentKeys.list(postId),
       });
+      // Invalidate post detail to refetch commentCount
+      queryClient.invalidateQueries({
+        queryKey: ['postDetail', postId],
+      });
     },
   });
 };
@@ -41,6 +45,9 @@ export const useDeletePostComment = (postId: number) => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: commentKeys.list(postId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['postDetail', postId],
       });
     },
   });

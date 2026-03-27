@@ -24,21 +24,32 @@
   .headerRow {
     font-size: 13px;
     line-height: 1.2;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    overflow: hidden;
 
     .nickname {
       color: #666;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex-shrink: 1;
     }
 
     .replyTo {
       font-size: 12px;
       color: #999;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex-shrink: 1;
     }
 
     .time {
       font-size: 12px;
       color: #999;
       margin-left: auto;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
   }
 

@@ -58,3 +58,20 @@ export interface UserUpdateDTO {
   birthday?: string;
   city?: string;
 }
+
+export interface UserResponse {
+  id: number;
+  nickname: string;
+  icon?: string;
+  city?: string;
+  intro?: string;
+  isFollow?: boolean;
+}
+
+export interface PageResult<T> {
+  pageNum: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+  list: T[];
+}

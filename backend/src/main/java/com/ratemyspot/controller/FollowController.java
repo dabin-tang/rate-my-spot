@@ -47,9 +47,10 @@ public class FollowController {
     @GetMapping("/followers")
     @Operation(summary = "Get Follower List")
     public Result<PageResult<UserResponse>> getFollowers(
+            @RequestParam(required = false) Long userId,
             @RequestParam(defaultValue = "1") Integer pageNum,
             @RequestParam(defaultValue = "10") Integer pageSize) {
-        return followService.getFollowers(pageNum, pageSize);
+        return followService.getFollowers(userId, pageNum, pageSize);
     }
 
     /**
@@ -62,8 +63,9 @@ public class FollowController {
     @GetMapping("/following")
     @Operation(summary = "Get Following List")
     public Result<PageResult<UserResponse>> getFollowing(
+            @RequestParam(required = false) Long userId,
             @RequestParam(defaultValue = "1") Integer pageNum,
             @RequestParam(defaultValue = "10") Integer pageSize) {
-        return followService.getFollowing(pageNum, pageSize);
+        return followService.getFollowing(userId, pageNum, pageSize);
     }
 }
