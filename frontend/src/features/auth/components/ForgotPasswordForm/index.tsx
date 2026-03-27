@@ -1,33 +1,33 @@
 import React from 'react';
 import { Form, Input, Button, Typography, Space } from 'antd';
-import { useRegisterForm } from './useRegisterForm';
-import styles from './RegisterForm.module.scss';
+import { useForgotPasswordForm } from './useForgotPasswordForm';
+import styles from './ForgotPasswordForm.module.scss';
 
 const { Text } = Typography;
 
-interface RegisterFormProps {
+interface ForgotPasswordFormProps {
   onSuccess?: () => void;
   onSwitchToLogin?: () => void;
 }
 
-export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onSwitchToLogin }) => {
-  const { form, countdown, onFinish, resendCode, isPending } = useRegisterForm(onSuccess, onSwitchToLogin);
+export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onSuccess, onSwitchToLogin }) => {
+  const { form, countdown, onFinish, resendCode, isPending } = useForgotPasswordForm(onSuccess, onSwitchToLogin);
 
   return (
     <div className={styles.container}>
       <Form
         form={form}
-        name="register"
+        name="forgotPassword"
         onFinish={onFinish}
         layout="vertical"
         requiredMark={false}
       >
         <Form.Item
-          label={<span className={styles.label}>Email</span>}
+          label={<span className={styles.label}>Email Address</span>}
           name="email"
           rules={[
-            { required: true, message: 'Please input your Email!' },
-            { type: 'email', message: 'The input is not valid E-mail!' }
+            { required: true, message: 'Please input your registered email!' },
+            { type: 'email', message: 'The input is not a valid E-mail!' }
           ]}
           style={{ marginBottom: '12px' }}
         >
@@ -41,7 +41,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onSwitchT
         <Form.Item
           label={<span className={styles.label}>Verification Code</span>}
           name="code"
-          rules={[{ required: true, message: 'Please input verification code!' }]}
+          rules={[{ required: true, message: 'Please input the verification code sent to your email!' }]}
           style={{ marginBottom: '12px' }}
         >
           <Space.Compact style={{ width: '100%' }}>
@@ -57,17 +57,17 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onSwitchT
                 disabled={countdown > 0}
                 className={styles.codeBtn}
              >
-                {countdown > 0 ? `${countdown}s` : 'Send Code'}
+                {countdown > 0 ? `${countdown}s` : 'Get Code'}
              </Button>
           </Space.Compact>
         </Form.Item>
 
         <Form.Item
-          label={<span className={styles.label}>Password</span>}
+          label={<span className={styles.label}>New Password</span>}
           name="password"
           rules={[
-            { required: true, message: 'Please input your Password!' },
-            { min: 6, message: 'Password must be at least 6 characters.' }
+            { required: true, message: 'Please input your new password!' },
+            { min: 6, message: 'Password must be at least 6 characters long.' }
           ]}
           style={{ marginBottom: '12px' }}
         >
@@ -88,14 +88,14 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onSwitchT
             loading={isPending}
             className={styles.submitBtn}
           >
-            Sign Up
+            Reset Password
           </Button>
         </Form.Item>
       </Form>
       
       {onSwitchToLogin && (
         <div className={styles.switchContainer}>
-          <Text className={styles.switchText}>Already have an account? </Text>
+          <Text className={styles.switchText}>Remember your password? </Text>
           <span 
             onClick={onSwitchToLogin} 
             className={styles.switchAction}

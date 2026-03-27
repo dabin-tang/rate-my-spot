@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Typography } from 'antd';
 import { LoginForm } from '../LoginForm';
 import { RegisterForm } from '../RegisterForm';
+import { ForgotPasswordForm } from '../ForgotPasswordForm';
 import styles from './AuthModal.module.scss';
 
 const { Title, Text } = Typography;
@@ -12,7 +13,7 @@ interface AuthModalProps {
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose }) => {
-  const [mode, setMode] = useState<'login' | 'register'>('login');
+  const [mode, setMode] = useState<'login' | 'register' | 'forgot_password'>('login');
 
   const handleClose = () => {
     setMode('login'); // Reset to login mode on close
@@ -48,11 +49,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose }) => {
         <LoginForm 
           onSuccess={handleClose} 
           onSwitchToRegister={() => setMode('register')} 
+          onSwitchToForgotPassword={() => setMode('forgot_password')}
         />
-      ) : (
+      ) : mode === 'register' ? (
         <RegisterForm 
           onSuccess={handleClose} 
           onSwitchToLogin={() => setMode('login')} 
+        />
+      ) : (
+        <ForgotPasswordForm
+          onSuccess={handleClose}
+          onSwitchToLogin={() => setMode('login')}
         />
       )}
     </Modal>

@@ -130,6 +130,22 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     void decrementLiked(@Param("postId") Long postId);
 
     /**
+     * Sync the cached nickname on all posts by a given user.
+     * Called after the user updates their nickname.
+     */
+    @Modifying
+    @Query("UPDATE Post p SET p.userNickname = :nickname WHERE p.userId = :userId")
+    void updateUserNicknameByUserId(@Param("userId") Long userId, @Param("nickname") String nickname);
+
+    /**
+     * Sync the cached icon URL on all posts by a given user.
+     * Called after the user updates their avatar.
+     */
+    @Modifying
+    @Query("UPDATE Post p SET p.userIcon = :icon WHERE p.userId = :userId")
+    void updateUserIconByUserId(@Param("userId") Long userId, @Param("icon") String icon);
+
+    /**
      * Search posts by keyword (fuzzy match on title or content).
      * Only returns posts with status=0 (published), ordered by create time DESC.
      */

@@ -42,6 +42,7 @@ public class UserServiceImpl implements UserService {
     private final FollowRepository followRepository;
     private final RedisTemplate<String, Object> redisTemplateObj;
     private final JwtUtil jwtUtil;
+    private final com.ratemyspot.repository.PostRepository postRepository;
 
     // Generate 6-digit code
     private String generateCode() {
@@ -179,6 +180,15 @@ public class UserServiceImpl implements UserService {
         }
         user.setUpdateTime(LocalDateTime.now());
         userRepository.save(user);
+
+        // If nickname or icon changed, update them in all posts by this user.
+        if (userUpdateInfo.getNickname() != null) {
+            postRepository.updateUserNicknameByUserId(currentUserId, user.getNickname());
+        }
+        if (userUpdateInfo.getIcon() != null) {
+            postRepository.updateUserIconByUserId(currentUserId, user.getIcon());
+        }
+
         UserDTO userDTO = new UserDTO();
         BeanUtils.copyProperties(user, userDTO);
         return Result.ok(userDTO);

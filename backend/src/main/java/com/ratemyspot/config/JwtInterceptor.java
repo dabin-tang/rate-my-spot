@@ -23,6 +23,7 @@ public class JwtInterceptor implements HandlerInterceptor {
             "/api/user/send-code",
             "/api/user/login",
             "/api/user/register",
+            "/api/user/reset-password",
             "/api/admin/login",
 
             // 2. Public stuff. Guests can see spots, posts, and reviews
