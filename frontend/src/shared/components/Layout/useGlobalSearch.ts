@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-import { searchSpots } from '../../../features/spots/api/searchSpots';
-import type { SpotResponse } from '../../../features/spots/types';
+import { searchPosts } from '../../../features/posts/api/searchPosts';
+import type { PostResponse } from '../../../features/posts/types';
 import { useUIStore } from '../../stores/useUIStore';
 
 export const useGlobalSearch = () => {
   const [keyword, setKeyword] = useState('');
-  const [results, setResults] = useState<SpotResponse[]>([]);
+  const [results, setResults] = useState<PostResponse[]>([]);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
@@ -36,11 +36,11 @@ export const useGlobalSearch = () => {
       
       setIsLoading(true);
       try {
-        const response = await searchSpots(keyword.trim());
-        // The cast in searchSpots api defines this is returning Result<SpotResponse[]>
+        const response = await searchPosts(keyword.trim());
+        // The cast in searchPosts api defines this is returning Result<PostResponse[]>
         setResults(response.data || []);
       } catch (error) {
-        console.error('Failed to search spots:', error);
+        console.error('Failed to search posts:', error);
         setResults([]);
       } finally {
         setIsLoading(false);
@@ -62,12 +62,11 @@ export const useGlobalSearch = () => {
     }
   };
 
-  const handleResultClick = (spotId: number) => {
+  const handleResultClick = (postId: number) => {
     setIsDropdownVisible(false);
     setKeyword('');
-    const { setDrawerOpen, setSelectedSpotId } = useUIStore.getState();
-    setDrawerOpen(true);
-    setSelectedSpotId(spotId);
+    const { setSelectedPostId } = useUIStore.getState();
+    setSelectedPostId(postId);
   };
 
   return {

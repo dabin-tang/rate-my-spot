@@ -18,6 +18,8 @@ export interface UserProfileDTO {
   city?: string;
   introduce?: string;
   likesPrivate?: boolean;
+  followersCount?: number;
+  followingCount?: number;
 }
 
 export interface UserLoginDTO {
@@ -67,6 +69,7 @@ export interface UserResponse {
   city?: string;
   intro?: string;
   isFollow?: boolean;
+  isFollowing?: boolean;
 }
 
 export interface PageResult<T> {

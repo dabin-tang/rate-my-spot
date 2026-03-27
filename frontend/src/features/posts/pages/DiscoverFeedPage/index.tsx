@@ -1,25 +1,22 @@
 import React, { useState } from 'react';
 import { CategoryFilter } from '../../../spots/components/CategoryFilter';
 import { PostFeed } from '../../components/PostFeed';
-import { Input, Select, Spin } from 'antd';
+import { Input, Select } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { NeumorphicSpotButton } from '../../../../shared/components/NeumorphicSpotButton';
-import { useGlobalSearch } from '../../../../shared/components/Layout/useGlobalSearch';
+import { useNavigate } from 'react-router-dom';
 
 export const DiscoverFeedPage: React.FC = () => {
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | undefined>(undefined);
   const [sortOrder, setSortOrder] = useState<string>('latest');
+  const [searchVal, setSearchVal] = useState('');
+  const navigate = useNavigate();
 
-  const {
-    keyword,
-    results: searchResults,
-    isDropdownVisible,
-    isLoading: isSearchLoading,
-    dropdownRef,
-    handleInputChange,
-    handleFocus,
-    handleResultClick,
-  } = useGlobalSearch();
+  const triggerSearch = () => {
+    if (searchVal.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchVal.trim())}&type=posts`);
+    }
+  };
 
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', background: '#fafbfc' }}>
@@ -30,44 +27,34 @@ export const DiscoverFeedPage: React.FC = () => {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px 0 24px', marginBottom: 12 }}>
             <div style={{ flex: 1 }}></div>
             
-            <div style={{ position: 'relative', flex: 2, maxWidth: 500, margin: '0 20px' }} ref={dropdownRef}>
+            <div style={{ display: 'flex', flex: 2, maxWidth: 500, margin: '0 20px' }}>
               <Input 
-                placeholder="Search posts or spots..." 
-                prefix={<SearchOutlined style={{ color: '#aaa', fontSize: '16px', marginRight: 4 }} />} 
-                style={{ borderRadius: 100, backgroundColor: '#f0f2f5', border: '1px solid transparent', width: '100%', padding: '8px 16px', fontSize: '15px', color: '#333', transition: 'all 0.3s' }}
-                value={keyword}
-                onChange={handleInputChange}
-                onFocus={handleFocus}
+                placeholder="Search interesting content..." 
+                suffix={
+                  <div 
+                    onClick={triggerSearch}
+                    style={{ cursor: 'pointer', padding: '0 4px', display: 'flex', alignItems: 'center', transition: 'opacity 0.2s' }}
+                    onMouseEnter={(e) => e.currentTarget.style.opacity = '0.6'}
+                    onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                  >
+                    <SearchOutlined style={{ color: '#333', fontSize: '18px' }} />
+                  </div>
+                }
+                style={{ 
+                  borderRadius: 100, 
+                  backgroundColor: '#f1f2f5', 
+                  border: '1px solid transparent', 
+                  width: '100%', 
+                  padding: '8px 24px', 
+                  fontSize: '15px', 
+                  color: '#333', 
+                  transition: 'all 0.3s' 
+                }}
+                value={searchVal}
+                onChange={(e) => setSearchVal(e.target.value)}
+                onPressEnter={triggerSearch}
                 allowClear
               />
-              {isDropdownVisible && keyword.trim() !== '' && (
-                <div style={{
-                  position: 'absolute', top: 'calc(100% + 8px)', left: 0, right: 0,
-                  background: '#fff', borderRadius: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-                  zIndex: 1000, maxHeight: 400, overflowY: 'auto', border: '1px solid #eee', padding: '8px 0'
-                }}>
-                  {isSearchLoading ? (
-                    <div style={{ padding: 16, textAlign: 'center', color: '#888' }}><Spin size="small"/> Loading...</div>
-                  ) : searchResults.length > 0 ? (
-                    <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-                      {searchResults.map(spot => (
-                        <li 
-                          key={spot.id} 
-                          onClick={() => handleResultClick(spot.id)} 
-                          style={{ padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f9f9f9', transition: 'background 0.2s' }}
-                          onMouseEnter={(e) => e.currentTarget.style.background = '#f9f9f9'}
-                          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                        >
-                          <div style={{ fontSize: 15, fontWeight: 500, color: '#333', marginBottom: 4 }}>{spot.name}</div>
-                          <div style={{ fontSize: 13, color: '#888' }}>{spot.address}</div>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <div style={{ padding: 16, textAlign: 'center', color: '#888' }}>No results found</div>
-                  )}
-                </div>
-              )}
             </div>
             
             <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>

@@ -196,4 +196,18 @@ CREATE TABLE `report` (
                           KEY `idx_target` (`target_type`, `target_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='User reports for content moderation';
 
+
+-- 11. Table: comment_like
+-- Description: To track who liked which comment (prevents duplicate likes).
+
+DROP TABLE IF EXISTS `comment_like`;
+CREATE TABLE `comment_like` (
+                                `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
+                                `comment_id` bigint(20) UNSIGNED NOT NULL COMMENT 'Foreign Key: Comment ID',
+                                `user_id` bigint(20) UNSIGNED NOT NULL COMMENT 'Foreign Key: User ID',
+                                `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Like time',
+                                PRIMARY KEY (`id`),
+                                UNIQUE KEY `uq_comment_user` (`comment_id`, `user_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Comment like records';
+
 SET FOREIGN_KEY_CHECKS = 1;

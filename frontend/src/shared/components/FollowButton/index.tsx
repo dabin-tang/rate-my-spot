@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '../../../features/auth/stores/useAuthStore';
 import { message } from 'antd';
 import { useToggleFollow } from '../../../features/users/hooks/useFollow';
@@ -19,6 +19,10 @@ export const FollowButton: React.FC<FollowButtonProps> = ({
 }) => {
   const { user } = useAuthStore();
   const [isFollow, setIsFollow] = useState(initialIsFollow);
+  
+  useEffect(() => {
+    setIsFollow(initialIsFollow);
+  }, [initialIsFollow]);
   
   // Custom hook wrapping the mutation
   const { mutate: toggleFollowApi, isPending } = useToggleFollow(() => {

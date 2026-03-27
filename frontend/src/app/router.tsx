@@ -6,6 +6,7 @@ import { CreatePostPage } from '../features/posts/pages/CreatePostPage';
 
 import { DiscoverFeedPage } from '../features/posts/pages/DiscoverFeedPage';
 import { ProfilePage } from '../features/users/pages/ProfilePage';
+import { SearchPage } from '../pages/SearchPage';
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
       {
         path: 'profile',
         element: <ProfilePage />,
+      },
+      {
+        path: 'search',
+        element: <SearchPage />,
       },
       {
         path: 'user/:id',

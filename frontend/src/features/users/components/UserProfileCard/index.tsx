@@ -60,16 +60,12 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
 
           <Flex gap={40} className={styles.statsRow}>
             <div className={styles.statBlock} onClick={() => setModalType('following')}>
-              <Text className={styles.statNumber}>{user.followee ?? 0}</Text>
+              <Text className={styles.statNumber}>{user.followingCount ?? user.followee ?? 0}</Text>
               <Text className={styles.statLabel}>Following</Text>
             </div>
             <div className={styles.statBlock} onClick={() => setModalType('followers')}>
-              <Text className={styles.statNumber}>{user.fans ?? 0}</Text>
+              <Text className={styles.statNumber}>{user.followersCount ?? user.fans ?? 0}</Text>
               <Text className={styles.statLabel}>Followers</Text>
-            </div>
-            <div className={styles.statBlock}>
-              <Text className={styles.statNumber}>{user.credit || 0}</Text>
-              <Text className={styles.statLabel}>Likes</Text> 
             </div>
           </Flex>
 
