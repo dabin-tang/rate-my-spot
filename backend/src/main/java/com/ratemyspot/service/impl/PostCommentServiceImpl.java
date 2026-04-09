@@ -112,7 +112,8 @@ public class PostCommentServiceImpl implements PostCommentService {
 
         // Batch fetch users (authors and replied-to users)
         List<Long> authorIds = flatList.stream().map(PostComment::getUserId).collect(Collectors.toList());
-        List<Long> replyIds = flatList.stream().map(PostComment::getReplyToUserId).filter(id -> id != null && id > 0).collect(Collectors.toList());
+        List<Long> replyIds = flatList.stream().map(PostComment::getReplyToUserId)
+                .filter(id -> id != null && id > 0).collect(Collectors.toList());
         List<Long> allUserIds = new ArrayList<>(authorIds);
         allUserIds.addAll(replyIds);
         allUserIds = allUserIds.stream().distinct().collect(Collectors.toList());

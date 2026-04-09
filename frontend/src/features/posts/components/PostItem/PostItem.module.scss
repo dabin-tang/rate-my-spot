@@ -79,6 +79,30 @@
   font-weight: bold;
 }
 
+.likeCount {
+  font-size: 13px;
+  color: #888;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.moreOptions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: #999;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #f0f0f0;
+    color: #333;
+  }
+}
+
 .authorName {
   font-size: 12px;
   color: #666;
