@@ -26,4 +26,7 @@ public interface SpotService {
      * Asynchronously update spot rating and review count.
      */
     void updateSpotRatingAsync(Long spotId);
+
+    /** Get top 5 trending spots ordered by score and review count. */
+    Result<List<SpotResponse>> getTrendingSpots();
 }

@@ -76,4 +76,15 @@ public class SpotController {
         log.info("Get Spot Detail: {}", id);
         return spotService.getSpotDetail(id);
     }
+
+    /**
+     * Get the top 5 trending spots ranked by score and review count.
+     *
+     * @return Result containing list of up to 5 SpotResponse
+     */
+    @GetMapping("/trending")
+    @Operation(summary = "Get Trending Spots", description = "Returns top 5 spots ranked by score DESC, then review count DESC.")
+    public Result<List<SpotResponse>> getTrendingSpots() {
+        return spotService.getTrendingSpots();
+    }
 }

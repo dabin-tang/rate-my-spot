@@ -173,4 +173,11 @@ public class SpotServiceImpl implements SpotService {
         }
     }
 
+    /** Get top 5 trending spots ordered by score DESC, reviewCount DESC. */
+    @Override
+    public Result<List<SpotResponse>> getTrendingSpots() {
+        List<SpotResponse> trending = spotRepository.findTop5Trending(PageRequest.of(0, 5));
+        return Result.ok(trending);
+    }
+
 }

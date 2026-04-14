@@ -4,10 +4,11 @@ import { useUIStore } from '../../stores/useUIStore';
 import styles from './NeumorphicSpotButton.module.scss';
 
 export const NeumorphicSpotButton: React.FC = () => {
+  const isDrawerOpen = useUIStore((state) => state.isDrawerOpen);
   const setDrawerOpen = useUIStore((state) => state.setDrawerOpen);
 
   const handleClick = () => {
-    setDrawerOpen(true);
+    setDrawerOpen(!isDrawerOpen);
   };
 
   return (

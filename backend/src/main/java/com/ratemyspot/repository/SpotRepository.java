@@ -1,6 +1,7 @@
 package com.ratemyspot.repository;
 
 import com.ratemyspot.entity.Spot;
+import com.ratemyspot.response.SpotResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -40,4 +41,15 @@ public interface SpotRepository extends JpaRepository<Spot, Long> {
      * Search spots by name or description containing the keyword (Case Insensitive).
      */
     List<Spot> findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String name, String description);
+
+    /**
+     * Get top 5 trending spots ordered by score DESC, then reviewCount DESC.
+     * Uses Constructor Projection to avoid over-fetching.
+     */
+    @Query("SELECT new com.ratemyspot.response.SpotResponse(" +
+            "s.id, s.name, s.categoryId, s.description, s.address, s.images, " +
+            "s.x, s.y, s.score, s.reviewCount, s.createTime, s.updateTime) " +
+            "FROM Spot s " +
+            "ORDER BY s.score DESC, s.reviewCount DESC")
+    List<SpotResponse> findTop5Trending(Pageable pageable);
 }
