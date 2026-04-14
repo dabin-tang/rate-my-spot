@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Input, Button, Avatar, Flex, Typography, message } from 'antd';
-import { CloseOutlined, SendOutlined, HeartOutlined, HeartFilled, CommentOutlined } from '@ant-design/icons';
+import { CloseOutlined, SendOutlined, HeartOutlined, HeartFilled, MessageOutlined } from '@ant-design/icons';
 import { useAuthStore } from '../../../auth/stores/useAuthStore';
 import { useCreatePostComment } from '../../hooks/usePostComments';
 import type { PostCommentResponse } from '../../types';
@@ -132,7 +132,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
             <span className={styles.count}>{postLiked}</span>
           </div>
           <div className={styles.capsuleBtn}>
-            <CommentOutlined />
+            <MessageOutlined />
             <span className={styles.count}>{postCommentCount}</span>
           </div>
         </Flex>

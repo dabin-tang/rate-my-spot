@@ -7,7 +7,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { searchSpots } from '../../../spots/api/searchSpots';
 import { createPost } from '../../api/createPost';
 import { uploadFile } from '../../../../shared/api/upload';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../../auth/stores/useAuthStore';
 
 const { Title, Text } = Typography;
@@ -16,10 +16,12 @@ const { TextArea } = Input;
 export const CreatePostPage: React.FC = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const location = useLocation();
+  const state = location.state as { prefillSpotId?: number, prefillSpotName?: string, prefillSpotAddress?: string } | null;
   const { token } = useAuthStore();
   
   // State for step 1
-  const [selectedSpotId, setSelectedSpotId] = useState<number | undefined>(undefined);
+  const [selectedSpotId, setSelectedSpotId] = useState<number | undefined>(state?.prefillSpotId || undefined);
   const [searchKeyword, setSearchKeyword] = useState('');
   
   // State for step 2 images
@@ -47,21 +49,41 @@ export const CreatePostPage: React.FC = () => {
   });
 
   const spotOptions = useMemo(() => {
-    if (!Array.isArray(spotsData?.data)) return [];
-    return spotsData.data.map((spot: any) => ({
-      value: spot.id,
-      label: (
-        <Flex align="center" gap={8}>
-          <EnvironmentOutlined style={{ color: '#ff2442' }} />
-          <span>{spot.name}</span>
-          <Text type="secondary" style={{ fontSize: '12px', marginLeft: 'auto' }}>
-            {spot.address}
-          </Text>
-        </Flex>
-      ),
-      spotData: spot
-    }));
-  }, [spotsData]);
+    let options: any[] = [];
+    if (Array.isArray(spotsData?.data)) {
+      options = spotsData.data.map((spot: any) => ({
+        value: spot.id,
+        label: (
+          <Flex align="center" gap={8}>
+            <EnvironmentOutlined style={{ color: '#ff2442' }} />
+            <span>{spot.name}</span>
+            <Text type="secondary" style={{ fontSize: '12px', marginLeft: 'auto' }}>
+              {spot.address}
+            </Text>
+          </Flex>
+        ),
+        spotData: spot
+      }));
+    }
+
+    if (state?.prefillSpotId && state?.prefillSpotName && !options.find(o => o.value === state.prefillSpotId)) {
+      options.unshift({
+        value: state.prefillSpotId,
+        label: (
+          <Flex align="center" gap={8}>
+            <EnvironmentOutlined style={{ color: '#ff2442' }} />
+            <span>{state.prefillSpotName}</span>
+            <Text type="secondary" style={{ fontSize: '12px', marginLeft: 'auto' }}>
+              {state.prefillSpotAddress}
+            </Text>
+          </Flex>
+        ),
+        spotData: { id: state.prefillSpotId, name: state.prefillSpotName, address: state.prefillSpotAddress }
+      });
+    }
+
+    return options;
+  }, [spotsData, state]);
 
   // Handle post creation mutation
   const createMutation = useMutation({
@@ -196,6 +218,7 @@ export const CreatePostPage: React.FC = () => {
             showSearch
             placeholder="Search spots by name..."
             size="large"
+            value={selectedSpotId}
             style={{ width: '100%' }}
             defaultActiveFirstOption={false}
             suffixIcon={null}

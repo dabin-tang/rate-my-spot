@@ -1,7 +1,9 @@
-import React from 'react';
-import { Spin } from 'antd';
-import { StarFilled } from '@ant-design/icons';
+import React, { useState } from 'react';
+import { Spin, Dropdown } from 'antd';
+import { StarFilled, MoreOutlined, FlagOutlined } from '@ant-design/icons';
 import { useSpotReviews } from '../../hooks/useSpotReviews';
+import { useAuthStore } from '../../../auth/stores/useAuthStore';
+import { ReportModal } from '../../../../shared/components/ReportModal';
 import styles from './ReviewList.module.scss';
 import type { SpotReviewResponse } from '../../types';
 
@@ -12,6 +14,9 @@ interface ReviewListProps {
 export const ReviewList: React.FC<ReviewListProps> = ({ spotId }) => {
   const { data: pageData, isLoading, isError } = useSpotReviews(spotId);
   const reviews: SpotReviewResponse[] = pageData?.list || [];
+  const user = useAuthStore(state => state.user);
+  
+  const [reportingReviewId, setReportingReviewId] = useState<number | null>(null);
 
   if (isLoading) {
     return (
@@ -39,8 +44,34 @@ export const ReviewList: React.FC<ReviewListProps> = ({ spotId }) => {
                   <img src={review.userIcon || `https://api.dicebear.com/7.x/avataaars/svg?seed=${review.userId}`} alt="avatar" className={styles.avatar} />
                   <span className={styles.userName}>{review.userNickname}</span>
                 </div>
-                <div className={styles.rating}>
-                  <StarFilled /> {review.rating.toFixed(1)}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div className={styles.rating}>
+                    <StarFilled /> {review.rating.toFixed(1)}
+                  </div>
+                  <Dropdown
+                    menu={{
+                      items: [
+                        {
+                          key: 'report',
+                          label: 'Report Review',
+                          icon: <FlagOutlined />,
+                          onClick: () => {
+                            if (!user) {
+                              import('antd').then(({ message }) => message.warning('Please log in first.'));
+                              return;
+                            }
+                            setReportingReviewId(review.id);
+                          }
+                        }
+                      ]
+                    }}
+                    trigger={['click']}
+                    placement="bottomRight"
+                  >
+                    <div style={{ cursor: 'pointer', color: '#999', padding: '0 4px', fontSize: '18px' }}>
+                      <MoreOutlined />
+                    </div>
+                  </Dropdown>
                 </div>
               </div>
               
@@ -66,6 +97,15 @@ export const ReviewList: React.FC<ReviewListProps> = ({ spotId }) => {
         </div>
       ) : (
         <div className={styles.emptyState}>No reviews yet. Be the first to review!</div>
+      )}
+      
+      {reportingReviewId && (
+        <ReportModal
+          isOpen={true}
+          targetId={reportingReviewId}
+          targetType="REVIEW"
+          onClose={() => setReportingReviewId(null)}
+        />
       )}
     </div>
   );

@@ -33,25 +33,40 @@
     transition: border-color 0.2s, box-shadow 0.2s;
 
     &:hover, &:focus {
-      border-color: #ff2442;
-      box-shadow: 0 0 0 2px rgba(255, 36, 66, 0.1);
+      border-color: #12B7F5;
+      box-shadow: 0 0 0 2px rgba(18, 183, 245, 0.2);
+      outline: none;
     }
   }
 
   .actionRow {
     display: flex;
     justify-content: flex-end;
-    margin-top: 16px;
+    margin-top: 28px;
 
     .submitButton {
-      background-color: #ff2442;
-      border-radius: 8px;
+      background-color: #8AD8F7;
+      color: #ffffff;
+      border: none !important;
+      border-radius: 6px;
       font-weight: 500;
+      font-size: 15px;
       padding: 0 24px;
-      height: 40px;
+      height: 36px;
+      box-shadow: none !important;
+      outline: none !important;
+      transition: all 0.2s ease;
 
-      &:hover, &:focus {
-        background-color: #ff4d6a;
+      &:hover, &:focus, &:active {
+        background-color: #12B7F5 !important;
+        color: #ffffff !important;
+        border: none !important;
+        box-shadow: none !important;
+        outline: none !important;
+      }
+
+      &::after {
+        display: none !important;
       }
     }
   }

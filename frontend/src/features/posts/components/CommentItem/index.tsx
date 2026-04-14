@@ -5,6 +5,7 @@ import type { MenuProps } from 'antd';
 import { HeartOutlined, HeartFilled, MoreOutlined } from '@ant-design/icons';
 import { formatDistanceToNow } from 'date-fns';
 import { useAuthStore } from '../../../auth/stores/useAuthStore';
+import { ReportModal } from '../../../../shared/components/ReportModal';
 import type { PostCommentResponse } from '../../../posts/types';
 import styles from './CommentItem.module.scss';
 
@@ -22,6 +23,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({ comment, onReply, onLi
   const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const currentUser = useAuthStore(state => state.user);
 
   const isOwner = currentUser?.id === comment.userId;
@@ -31,7 +33,13 @@ export const CommentItem: React.FC<CommentItemProps> = ({ comment, onReply, onLi
       {
         key: 'report',
         label: 'Report',
-        onClick: () => message.info('Report functionality coming soon'),
+        onClick: () => {
+          if (!currentUser) {
+            message.warning('Please log in first.');
+            return;
+          }
+          setIsReportModalOpen(true);
+        },
       }
     ];
 
@@ -45,7 +53,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({ comment, onReply, onLi
     }
 
     return items;
-  }, [isOwner, onDelete, comment.id]);
+  }, [isOwner, onDelete, comment.id, currentUser]);
 
   // We cap nesting visual indent at depth 1 for a flat Bilibili style look.
   const indentClass = useMemo(() => {
@@ -159,6 +167,13 @@ export const CommentItem: React.FC<CommentItemProps> = ({ comment, onReply, onLi
           )}
         </div>
       )}
+
+      <ReportModal
+        isOpen={isReportModalOpen}
+        targetId={comment.id}
+        targetType="COMMENT"
+        onClose={() => setIsReportModalOpen(false)}
+      />
     </div>
   );
 };

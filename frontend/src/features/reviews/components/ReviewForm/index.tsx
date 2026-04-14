@@ -62,7 +62,6 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({ spotId }) => {
       
       <div className={styles.actionRow}>
         <Button 
-          type="primary" 
           onClick={handleSubmit} 
           loading={createReviewMutation.isPending}
           className={styles.submitButton}

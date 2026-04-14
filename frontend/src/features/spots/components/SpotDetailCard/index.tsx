@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { CloseOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import { CloseOutlined, EnvironmentOutlined, CameraOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import { Spin } from 'antd';
 import { useSpotDetail } from './useSpotDetail';
 import { ReviewList } from '../../../reviews/components/ReviewList';
@@ -16,6 +17,7 @@ export interface SpotDetailCardProps {
 export const SpotDetailCard: React.FC<SpotDetailCardProps> = ({ spotId, isOpen, onClose }) => {
   const [isRendered, setIsRendered] = useState(isOpen);
   const setSelectedPostId = useUIStore((state) => state.setSelectedPostId);
+  const navigate = useNavigate();
 
   if (isOpen && !isRendered) {
     setIsRendered(true);
@@ -71,8 +73,16 @@ export const SpotDetailCard: React.FC<SpotDetailCardProps> = ({ spotId, isOpen, 
                   {spot.address} • 1.2 mi away
                 </p>
 
-                <button className={styles.quickPostBtn} onClick={() => console.log('post')}>
-                  <span role="img" aria-label="camera">📷</span> Post Here
+                <button 
+                  className={styles.quickPostBtn} 
+                  onClick={() => {
+                    onClose();
+                    navigate('/post/create', { 
+                      state: { prefillSpotId: spot.id, prefillSpotName: spot.name, prefillSpotAddress: spot.address } 
+                    });
+                  }}
+                >
+                  <CameraOutlined style={{ marginRight: 8, fontSize: 18 }} /> Post Here
                 </button>
 
                 <div className={styles.recentPostsList}>
