@@ -2,15 +2,18 @@ import { useState, useEffect, useCallback } from 'react';
 import { useCategoryFilter } from '../CategoryFilter/useCategoryFilter';
 import { getSpots } from '../../api/getSpots';
 import type { SpotCategory, SpotResponse, SpotPageReq } from '../../types';
-
-// Assuming we have user location from elsewhere, or mocking it for now
-// In a real app, you might use navigator.geolocation
-const MOCK_LATITUDE = 40.7128;
-const MOCK_LONGITUDE = -74.0060;
+import { useLocationStore } from '../../../../shared/stores/useLocationStore';
 
 export const useSpotListDrawer = () => {
   const { categories } = useCategoryFilter();
   const [selectedCategory, setSelectedCategory] = useState<SpotCategory | null>(null);
+  
+  const { latitude, longitude, fetchLocation } = useLocationStore();
+
+  // Try fetching location when this hook mounts
+  useEffect(() => {
+    fetchLocation();
+  }, [fetchLocation]);
   
   const [spots, setSpots] = useState<SpotResponse[]>([]);
   const [isSpotsLoading, setIsSpotsLoading] = useState(false);
@@ -37,16 +40,16 @@ export const useSpotListDrawer = () => {
   // Fetch spots when category, sort, or page changes
   useEffect(() => {
     const fetchSpots = async () => {
-      if (!selectedCategory) return;
+      if (!selectedCategory || latitude === null || longitude === null) return;
       
       setIsSpotsLoading(true);
       try {
         const params: SpotPageReq = {
           categoryId: selectedCategory.id,
           sort: sortMethod,
-          latitude: MOCK_LATITUDE,
-          longitude: MOCK_LONGITUDE,
-          page: page, // Use the page state
+          latitude: latitude,
+          longitude: longitude,
+          page: page,
           keyword: debouncedKeyword.trim() || undefined,
         };
         const res = await getSpots(params);
@@ -69,7 +72,7 @@ export const useSpotListDrawer = () => {
     };
 
     fetchSpots();
-  }, [selectedCategory, sortMethod, page, debouncedKeyword]);
+  }, [selectedCategory, sortMethod, page, debouncedKeyword, latitude, longitude]);
 
   const loadMore = useCallback(() => {
     if (!isSpotsLoading && hasMore) {

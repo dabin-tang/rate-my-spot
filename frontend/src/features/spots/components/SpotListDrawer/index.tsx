@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { CloseOutlined, LeftOutlined } from '@ant-design/icons';
 import { useSpotListDrawer } from './useSpotListDrawer';
+import { useLocationStore } from '../../../../shared/stores/useLocationStore';
+import { calculateDistance } from '../../../../shared/utils/distance';
 import styles from './SpotListDrawer.module.scss';
 
 interface SpotListDrawerProps {
@@ -12,6 +14,7 @@ interface SpotListDrawerProps {
 export const SpotListDrawer: React.FC<SpotListDrawerProps> = ({ isOpen, onClose, onSpotSelect }) => {
   const [isRendered, setIsRendered] = useState(isOpen);
   const scrollRef = React.useRef<any>(null);
+  const { latitude, longitude } = useLocationStore();
 
   if (isOpen && !isRendered) {
     setIsRendered(true);
@@ -134,7 +137,7 @@ export const SpotListDrawer: React.FC<SpotListDrawerProps> = ({ isOpen, onClose,
                       <div className={styles.spotItemName}>{spot.name}</div>
                       <div className={styles.spotItemMeta}>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <span className={styles.spotDistance}>1.2 mi</span>
+                          <span className={styles.spotDistance}>{calculateDistance(latitude, longitude, spot.y, spot.x)}</span>
                           {spot.address}
                         </span>
                         <span style={{ color: 'orange', fontWeight: 'bold' }}>{spot.score?.toFixed(1) || '0.0'} ★</span>

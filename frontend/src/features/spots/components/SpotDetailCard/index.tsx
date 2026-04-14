@@ -5,6 +5,8 @@ import { Spin } from 'antd';
 import { useSpotDetail } from './useSpotDetail';
 import { ReviewList } from '../../../reviews/components/ReviewList';
 import { ReviewForm } from '../../../reviews/components/ReviewForm';
+import { useLocationStore } from '../../../../shared/stores/useLocationStore';
+import { calculateDistance } from '../../../../shared/utils/distance';
 import styles from './SpotDetailCard.module.scss';
 import { useUIStore } from '../../../../shared/stores/useUIStore';
 
@@ -18,6 +20,7 @@ export const SpotDetailCard: React.FC<SpotDetailCardProps> = ({ spotId, isOpen, 
   const [isRendered, setIsRendered] = useState(isOpen);
   const setSelectedPostId = useUIStore((state) => state.setSelectedPostId);
   const navigate = useNavigate();
+  const { latitude, longitude } = useLocationStore();
 
   if (isOpen && !isRendered) {
     setIsRendered(true);
@@ -70,7 +73,7 @@ export const SpotDetailCard: React.FC<SpotDetailCardProps> = ({ spotId, isOpen, 
                 
                 <p className={styles.spotAddressInfo}>
                   <EnvironmentOutlined />
-                  {spot.address} • 1.2 mi away
+                  {spot.address} • {calculateDistance(latitude, longitude, spot.y, spot.x)}
                 </p>
 
                 <button 
