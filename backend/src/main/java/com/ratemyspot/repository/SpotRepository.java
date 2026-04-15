@@ -50,6 +50,6 @@ public interface SpotRepository extends JpaRepository<Spot, Long> {
             "s.id, s.name, s.categoryId, s.description, s.address, s.images, " +
             "s.x, s.y, s.score, s.reviewCount, s.createTime, s.updateTime) " +
             "FROM Spot s " +
-            "ORDER BY s.score DESC, s.reviewCount DESC")
+            "ORDER BY s.reviewCount DESC, s.score DESC")
     List<SpotResponse> findTop5Trending(Pageable pageable);
 }

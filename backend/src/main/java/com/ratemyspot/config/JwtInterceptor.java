@@ -30,6 +30,7 @@ public class JwtInterceptor implements HandlerInterceptor {
             // But they cannot create posts or write comments (those need login)
             "/api/spot/list",
             "/api/spot/search",
+            "/api/spot/trending",
             "/api/spot-category/list",
             "/api/post/feed",
             "/api/post/search",       // Guests can search posts

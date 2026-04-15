@@ -61,6 +61,7 @@
 
 .navMenu {
   flex: 1;
+  flex-shrink: 0; /* Prevents navigation links from disappearing on small screens */
 }
 
 .navItem {

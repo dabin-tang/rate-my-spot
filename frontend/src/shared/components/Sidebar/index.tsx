@@ -3,6 +3,7 @@ import { Flex, Button, Typography, Layout as AntLayout, Dropdown } from 'antd';
 import { HomeOutlined, PlusCircleOutlined, UserOutlined, HeartOutlined, EditOutlined, MessageOutlined, LogoutOutlined } from '@ant-design/icons';
 import { AuthModal } from '../../../features/auth/components/AuthModal';
 import { useSidebarNavigation } from './useSidebarNavigation';
+import { TrendingSpotsPanel } from '../../../features/spots/components/TrendingSpotsPanel';
 import styles from './Sidebar.module.scss';
 import { useNavigate } from 'react-router-dom';
 
@@ -109,6 +110,13 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
             );
           })}
         </Flex>
+
+        {!collapsed && (
+          <TrendingSpotsPanel 
+            isLoggedIn={isLoggedIn} 
+            onLoginRequest={() => setIsAuthModalVisible(true)} 
+          />
+        )}
 
         <div className={styles.footer}>
           {!isLoggedIn ? (
