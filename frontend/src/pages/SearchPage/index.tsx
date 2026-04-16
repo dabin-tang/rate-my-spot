@@ -3,14 +3,14 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Input, Tabs, Spin, Typography, Avatar, Flex, Button } from 'antd';
 import { SearchOutlined, LeftOutlined } from '@ant-design/icons';
 
-import { searchPosts } from '../../features/posts/api/searchPosts';
-import { searchUsers } from '../../features/users/api/searchUsers';
+import { useSearchPosts } from '../../features/posts/hooks/useSearchPosts';
+import { useSearchUsers } from '../../features/users/hooks/useSearchUsers';
 import { PostItem } from '../../features/posts/components/PostItem';
 import { FollowButton } from '../../shared/components/FollowButton';
 import { useUIStore } from '../../shared/stores/useUIStore';
 import { useToggleLike } from '../../features/posts/hooks/useToggleLike';
+import { useQueryClient } from '@tanstack/react-query';
 
-import type { PostResponse } from '../../features/posts/types';
 import type { UserResponse } from '../../features/users/types';
 import styles from './SearchPage.module.scss';
 
@@ -26,42 +26,51 @@ export const SearchPage: React.FC = () => {
   const activeTab = searchParams.get('type') || 'posts';
 
   const [inputVal, setInputVal] = useState(rawKeyword);
+  const queryClient = useQueryClient();
   
-  // Data State
-  const [posts, setPosts] = useState<PostResponse[]>([]);
-  const [users, setUsers] = useState<UserResponse[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  // Data State bounded by Infinite Hooks intelligently filtering active renders.
+  const {
+    posts,
+    isLoading: isPostsLoading,
+    fetchNextPage: fetchNextPosts,
+    hasNextPage: hasNextPosts,
+    isFetchingNextPage: isFetchingPosts
+  } = useSearchPosts(rawKeyword, activeTab === 'posts');
+
+  const {
+    users,
+    isLoading: isUsersLoading,
+    fetchNextPage: fetchNextUsers,
+    hasNextPage: hasNextUsers,
+    isFetchingNextPage: isFetchingUsers
+  } = useSearchUsers(rawKeyword, activeTab === 'users');
+
+  const isLoading = activeTab === 'posts' ? isPostsLoading : isUsersLoading;
+
+  const postSentinelRef = React.useRef<HTMLDivElement>(null);
+  const userSentinelRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setInputVal(rawKeyword); // Synchronize input if route params change externally
-    if (rawKeyword.trim()) {
-      handleSearchExecution(rawKeyword.trim());
-    } else {
-      setPosts([]);
-      setUsers([]);
-    }
   }, [rawKeyword]);
 
-  const handleSearchExecution = async (triggerKeyword: string) => {
-    setIsLoading(true);
-    try {
-      // Parallel execution mapping both endpoints securely
-      const [postsRes, usersRes] = await Promise.all([
-        searchPosts(triggerKeyword),
-        searchUsers(triggerKeyword)
-      ]);
-      // Safely unpack backend PageResult wrappers resolving arrays dynamically
-      const postsArray = (Array.isArray(postsRes.data) ? postsRes.data : (postsRes.data as Record<string, unknown>)?.list || []) as PostResponse[];
-      const usersArray = (Array.isArray(usersRes.data) ? usersRes.data : (usersRes.data as Record<string, unknown>)?.list || []) as UserResponse[];
-      
-      setPosts(postsArray);
-      setUsers(usersArray);
-    } catch (err) {
-      console.error('Failed sweeping global search:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Observer for Post Infinite Scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && hasNextPosts && !isFetchingPosts) fetchNextPosts();
+    }, { threshold: 0.1 });
+    if (postSentinelRef.current) observer.observe(postSentinelRef.current);
+    return () => observer.disconnect();
+  }, [hasNextPosts, isFetchingPosts, fetchNextPosts]);
+
+  // Observer for User Infinite Scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && hasNextUsers && !isFetchingUsers) fetchNextUsers();
+    }, { threshold: 0.1 });
+    if (userSentinelRef.current) observer.observe(userSentinelRef.current);
+    return () => observer.disconnect();
+  }, [hasNextUsers, isFetchingUsers, fetchNextUsers]);
 
   const handleManualSearch = () => {
     if (!inputVal.trim()) return;
@@ -130,28 +139,46 @@ export const SearchPage: React.FC = () => {
         ) : activeTab === 'posts' ? (
           /* P O S T   F E E D   G R I D */
           posts.length > 0 ? (
-            <div className={styles.postGrid}>
+            <>
+              <div className={styles.postGrid}>
               {posts.map(post => (
                 <div key={post.id} className={styles.postCard}>
                   <PostItem 
                     post={post} 
                     onClick={(id) => setSelectedPostId(id)}
                     onLike={(id) => {
-                      // Apply optimistic update locally since Search bypasses React Query pools
-                      setPosts(prev => prev.map(p => {
-                        if (p.id === id) {
-                          const isLiked = !p.isLiked;
-                          const likedCount = isLiked ? (p.liked || 0) + 1 : Math.max(0, (p.liked || 0) - 1);
-                          return { ...p, isLiked, liked: likedCount };
-                        }
-                        return p;
-                      }));
+                      // Apply optimistic update via React Query
+                      queryClient.setQueryData(['searchPosts', rawKeyword], (oldData: any) => {
+                        if (!oldData) return oldData;
+                        return {
+                          ...oldData,
+                          pages: oldData.pages.map((page: any) => ({
+                            ...page,
+                            data: {
+                              ...page.data,
+                              list: page.data.list.map((p: any) => {
+                                if (p.id === id) {
+                                  const isLiked = !p.isLiked;
+                                  const likedCount = isLiked ? (p.liked || 0) + 1 : Math.max(0, (p.liked || 0) - 1);
+                                  return { ...p, isLiked, liked: likedCount };
+                                }
+                                return p;
+                              })
+                            }
+                          }))
+                        };
+                      });
                       toggleLike(id);
                     }}
                   />
                 </div>
               ))}
             </div>
+            {/* Infinite Scroll Post Sentinel Node */}
+            <div ref={postSentinelRef} style={{ width: '100%', height: '50px', display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '20px 0' }}>
+              {isFetchingPosts && <Spin size="large" />}
+            </div>
+          </>
           ) : (
             <Flex justify="center" className={styles.emptyContainer}>
               <Text type="secondary">No posts found for "{rawKeyword}"</Text>
@@ -160,7 +187,8 @@ export const SearchPage: React.FC = () => {
         ) : (
           /* U S E R   L I S T   V I E W */
           users.length > 0 ? (
-            <div className={styles.userList}>
+            <>
+              <div className={styles.userList}>
               {users.map((user: UserResponse) => (
                 <div 
                   key={user.id} 
@@ -180,15 +208,32 @@ export const SearchPage: React.FC = () => {
                       targetUserId={user.id} 
                       initialIsFollow={user.isFollowing ?? user.isFollow ?? false}
                       onFollowToggle={(newStatus) => {
-                        setUsers(prev => prev.map(u => 
-                          u.id === user.id ? { ...u, isFollowing: newStatus } : u
-                        ));
+                        queryClient.setQueryData(['searchUsers', rawKeyword], (oldData: any) => {
+                          if (!oldData) return oldData;
+                          return {
+                            ...oldData,
+                            pages: oldData.pages.map((page: any) => ({
+                              ...page,
+                              data: {
+                                ...page.data,
+                                list: page.data.list.map((u: any) => 
+                                  u.id === user.id ? { ...u, isFollowing: newStatus, isFollow: newStatus } : u
+                                )
+                              }
+                            }))
+                          };
+                        });
                       }}
                     />
                   </div>
                 </div>
               ))}
             </div>
+            {/* Infinite Scroll User Sentinel Node */}
+            <div ref={userSentinelRef} style={{ width: '100%', height: '50px', display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '20px 0' }}>
+              {isFetchingUsers && <Spin size="large" />}
+            </div>
+          </>
           ) : (
             <Flex justify="center" className={styles.emptyContainer}>
               <Text type="secondary">No users found for "{rawKeyword}"</Text>

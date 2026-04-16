@@ -1,5 +1,5 @@
-import React from 'react';
-import { Flex, Skeleton, Typography } from 'antd';
+import React, { useEffect, useRef } from 'react';
+import { Flex, Skeleton, Typography, Spin } from 'antd';
 import { usePostFeed } from './usePostFeed';
 import { useToggleLike } from '../../hooks/useToggleLike';
 import { PostItem } from '../PostItem';
@@ -18,8 +18,27 @@ export const PostFeed: React.FC<PostFeedProps> = ({ categoryId, sort = 'latest' 
   const { 
     posts, 
     isLoading, 
-    isError 
+    isError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
   } = usePostFeed(categoryId, sort);
+  
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    }, { threshold: 0.1 });
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
   
   const setSelectedPostId = useUIStore((state) => state.setSelectedPostId);
   const { mutate: toggleLike } = useToggleLike([['postFeed', categoryId || 'all', sort]]);
@@ -57,6 +76,11 @@ export const PostFeed: React.FC<PostFeedProps> = ({ categoryId, sort = 'latest' 
             />
           </div>
         ))}
+      </div>
+      
+      {/* Infinite Scroll Sentinel Node */}
+      <div ref={loadMoreRef} style={{ width: '100%', height: '50px', display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '20px 0' }}>
+        {isFetchingNextPage && <Spin size="large" />}
       </div>
     </>
   );
