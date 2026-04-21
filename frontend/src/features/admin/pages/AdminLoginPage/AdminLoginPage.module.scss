@@ -1,0 +1,134 @@
+.adminLoginContainer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--rms-background, #f3f4f6); // Using generic hex if var is missing
+  padding: 20px;
+}
+
+.loginCard {
+  width: 100%;
+  max-width: 420px;
+  background-color: var(--rms-surface, #eef0f5);
+  border-radius: 20px;
+  padding: 40px;
+  // Neumorphic outer shadow
+  box-shadow: 
+    10px 10px 20px rgba(174, 174, 192, 0.4), 
+    -10px -10px 20px #ffffff;
+  
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.header {
+  text-align: center;
+  h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--rms-text-primary, #2d3748);
+    margin: 0 0 8px 0;
+  }
+  p {
+    font-size: 14px;
+    color: var(--rms-text-secondary, #718096);
+    margin: 0;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--rms-text-primary, #4a5568);
+    margin-left: 4px;
+  }
+}
+
+.neumorphicInput {
+  background-color: var(--rms-surface, #eef0f5);
+  border: none;
+  font-size: 16px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  color: var(--rms-text-primary, #2d3748);
+  outline: none;
+  transition: all 0.3s ease;
+  // Neumorphic inner shadow for inputs
+  box-shadow: 
+    inset 4px 4px 8px rgba(174, 174, 192, 0.4), 
+    inset -4px -4px 8px #ffffff;
+
+  &:focus {
+    box-shadow: 
+      inset 6px 6px 10px rgba(174, 174, 192, 0.5), 
+      inset -6px -6px 10px #ffffff;
+  }
+
+  &::placeholder {
+    color: #a0aec0;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.errorMessage {
+  color: #e53e3e; // Red error text
+  font-size: 14px;
+  text-align: center;
+  margin-top: -5px;
+  min-height: 20px;
+}
+
+.submitButton {
+  margin-top: 10px;
+  background-color: var(--rms-primary, #3182ce);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  // Pressed neumorphic feel for buttons (primary color variant)
+  box-shadow: 
+    6px 6px 12px rgba(49, 130, 206, 0.4), 
+    -6px -6px 12px rgba(255, 255, 255, 0.8);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 
+      8px 8px 16px rgba(49, 130, 206, 0.4), 
+      -8px -8px 16px rgba(255, 255, 255, 0.8);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 
+      inset 4px 4px 8px rgba(35, 96, 153, 0.9), 
+      inset -4px -4px 8px rgba(67, 182, 255, 0.5);
+  }
+
+  &:disabled {
+    background-color: #a0aec0;
+    box-shadow: none;
+    cursor: not-allowed;
+    color: #edf2f7;
+  }
+}

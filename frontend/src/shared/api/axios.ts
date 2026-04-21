@@ -1,6 +1,7 @@
 import axios from 'axios';
 import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import { useAuthStore } from '../../features/auth/stores/useAuthStore';
+import { useAdminAuthStore } from '../../features/admin/stores/useAdminAuthStore';
 
 // Define the generic response structure based on the backend architecture
 export interface Result<T = unknown> {
@@ -18,9 +19,18 @@ const request: AxiosInstance = axios.create({
 // Request Interceptor: Attach token if available
 request.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = useAuthStore.getState().token;
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const isAdminApi = config.url?.startsWith('/api/admin');
+    
+    if (isAdminApi) {
+      const adminToken = useAdminAuthStore.getState().adminToken;
+      if (adminToken && config.headers) {
+        config.headers.Authorization = `Bearer ${adminToken}`;
+      }
+    } else {
+      const token = useAuthStore.getState().token;
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
@@ -45,10 +55,12 @@ request.interceptors.response.use(
   (error: AxiosError) => {
     // Handle 401 Unauthorized globally
     if (error.response?.status === 401) {
-      // Clear local auth state
-      useAuthStore.getState().logout();
-      // Optionally reload or redirect if you prefer full page refresh to clear state
-      // window.location.href = '/login'; 
+      // Clear local auth state based on the request URL
+      if (error.config?.url?.startsWith('/api/admin')) {
+        useAdminAuthStore.getState().logout();
+      } else {
+        useAuthStore.getState().logout();
+      }
     }
     
     // Extract backend error message if available

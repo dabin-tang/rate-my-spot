@@ -60,7 +60,7 @@ public class Admin implements Serializable {
     /**
      * Creation Time
      */
-    @Column(name = "create_time", nullable = false)
+    @Column(name = "create_time", insertable = false, nullable = false)
     @Schema(description = "Account Creation Time")
     private LocalDateTime createTime;
 }

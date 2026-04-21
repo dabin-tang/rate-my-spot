@@ -7,6 +7,7 @@ import { CreatePostPage } from '../features/posts/pages/CreatePostPage';
 import { DiscoverFeedPage } from '../features/posts/pages/DiscoverFeedPage';
 import { ProfilePage } from '../features/users/pages/ProfilePage';
 import { SearchPage } from '../pages/SearchPage';
+import { AdminLoginPage } from '../features/admin/pages/AdminLoginPage';
 
 const router = createBrowserRouter([
   {
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
         element: <Navigate to="/" replace />,
       }
     ],
+  },
+  {
+    path: '/admin/login',
+    element: <AdminLoginPage />,
   },
 ]);
 
