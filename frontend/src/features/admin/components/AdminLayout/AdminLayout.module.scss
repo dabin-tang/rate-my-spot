@@ -1,0 +1,66 @@
+.adminLayout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--rms-background, #f3f4f6);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background-color: var(--rms-surface, #eef0f5);
+  // Soft neumorphic shadow for the header bottom
+  box-shadow: 0 4px 10px rgba(174, 174, 192, 0.2);
+  z-index: 10;
+}
+
+.welcomeText {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--rms-text-primary, #2d3748);
+}
+
+.logoutButton {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  background-color: var(--rms-surface, #eef0f5);
+  color: #e53e3e; // Red text to indicate leave/destructive action
+  border: none;
+  transition: all 0.3s ease;
+  
+  // Outer Neumorphic Button
+  box-shadow: 
+    4px 4px 8px rgba(174, 174, 192, 0.4), 
+    -4px -4px 8px #ffffff;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 
+      6px 6px 12px rgba(174, 174, 192, 0.5), 
+      -6px -6px 12px #ffffff;
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 
+      inset 3px 3px 6px rgba(174, 174, 192, 0.4), 
+      inset -3px -3px 6px #ffffff;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.mainContent {
+  flex: 1;
+  padding: 24px;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
