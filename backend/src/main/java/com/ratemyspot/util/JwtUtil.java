@@ -122,7 +122,7 @@ public class JwtUtil {
 
         return Jwts.builder()
                 .claims(claims)
-                .subject(username)
+                .subject(String.valueOf(adminId))
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(SECRET_KEY, Jwts.SIG.HS256)

@@ -1,15 +1,37 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getStats } from '../../api/getStats';
+import type { AdminStatsResponse } from '../../types';
 
 export const useAdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [stats, setStats] = useState<AdminStatsResponse | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const fetchStats = async () => {
+    setLoading(true);
+    setErrorMsg(null);
+    try {
+      const result = await getStats();
+      setStats(result.data);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setErrorMsg(err.message || 'Failed to fetch statistics');
+      } else {
+        setErrorMsg('Failed to fetch statistics');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
 
   return {
-    activeTab,
-    setActiveTab,
-    stats: {
-      users: 0,
-      posts: 0,
-      reports: 0
-    }
+    stats,
+    loading,
+    errorMsg,
+    refetch: fetchStats
   };
 };

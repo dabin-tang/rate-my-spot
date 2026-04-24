@@ -8,3 +8,10 @@ export interface AdminUser {
   username: string;
   role: string | number;
 }
+
+export interface AdminStatsResponse {
+  totalUsers: number;
+  totalPosts: number;
+  todayPosts: number;
+  totalSpots: number;
+}
