@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getUserList } from '../../api/getUserList';
+import { updateUserStatus } from '../../api/updateUserStatus';
 import type { AdminUserQueryDTO, AdminUserResponse, PageResult } from '../../types';
 
 export const useAdminUserList = () => {
@@ -50,6 +51,33 @@ export const useAdminUserList = () => {
     }
   };
 
+  const toggleUserStatus = async (userId: number, currentStatus: number) => {
+    const newStatus = currentStatus === 0 ? 1 : 0;
+    
+    // Optimistic Update
+    setData(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        list: prev.list.map(u => u.id === userId ? { ...u, status: newStatus } : u)
+      };
+    });
+
+    try {
+      await updateUserStatus(userId, newStatus);
+    } catch (err: unknown) {
+      console.error('Failed to update status', err);
+      // Rollback
+      setData(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          list: prev.list.map(u => u.id === userId ? { ...u, status: currentStatus } : u)
+        };
+      });
+    }
+  };
+
   return {
     data,
     loading,
@@ -57,6 +85,7 @@ export const useAdminUserList = () => {
     queryParams,
     setQueryParams,
     handleSearch,
-    handlePageChange
+    handlePageChange,
+    toggleUserStatus
   };
 };

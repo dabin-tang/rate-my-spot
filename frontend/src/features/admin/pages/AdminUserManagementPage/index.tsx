@@ -11,7 +11,8 @@ export const AdminUserManagementPage: React.FC = () => {
     queryParams,
     setQueryParams,
     handleSearch,
-    handlePageChange
+    handlePageChange,
+    toggleUserStatus
   } = useAdminUserList();
 
   return (
@@ -81,8 +82,14 @@ export const AdminUserManagementPage: React.FC = () => {
                     </td>
                     <td>{new Date(user.createTime).toLocaleDateString()}</td>
                     <td>
-                       {/* Future stub: Toggle ban status */}
-                       <span style={{color: '#a0aec0'}}>Actions coming soon</span>
+                      <label className={styles.toggleSwitch} title={user.status === 0 ? "Ban User" : "Unban User"}>
+                        <input 
+                          type="checkbox" 
+                          checked={user.status === 1}
+                          onChange={() => toggleUserStatus(user.id, user.status)}
+                        />
+                        <span className={styles.slider}></span>
+                      </label>
                     </td>
                   </tr>
                 ))}
