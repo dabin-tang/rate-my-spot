@@ -15,3 +15,30 @@ export interface AdminStatsResponse {
   todayPosts: number;
   totalSpots: number;
 }
+
+export interface PageResult<T> {
+  page: number;
+  size: number;
+  total: number;
+  totalPages: number;
+  list: T[];
+}
+
+export interface AdminUserQueryDTO {
+  nickname?: string;
+  email?: string;
+  page?: number;
+  size?: number;
+}
+
+export interface AdminUserResponse {
+  id: number;
+  email: string;
+  nickname: string;
+  icon: string;
+  city: string;
+  credit: number;
+  status: number;
+  createTime: string;
+}
+

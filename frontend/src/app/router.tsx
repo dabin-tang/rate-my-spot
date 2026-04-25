@@ -10,6 +10,8 @@ import { SearchPage } from '../pages/SearchPage';
 import { AdminLoginPage } from '../features/admin/pages/AdminLoginPage';
 import { AdminLayout } from '../features/admin/components/AdminLayout';
 import { AdminDashboard } from '../features/admin/pages/AdminDashboard';
+import { AdminUserManagementPage } from '../features/admin/pages/AdminUserManagementPage';
+
 
 const router = createBrowserRouter([
   {
@@ -53,6 +55,10 @@ const router = createBrowserRouter([
       {
         path: 'dashboard',
         element: <AdminDashboard />,
+      },
+      {
+        path: 'user-management',
+        element: <AdminUserManagementPage />,
       },
       {
         index: true,
