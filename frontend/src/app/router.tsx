@@ -11,6 +11,8 @@ import { AdminLoginPage } from '../features/admin/pages/AdminLoginPage';
 import { AdminLayout } from '../features/admin/components/AdminLayout';
 import { AdminDashboard } from '../features/admin/pages/AdminDashboard';
 import { AdminUserManagementPage } from '../features/admin/pages/AdminUserManagementPage';
+import { AdminSpotManagementPage } from '../features/admin/pages/AdminSpotManagementPage';
+
 
 
 const router = createBrowserRouter([
@@ -59,6 +61,10 @@ const router = createBrowserRouter([
       {
         path: 'user-management',
         element: <AdminUserManagementPage />,
+      },
+      {
+        path: 'spot-management',
+        element: <AdminSpotManagementPage />,
       },
       {
         index: true,

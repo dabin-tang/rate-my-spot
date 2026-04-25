@@ -41,8 +41,12 @@ export const AdminLayout: React.FC = () => {
             >
               User Management
             </NavLink>
-            {/* Future stubs */}
-            <div className={styles.navItemDisabled}>Spot Management</div>
+            <NavLink 
+              to="/admin/spot-management" 
+              className={({ isActive }) => isActive ? `${styles.navItem} ${styles.active}` : styles.navItem}
+            >
+              Spot Management
+            </NavLink>
             <div className={styles.navItemDisabled}>Post Management</div>
           </nav>
         </aside>

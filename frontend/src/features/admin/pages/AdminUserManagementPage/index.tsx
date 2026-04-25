@@ -105,16 +105,16 @@ export const AdminUserManagementPage: React.FC = () => {
               <div className={styles.pagination}>
                 <button 
                   className={styles.pageButton} 
-                  disabled={data.page <= 1}
-                  onClick={() => handlePageChange(data.page - 1)}
+                  disabled={Number(data.page) <= 1}
+                  onClick={() => handlePageChange(Number(data.page) - 1)}
                 >
                   Previous
                 </button>
                 <span>Page {data.page} of {data.totalPages}</span>
                 <button 
                   className={styles.pageButton}
-                  disabled={data.page >= data.totalPages}
-                  onClick={() => handlePageChange(data.page + 1)}
+                  disabled={Number(data.page) >= Number(data.totalPages)}
+                  onClick={() => handlePageChange(Number(data.page) + 1)}
                 >
                   Next
                 </button>

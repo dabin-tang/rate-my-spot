@@ -42,3 +42,10 @@ export interface AdminUserResponse {
   createTime: string;
 }
 
+export interface AdminSpotQueryDTO {
+  categoryId?: number;
+  page?: number;
+  size?: number;
+}
+
+
