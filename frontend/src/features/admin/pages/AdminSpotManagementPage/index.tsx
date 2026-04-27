@@ -1,21 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAdminSpotList } from './useAdminSpotList';
 import styles from './AdminSpotManagementPage.module.scss';
-// Fallback image source if the spot has no provided image array
+import { SpotFormModal } from './SpotFormModal';
 const DEFAULT_IMG = 'https://images.unsplash.com/photo-1555685812-4b943f1cb6eb?auto=format&fit=crop&w=150&q=80'; 
 
 export const AdminSpotManagementPage: React.FC = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const {
     data,
     loading,
     errorMsg,
-    handlePageChange
+    handlePageChange,
+    refreshSpots
   } = useAdminSpotList();
 
   return (
     <div className={styles.container}>
       <header className={styles.header}>
         <h2>Spot Management</h2>
+        <button className={styles.createBtn} onClick={() => setIsModalOpen(true)}>
+          + Create New Spot
+        </button>
       </header>
 
       {errorMsg && <div className={styles.errorMessage}>{errorMsg}</div>}
@@ -93,6 +98,13 @@ export const AdminSpotManagementPage: React.FC = () => {
           </>
         )}
       </div>
+
+      {isModalOpen && (
+        <SpotFormModal 
+          onClose={() => setIsModalOpen(false)} 
+          onSuccess={refreshSpots} 
+        />
+      )}
     </div>
   );
 };

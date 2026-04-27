@@ -48,4 +48,22 @@ export interface AdminSpotQueryDTO {
   size?: number;
 }
 
+export interface SpotCreateDTO {
+  name: string;
+  categoryId: number;
+  description?: string;
+  address: string;
+  images?: string;
+  x: number;
+  y: number;
+}
+
+export interface AdminCategoryResponse {
+  id: number;
+  name: string;
+  icon: string | null;
+  sort: number;
+}
+
+
 

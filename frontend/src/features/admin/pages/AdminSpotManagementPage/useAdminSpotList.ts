@@ -46,12 +46,17 @@ export const useAdminSpotList = () => {
     setQueryParams(prev => ({ ...prev, page: 1, categoryId }));
   };
 
+  const refreshSpots = () => {
+    fetchSpots(queryParams);
+  };
+
   return {
     data,
     loading,
     errorMsg,
     queryParams,
     handlePageChange,
-    handleFilterCategory
+    handleFilterCategory,
+    refreshSpots
   };
 };

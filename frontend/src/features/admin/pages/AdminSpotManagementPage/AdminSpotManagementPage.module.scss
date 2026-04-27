@@ -5,13 +5,40 @@
 }
 
 .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
   h2 {
     font-size: 24px;
     font-weight: 700;
     color: var(--rms-text-primary, #2d3748);
-    margin: 0 0 16px 0;
+    margin: 0;
   }
 }
+
+.createBtn {
+  background-color: var(--rms-primary, #3182ce);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 
+    4px 4px 8px rgba(49, 130, 206, 0.4), 
+    -4px -4px 8px rgba(255, 255, 255, 0.8);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 
+      6px 6px 12px rgba(49, 130, 206, 0.4), 
+      -6px -6px 12px rgba(255, 255, 255, 0.8);
+  }
+}
+
 
 .controlsBar {
   display: flex;

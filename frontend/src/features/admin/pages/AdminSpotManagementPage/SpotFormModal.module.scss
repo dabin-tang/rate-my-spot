@@ -1,0 +1,138 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(45, 55, 72, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background-color: var(--rms-surface, #eef0f5);
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 16px;
+  padding: 32px;
+  // Deep neumorphic shadow for modal popup
+  box-shadow: 
+    12px 12px 24px rgba(174, 174, 192, 0.4), 
+    -12px -12px 24px #ffffff;
+
+  h3 {
+    margin-top: 0;
+    margin-bottom: 24px;
+    font-size: 20px;
+    color: var(--rms-text-primary, #2d3748);
+  }
+}
+
+.errorMessage {
+  background-color: #fff5f5;
+  color: #e53e3e;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--rms-text-secondary, #718096);
+  }
+
+  input, select, textarea {
+    background-color: var(--rms-surface, #eef0f5);
+    border: none;
+    font-size: 14px;
+    padding: 12px;
+    border-radius: 8px;
+    color: var(--rms-text-primary, #2d3748);
+    outline: none;
+    
+    // Inset neumorphic shadow for input fields
+    box-shadow: 
+      inset 4px 4px 8px rgba(174, 174, 192, 0.4), 
+      inset -4px -4px 8px #ffffff;
+
+    &:focus {
+      box-shadow: 
+        inset 6px 6px 10px rgba(174, 174, 192, 0.5), 
+        inset -6px -6px 10px #ffffff;
+    }
+  }
+
+  textarea {
+    resize: vertical;
+  }
+}
+
+.coordGroup {
+  display: flex;
+  gap: 16px;
+  input {
+    flex: 1;
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.cancelBtn, .submitBtn {
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelBtn {
+  background-color: transparent;
+  color: var(--rms-text-secondary, #718096);
+
+  &:hover {
+    color: var(--rms-text-primary, #2d3748);
+    background-color: rgba(174, 174, 192, 0.1);
+  }
+}
+
+.submitBtn {
+  background-color: var(--rms-primary, #3182ce);
+  color: white;
+  box-shadow: 
+    4px 4px 8px rgba(49, 130, 206, 0.4), 
+    -4px -4px 8px rgba(255, 255, 255, 0.8);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 
+      6px 6px 12px rgba(49, 130, 206, 0.4), 
+      -6px -6px 12px rgba(255, 255, 255, 0.8);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
