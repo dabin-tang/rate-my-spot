@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import styles from './SpotFormModal.module.scss';
 import { createSpot } from '../../api/createSpot';
+import { updateSpot } from '../../api/updateSpot';
 import { getCategoryList } from '../../api/getCategoryList';
 import type { SpotCreateDTO, AdminCategoryResponse } from '../../types';
+import type { SpotResponse } from '../../../spots/types';
 
 interface SpotFormModalProps {
+  initialData?: SpotResponse | null;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-export const SpotFormModal: React.FC<SpotFormModalProps> = ({ onClose, onSuccess }) => {
+export const SpotFormModal: React.FC<SpotFormModalProps> = ({ initialData, onClose, onSuccess }) => {
   const [categories, setCategories] = useState<AdminCategoryResponse[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   
   const [formData, setFormData] = useState<SpotCreateDTO>({
-    name: '',
-    categoryId: 0,
-    address: '',
-    description: '',
-    images: '',
-    x: 0,
-    y: 0
+    name: initialData?.name || '',
+    categoryId: initialData?.categoryId || 0,
+    address: initialData?.address || '',
+    description: initialData?.description || '',
+    images: initialData?.images || '',
+    x: initialData?.x || 0,
+    y: initialData?.y || 0
   });
 
   useEffect(() => {
@@ -29,7 +32,7 @@ export const SpotFormModal: React.FC<SpotFormModalProps> = ({ onClose, onSuccess
     getCategoryList().then(res => {
       if(res.data) {
         setCategories(res.data);
-        if(res.data.length > 0) {
+        if(res.data.length > 0 && !initialData) {
           setFormData(prev => ({ ...prev, categoryId: res.data[0].id }));
         }
       }
@@ -56,14 +59,18 @@ export const SpotFormModal: React.FC<SpotFormModalProps> = ({ onClose, onSuccess
     setSubmitting(true);
     setErrorMsg(null);
     try {
-      await createSpot(formData);
+      if (initialData) {
+        await updateSpot(initialData.id, formData);
+      } else {
+        await createSpot(formData);
+      }
       onSuccess(); // Triggers reload
       onClose();   // Closes modal
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setErrorMsg(err.message || 'Failed to create spot');
+        setErrorMsg(err.message || 'Failed to save spot');
       } else {
-        setErrorMsg('Failed to create spot');
+        setErrorMsg('Failed to save spot');
       }
     } finally {
       setSubmitting(false);
@@ -73,7 +80,7 @@ export const SpotFormModal: React.FC<SpotFormModalProps> = ({ onClose, onSuccess
   return (
     <div className={styles.overlay}>
       <div className={styles.modal}>
-        <h3>Create New Spot</h3>
+        <h3>{initialData ? 'Edit Spot' : 'Create New Spot'}</h3>
         {errorMsg && <div className={styles.errorMessage}>{errorMsg}</div>}
         
         <form onSubmit={handleSubmit} className={styles.form}>
@@ -118,7 +125,7 @@ export const SpotFormModal: React.FC<SpotFormModalProps> = ({ onClose, onSuccess
           <div className={styles.actions}>
             <button type="button" onClick={onClose} className={styles.cancelBtn} disabled={submitting}>Cancel</button>
             <button type="submit" className={styles.submitBtn} disabled={submitting}>
-              {submitting ? 'Creating...' : 'Create Spot'}
+              {submitting ? 'Saving...' : (initialData ? 'Save Changes' : 'Create Spot')}
             </button>
           </div>
         </form>

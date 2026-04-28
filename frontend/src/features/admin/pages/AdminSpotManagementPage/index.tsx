@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { useAdminSpotList } from './useAdminSpotList';
 import styles from './AdminSpotManagementPage.module.scss';
 import { SpotFormModal } from './SpotFormModal';
+import type { SpotResponse } from '../../../spots/types';
 const DEFAULT_IMG = 'https://images.unsplash.com/photo-1555685812-4b943f1cb6eb?auto=format&fit=crop&w=150&q=80'; 
 
 export const AdminSpotManagementPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingSpot, setEditingSpot] = useState<SpotResponse | null>(null);
+  
   const {
     data,
     loading,
@@ -18,7 +21,7 @@ export const AdminSpotManagementPage: React.FC = () => {
     <div className={styles.container}>
       <header className={styles.header}>
         <h2>Spot Management</h2>
-        <button className={styles.createBtn} onClick={() => setIsModalOpen(true)}>
+        <button className={styles.createBtn} onClick={() => { setEditingSpot(null); setIsModalOpen(true); }}>
           + Create New Spot
         </button>
       </header>
@@ -62,8 +65,13 @@ export const AdminSpotManagementPage: React.FC = () => {
                       <td>{spot.score.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</td>
                       <td>{spot.reviewCount}</td>
                       <td>{new Date(spot.createTime).toLocaleDateString()}</td>
-                      <td>
-                         <span style={{color: '#a0aec0'}}>Actions coming soon</span>
+                      <td className={styles.actionsCell}>
+                         <button 
+                           className={styles.editBtn} 
+                           onClick={() => { setEditingSpot(spot); setIsModalOpen(true); }}
+                         >
+                           Edit
+                         </button>
                       </td>
                     </tr>
                   );
@@ -101,7 +109,8 @@ export const AdminSpotManagementPage: React.FC = () => {
 
       {isModalOpen && (
         <SpotFormModal 
-          onClose={() => setIsModalOpen(false)} 
+          initialData={editingSpot}
+          onClose={() => { setIsModalOpen(false); setEditingSpot(null); }} 
           onSuccess={refreshSpots} 
         />
       )}
