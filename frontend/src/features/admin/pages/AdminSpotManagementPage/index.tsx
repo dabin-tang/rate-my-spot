@@ -8,14 +8,23 @@ const DEFAULT_IMG = 'https://images.unsplash.com/photo-1555685812-4b943f1cb6eb?a
 export const AdminSpotManagementPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSpot, setEditingSpot] = useState<SpotResponse | null>(null);
+  const [spotToDelete, setSpotToDelete] = useState<SpotResponse | null>(null);
   
   const {
     data,
     loading,
     errorMsg,
     handlePageChange,
-    refreshSpots
+    refreshSpots,
+    deleteSpotById
   } = useAdminSpotList();
+
+  const executeDelete = async () => {
+    if (spotToDelete) {
+      await deleteSpotById(spotToDelete.id);
+      setSpotToDelete(null);
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -72,6 +81,12 @@ export const AdminSpotManagementPage: React.FC = () => {
                          >
                            Edit
                          </button>
+                         <button 
+                           className={styles.deleteActionBtn} 
+                           onClick={() => setSpotToDelete(spot)}
+                         >
+                           Delete
+                         </button>
                       </td>
                     </tr>
                   );
@@ -113,6 +128,23 @@ export const AdminSpotManagementPage: React.FC = () => {
           onClose={() => { setIsModalOpen(false); setEditingSpot(null); }} 
           onSuccess={refreshSpots} 
         />
+      )}
+
+      {spotToDelete && (
+        <div className={styles.confirmOverlay}>
+          <div className={styles.confirmModal}>
+            <h3>Confirm Deletion</h3>
+            <p>Are you sure you want to permanently delete "{spotToDelete.name}"? This action cannot be undone.</p>
+            <div className={styles.confirmActions}>
+              <button className={styles.confirmCancelBtn} onClick={() => setSpotToDelete(null)}>
+                Cancel
+              </button>
+              <button className={styles.confirmDeleteBtn} onClick={executeDelete}>
+                Delete Spot
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -225,3 +225,107 @@
   }
 }
 
+.deleteActionBtn {
+  background-color: var(--rms-surface, #eef0f5);
+  color: #e53e3e;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 
+    3px 3px 6px rgba(174, 174, 192, 0.4), 
+    -3px -3px 6px #ffffff;
+
+  &:hover {
+    color: #c53030;
+    box-shadow: 
+      inset 2px 2px 4px rgba(174, 174, 192, 0.4), 
+      inset -2px -2px 4px #ffffff;
+  }
+}
+
+.confirmOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(45, 55, 72, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.confirmModal {
+  background-color: var(--rms-surface, #eef0f5);
+  width: 100%;
+  max-width: 400px;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 
+    12px 12px 24px rgba(174, 174, 192, 0.4), 
+    -12px -12px 24px #ffffff;
+
+  h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 20px;
+    color: var(--rms-text-primary, #2d3748);
+  }
+
+  p {
+    font-size: 14px;
+    color: var(--rms-text-secondary, #718096);
+    line-height: 1.5;
+    margin-bottom: 24px;
+  }
+}
+
+.confirmActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.confirmCancelBtn {
+  background-color: transparent;
+  color: var(--rms-text-secondary, #718096);
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: var(--rms-text-primary, #2d3748);
+    background-color: rgba(174, 174, 192, 0.1);
+  }
+}
+
+.confirmDeleteBtn {
+  background-color: #e53e3e;
+  color: white;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 
+    4px 4px 8px rgba(229, 62, 62, 0.4), 
+    -4px -4px 8px rgba(255, 255, 255, 0.8);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 
+      6px 6px 12px rgba(229, 62, 62, 0.4), 
+      -6px -6px 12px rgba(255, 255, 255, 0.8);
+  }
+}
+
+

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getSpotList } from '../../api/getSpotList';
+import { deleteSpot } from '../../api/deleteSpot';
 import type { AdminSpotQueryDTO, PageResult } from '../../types';
 import type { SpotResponse } from '../../../spots/types';
 
@@ -50,6 +51,22 @@ export const useAdminSpotList = () => {
     fetchSpots(queryParams);
   };
 
+  const deleteSpotById = async (id: number) => {
+    setLoading(true);
+    setErrorMsg(null);
+    try {
+      await deleteSpot(id);
+      refreshSpots(); // Reload data silently on success
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setErrorMsg(err.message || 'Failed to delete spot');
+      } else {
+        setErrorMsg('Failed to delete spot');
+      }
+      setLoading(false);
+    }
+  };
+
   return {
     data,
     loading,
@@ -57,6 +74,7 @@ export const useAdminSpotList = () => {
     queryParams,
     handlePageChange,
     handleFilterCategory,
-    refreshSpots
+    refreshSpots,
+    deleteSpotById
   };
 };
