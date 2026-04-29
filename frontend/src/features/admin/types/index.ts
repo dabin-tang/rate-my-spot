@@ -65,5 +65,12 @@ export interface AdminCategoryResponse {
   sort: number;
 }
 
+export interface SpotCategoryUpdateDTO {
+  name?: string;
+  icon?: string;
+  sort?: number;
+}
+
+
 
 

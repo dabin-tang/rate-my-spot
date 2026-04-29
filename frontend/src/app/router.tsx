@@ -12,7 +12,7 @@ import { AdminLayout } from '../features/admin/components/AdminLayout';
 import { AdminDashboard } from '../features/admin/pages/AdminDashboard';
 import { AdminUserManagementPage } from '../features/admin/pages/AdminUserManagementPage';
 import { AdminSpotManagementPage } from '../features/admin/pages/AdminSpotManagementPage';
-
+import { AdminCategoryManagementPage } from '../features/admin/pages/AdminCategoryManagementPage';
 
 
 const router = createBrowserRouter([
@@ -65,6 +65,10 @@ const router = createBrowserRouter([
       {
         path: 'spot-management',
         element: <AdminSpotManagementPage />,
+      },
+      {
+        path: 'category-management',
+        element: <AdminCategoryManagementPage />,
       },
       {
         index: true,
