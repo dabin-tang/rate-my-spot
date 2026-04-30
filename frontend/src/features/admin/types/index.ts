@@ -71,6 +71,12 @@ export interface SpotCategoryUpdateDTO {
   sort?: number;
 }
 
+export interface AdminPostQueryDTO {
+  page?: number;
+  size?: number;
+}
+
+
 
 
 

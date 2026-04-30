@@ -13,6 +13,7 @@ import { AdminDashboard } from '../features/admin/pages/AdminDashboard';
 import { AdminUserManagementPage } from '../features/admin/pages/AdminUserManagementPage';
 import { AdminSpotManagementPage } from '../features/admin/pages/AdminSpotManagementPage';
 import { AdminCategoryManagementPage } from '../features/admin/pages/AdminCategoryManagementPage';
+import { AdminPostManagementPage } from '../features/admin/pages/AdminPostManagementPage';
 
 
 const router = createBrowserRouter([
@@ -69,6 +70,10 @@ const router = createBrowserRouter([
       {
         path: 'category-management',
         element: <AdminCategoryManagementPage />,
+      },
+      {
+        path: 'post-management',
+        element: <AdminPostManagementPage />,
       },
       {
         index: true,

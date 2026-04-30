@@ -53,7 +53,12 @@ export const AdminLayout: React.FC = () => {
             >
               Category Management
             </NavLink>
-            <div className={styles.navItemDisabled}>Post Management</div>
+            <NavLink 
+              to="/admin/post-management" 
+              className={({ isActive }) => isActive ? `${styles.navItem} ${styles.active}` : styles.navItem}
+            >
+              Post Management
+            </NavLink>
           </nav>
         </aside>
 
