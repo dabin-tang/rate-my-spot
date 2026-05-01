@@ -76,6 +76,25 @@ export interface AdminPostQueryDTO {
   size?: number;
 }
 
+export interface AdminCommentQueryDTO {
+  postId?: number;
+  keyword?: string;
+  page?: number;
+  size?: number;
+}
+
+export interface AdminCommentResponse {
+  id: number;
+  postId: number;
+  userId: number;
+  parentId?: number;
+  content: string;
+  image?: string;
+  liked: number;
+  createTime: string;
+}
+
+
 
 
 

@@ -59,6 +59,12 @@ export const AdminLayout: React.FC = () => {
             >
               Post Management
             </NavLink>
+            <NavLink 
+              to="/admin/comment-management" 
+              className={({ isActive }) => isActive ? `${styles.navItem} ${styles.active}` : styles.navItem}
+            >
+              Comment Management
+            </NavLink>
           </nav>
         </aside>
 
