@@ -94,6 +94,24 @@ export interface AdminCommentResponse {
   createTime: string;
 }
 
+export interface SpotReviewResponse {
+  id: number;
+  userId: number;
+  userNickname: string;
+  userIcon: string;
+  rating: number;
+  content: string;
+  images: string[];
+  createTime: string;
+}
+
+export interface AdminReviewQueryDTO {
+  spotReviewId?: number;
+  page?: number;
+  size?: number;
+}
+
+
 
 
 

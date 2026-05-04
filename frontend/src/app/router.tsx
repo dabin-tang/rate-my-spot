@@ -15,6 +15,7 @@ import { AdminSpotManagementPage } from '../features/admin/pages/AdminSpotManage
 import { AdminCategoryManagementPage } from '../features/admin/pages/AdminCategoryManagementPage';
 import { AdminPostManagementPage } from '../features/admin/pages/AdminPostManagementPage';
 import { AdminCommentManagementPage } from '../features/admin/pages/AdminCommentManagementPage';
+import { AdminReviewManagementPage } from '../features/admin/pages/AdminReviewManagementPage';
 
 
 const router = createBrowserRouter([
@@ -79,6 +80,10 @@ const router = createBrowserRouter([
       {
         path: 'comment-management',
         element: <AdminCommentManagementPage />,
+      },
+      {
+        path: 'review-management',
+        element: <AdminReviewManagementPage />,
       },
       {
         index: true,
