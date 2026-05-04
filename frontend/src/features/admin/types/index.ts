@@ -111,6 +111,25 @@ export interface AdminReviewQueryDTO {
   size?: number;
 }
 
+export interface ReportResponse {
+  id: number;
+  userId: number;
+  targetType: string;
+  targetId: number;
+  reason: string;
+  status: number;
+  adminRemark: string | null;
+  createTime: string;
+  updateTime: string;
+}
+
+export interface AdminReportQueryDTO {
+  status?: number;
+  page?: number;
+  size?: number;
+}
+
+
 
 
 

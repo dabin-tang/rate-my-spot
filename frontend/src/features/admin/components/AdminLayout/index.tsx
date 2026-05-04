@@ -71,6 +71,12 @@ export const AdminLayout: React.FC = () => {
             >
               Review Management
             </NavLink>
+            <NavLink 
+              to="/admin/report-management" 
+              className={({ isActive }) => isActive ? `${styles.navItem} ${styles.active}` : styles.navItem}
+            >
+              Report Handling
+            </NavLink>
           </nav>
         </aside>
 
