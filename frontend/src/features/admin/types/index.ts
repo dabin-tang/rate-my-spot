@@ -129,6 +129,12 @@ export interface AdminReportQueryDTO {
   size?: number;
 }
 
+export interface ResolveReportDTO {
+  status: number;
+  adminRemark?: string;
+}
+
+
 
 
 

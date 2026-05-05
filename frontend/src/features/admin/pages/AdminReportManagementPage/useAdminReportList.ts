@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getAdminReportList } from '../../api/getAdminReportList';
-import type { AdminReportQueryDTO, ReportResponse, PageResult } from '../../types';
+import { resolveAdminReport } from '../../api/resolveAdminReport';
+import type { AdminReportQueryDTO, ReportResponse, PageResult, ResolveReportDTO } from '../../types';
 
 export const useAdminReportList = () => {
   const [data, setData] = useState<PageResult<ReportResponse> | null>(null);
@@ -52,6 +53,22 @@ export const useAdminReportList = () => {
     fetchReports(queryParams);
   };
 
+  const resolveReportById = async (id: number, payload: ResolveReportDTO) => {
+    setLoading(true);
+    setErrorMsg(null);
+    try {
+      await resolveAdminReport(id, payload);
+      refreshReports();
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setErrorMsg(err.message || 'Failed to process report');
+      } else {
+        setErrorMsg('Failed to process report');
+      }
+      setLoading(false);
+    }
+  };
+
   return {
     data,
     loading,
@@ -59,6 +76,7 @@ export const useAdminReportList = () => {
     handlePageChange,
     handleFilterStatus,
     refreshReports,
+    resolveReportById,
     queryParams
   };
 };

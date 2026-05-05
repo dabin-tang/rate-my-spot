@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAdminReportList } from './useAdminReportList';
+import { ReportResolveModal } from './ReportResolveModal';
+import type { ReportResponse } from '../../types';
 import styles from './AdminReportManagementPage.module.scss';
 
 export const AdminReportManagementPage: React.FC = () => {
@@ -9,8 +11,11 @@ export const AdminReportManagementPage: React.FC = () => {
     errorMsg,
     handlePageChange,
     handleFilterStatus,
+    resolveReportById,
     queryParams
   } = useAdminReportList();
+
+  const [resolvingReport, setResolvingReport] = useState<ReportResponse | null>(null);
 
   const renderStatusBadge = (status: number) => {
     switch(status) {
@@ -66,11 +71,12 @@ export const AdminReportManagementPage: React.FC = () => {
               <thead>
                 <tr>
                   <th>Ticket ID</th>
-                  <th>Reporter (User ID)</th>
+                  <th>Reporter</th>
                   <th>Violating Target</th>
                   <th>Reason</th>
                   <th>Status</th>
                   <th>Date Logged</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -79,9 +85,26 @@ export const AdminReportManagementPage: React.FC = () => {
                     <td>#{report.id}</td>
                     <td>User #{report.userId}</td>
                     <td>{renderTargetBadge(report.targetType, report.targetId)}</td>
-                    <td><div className={styles.reasonCell}>{report.reason}</div></td>
+                    <td>
+                      <div className={styles.reasonCell}>
+                        {report.reason}
+                        {report.adminRemark && <div className={styles.remarkSubtext}>Note: {report.adminRemark}</div>}
+                      </div>
+                    </td>
                     <td>{renderStatusBadge(report.status)}</td>
                     <td>{new Date(report.createTime).toLocaleString()}</td>
+                    <td>
+                      {report.status === 0 ? (
+                        <button 
+                          className={styles.resolveActionBtn}
+                          onClick={() => setResolvingReport(report)}
+                        >
+                          Process
+                        </button>
+                      ) : (
+                        <span className={styles.noAction}>—</span>
+                      )}
+                    </td>
                   </tr>
                 ))}
                 {data?.list.length === 0 && (
@@ -114,6 +137,14 @@ export const AdminReportManagementPage: React.FC = () => {
           </>
         )}
       </div>
+
+      {resolvingReport && (
+        <ReportResolveModal 
+          report={resolvingReport}
+          onClose={() => setResolvingReport(null)}
+          onResolve={resolveReportById}
+        />
+      )}
     </div>
   );
 };
