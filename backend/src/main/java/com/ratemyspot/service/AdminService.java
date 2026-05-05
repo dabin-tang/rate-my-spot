@@ -36,8 +36,8 @@ public interface AdminService {
     /** Update the status of a specified user (e.g., ban or unban). */
     Result<String> updateUserStatus(Long userId, Integer status);
 
-    /** Get paginated spot list with optional categoryId filter. */
-    Result<PageResult<SpotResponse>> getSpotList(Long categoryId, Integer page, Integer size);
+    /** Get paginated spot list with optional categoryId and keyword filters. */
+    Result<PageResult<SpotResponse>> getSpotList(Long categoryId, String keyword, Integer page, Integer size);
 
     /** Create a new spot. */
     Result<SpotResponse> createSpot(SpotCreateDTO dto);
@@ -54,8 +54,8 @@ public interface AdminService {
     /** Update an existing spot category by ID. */
     Result<SpotCategory> updateSpotCategory(Long categoryId, SpotCategoryUpdateDTO dto);
 
-    /** Get paginated post list for admin review (all statuses). */
-    Result<PageResult<PostResponse>> getPostList(Integer page, Integer size);
+    /** Get paginated post list for admin review (all statuses), with optional keyword filter. */
+    Result<PageResult<PostResponse>> getPostList(String keyword, Integer page, Integer size);
 
     /** Force delete a post by ID. */
     Result<String> deletePost(Long postId);

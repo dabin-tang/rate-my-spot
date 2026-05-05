@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAdminSpotList } from './useAdminSpotList';
 import styles from './AdminSpotManagementPage.module.scss';
 import { SpotFormModal } from './SpotFormModal';
@@ -15,9 +15,12 @@ export const AdminSpotManagementPage: React.FC = () => {
     loading,
     errorMsg,
     handlePageChange,
+    handleFilterKeyword,
     refreshSpots,
     deleteSpotById
   } = useAdminSpotList();
+
+  const [keywordInput, setKeywordInput] = useState('');
 
   const executeDelete = async () => {
     if (spotToDelete) {
@@ -36,6 +39,22 @@ export const AdminSpotManagementPage: React.FC = () => {
       </header>
 
       {errorMsg && <div className={styles.errorMessage}>{errorMsg}</div>}
+
+      <div className={styles.controlsBar}>
+        <input 
+          type="text" 
+          placeholder="Search spot name or details..." 
+          className={styles.searchInput}
+          value={keywordInput}
+          onChange={(e) => setKeywordInput(e.target.value)}
+        />
+        <button 
+          className={styles.searchBtn} 
+          onClick={() => handleFilterKeyword(keywordInput)}
+        >
+          Search Spot
+        </button>
+      </div>
 
       <div className={styles.tableContainer}>
         {loading && !data ? (

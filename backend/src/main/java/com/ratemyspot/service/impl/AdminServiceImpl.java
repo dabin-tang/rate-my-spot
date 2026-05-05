@@ -142,13 +142,15 @@ public class AdminServiceImpl implements AdminService {
     }
 
     /**
-     * Get paginated spot list with optional categoryId filter.
+     * Get paginated spot list with optional categoryId and keyword filters.
      */
     @Override
-    public Result<PageResult<SpotResponse>> getSpotList(Long categoryId, Integer page, Integer size) {
+    public Result<PageResult<SpotResponse>> getSpotList(Long categoryId, String keyword, Integer page, Integer size) {
         PageRequest pageable = PageRequest.of(page - 1, size);
-        // Reuse existing JPQL: categoryId=null means no filter
-        Page<Spot> pageData = spotRepository.findByFilterDefault(categoryId, null, pageable);
+        // Convert blank keyword to null so JPQL IS NULL check skips filtering
+        String keywordFilter = (keyword == null || keyword.isBlank()) ? null : keyword;
+        // Reuse existing JPQL: null params are treated as no filter
+        Page<Spot> pageData = spotRepository.findByFilterDefault(categoryId, keywordFilter, pageable);
         // Map Spot entities to SpotResponse VOs
         List<SpotResponse> list = pageData.getContent().stream().map(spot -> {
             SpotResponse vo = new SpotResponse();
@@ -250,12 +252,13 @@ public class AdminServiceImpl implements AdminService {
     }
 
     /**
-     * Get paginated post list for admin review (all statuses).
+     * Get paginated post list for admin review with optional keyword filter.
      */
     @Override
-    public Result<PageResult<PostResponse>> getPostList(Integer page, Integer size) {
+    public Result<PageResult<PostResponse>> getPostList(String keyword, Integer page, Integer size) {
+        String keywordFilter = (keyword == null || keyword.isBlank()) ? null : keyword;
         PageRequest pageable = PageRequest.of(page - 1, size);
-        Page<PostResponse> pageData = postRepository.findAllForAdmin(pageable);
+        Page<PostResponse> pageData = postRepository.findAllForAdmin(keywordFilter, pageable);
         PageResult<PostResponse> result = new PageResult<>(
                 page, size,
                 pageData.getTotalElements(),

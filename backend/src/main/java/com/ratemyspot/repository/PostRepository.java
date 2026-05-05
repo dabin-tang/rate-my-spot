@@ -21,7 +21,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     long countByCreateTimeAfter(LocalDateTime dateTime);
 
     /**
-     * Find all posts for admin review (no status filter), ordered by create time DESC.
+     * Find all posts for admin review with optional keyword filter on title or content.
+     * Pass null for keyword to skip filtering.
      */
     @Query("SELECT new com.ratemyspot.response.PostResponse(" +
             "p.id, p.spotId, p.userId, p.userNickname, p.userIcon, " +
@@ -31,8 +32,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "FROM Post p " +
             "LEFT JOIN Spot s ON p.spotId = s.id " +
             "LEFT JOIN SpotCategory c ON s.categoryId = c.id " +
+            "WHERE (:keyword IS NULL OR LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(p.content) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
             "ORDER BY p.createTime DESC")
-    Page<PostResponse> findAllForAdmin(Pageable pageable);
+    Page<PostResponse> findAllForAdmin(@Param("keyword") String keyword, Pageable pageable);
 
     /**
      * Find post feed sorted by latest (create_time DESC).

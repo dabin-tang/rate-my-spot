@@ -44,6 +44,7 @@ export interface AdminUserResponse {
 
 export interface AdminSpotQueryDTO {
   categoryId?: number;
+  keyword?: string;
   page?: number;
   size?: number;
 }

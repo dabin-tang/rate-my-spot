@@ -107,6 +107,7 @@ public class AdminController {
      * Get paginated spot list for admin management.
      *
      * @param categoryId Optional category filter
+     * @param keyword    Optional keyword to fuzzy search spot name or description
      * @param page       Page number, starts from 1 (default: 1)
      * @param size       Page size (default: 10)
      * @return Paginated list of SpotResponse
@@ -115,9 +116,10 @@ public class AdminController {
     @Operation(summary = "Get Spot List (Admin)")
     public Result<PageResult<SpotResponse>> getSpotList(
             @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
-        return adminService.getSpotList(categoryId, page, size);
+        return adminService.getSpotList(categoryId, keyword, page, size);
     }
 
     /**
@@ -197,16 +199,18 @@ public class AdminController {
      * Get paginated post list for admin review.
      * Returns all posts regardless of status, ordered by create time DESC.
      *
-     * @param page Page number, starts from 1 (default: 1)
-     * @param size Page size (default: 10)
+     * @param keyword Optional keyword to fuzzy search post title or content
+     * @param page    Page number, starts from 1 (default: 1)
+     * @param size    Page size (default: 10)
      * @return Paginated list of PostResponse
      */
     @GetMapping("/post/list")
     @Operation(summary = "Get Post List (Admin)")
     public Result<PageResult<PostResponse>> getPostList(
+            @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
-        return adminService.getPostList(page, size);
+        return adminService.getPostList(keyword, page, size);
     }
 
     /**

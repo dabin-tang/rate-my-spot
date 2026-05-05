@@ -12,7 +12,8 @@ export const useAdminSpotList = () => {
   const [queryParams, setQueryParams] = useState<AdminSpotQueryDTO>({
     page: 1,
     size: 10,
-    categoryId: undefined
+    categoryId: undefined,
+    keyword: undefined
   });
 
   const fetchSpots = useCallback(async (params: AdminSpotQueryDTO) => {
@@ -35,7 +36,7 @@ export const useAdminSpotList = () => {
   useEffect(() => {
     fetchSpots(queryParams);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queryParams.page, queryParams.categoryId]);
+  }, [queryParams.page, queryParams.categoryId, queryParams.keyword]);
 
   const handlePageChange = (newPage: number) => {
     if (data && newPage >= 1 && newPage <= data.totalPages) {
@@ -45,6 +46,10 @@ export const useAdminSpotList = () => {
 
   const handleFilterCategory = (categoryId?: number) => {
     setQueryParams(prev => ({ ...prev, page: 1, categoryId }));
+  };
+
+  const handleFilterKeyword = (keyword?: string) => {
+    setQueryParams(prev => ({ ...prev, page: 1, keyword: keyword || undefined }));
   };
 
   const refreshSpots = () => {
@@ -74,6 +79,7 @@ export const useAdminSpotList = () => {
     queryParams,
     handlePageChange,
     handleFilterCategory,
+    handleFilterKeyword,
     refreshSpots,
     deleteSpotById
   };
