@@ -11,7 +11,8 @@ export const useAdminPostList = () => {
 
   const [queryParams, setQueryParams] = useState<AdminPostQueryDTO>({
     page: 1,
-    size: 10
+    size: 10,
+    keyword: undefined
   });
 
   const fetchPosts = useCallback(async (params: AdminPostQueryDTO) => {
@@ -39,12 +40,16 @@ export const useAdminPostList = () => {
     // We intentionally fetch when page changes.
     fetchPosts(queryParams);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queryParams.page]);
+  }, [queryParams.page, queryParams.keyword]);
 
   const handlePageChange = (newPage: number) => {
     if (data && newPage >= 1 && newPage <= data.totalPages) {
       setQueryParams(prev => ({ ...prev, page: newPage }));
     }
+  };
+
+  const handleFilterKeyword = (keyword?: string) => {
+    setQueryParams(prev => ({ ...prev, page: 1, keyword: keyword || undefined }));
   };
 
   const refreshPosts = () => {
@@ -73,6 +78,7 @@ export const useAdminPostList = () => {
     errorMsg,
     queryParams,
     handlePageChange,
+    handleFilterKeyword,
     refreshPosts,
     deletePostById
   };

@@ -73,6 +73,7 @@ export interface SpotCategoryUpdateDTO {
 }
 
 export interface AdminPostQueryDTO {
+  keyword?: string;
   page?: number;
   size?: number;
 }

@@ -5,11 +5,14 @@ import type { PostResponse } from '../../../posts/types';
 
 export const AdminPostManagementPage: React.FC = () => {
   const [postToDelete, setPostToDelete] = useState<PostResponse | null>(null);
+  const [keywordInput, setKeywordInput] = useState('');
+
   const {
     data,
     loading,
     errorMsg,
     handlePageChange,
+    handleFilterKeyword,
     deletePostById
   } = useAdminPostList();
 
@@ -27,6 +30,22 @@ export const AdminPostManagementPage: React.FC = () => {
       </header>
 
       {errorMsg && <div className={styles.errorMessage}>{errorMsg}</div>}
+
+      <div className={styles.controlsBar}>
+        <input 
+          type="text" 
+          placeholder="Search post title or content..." 
+          className={styles.searchInput}
+          value={keywordInput}
+          onChange={(e) => setKeywordInput(e.target.value)}
+        />
+        <button 
+          className={styles.searchBtn} 
+          onClick={() => handleFilterKeyword(keywordInput)}
+        >
+          Search Posts
+        </button>
+      </div>
 
       <div className={styles.tableContainer}>
         {loading && !data ? (
