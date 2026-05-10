@@ -1,5 +1,5 @@
 # Rate My Spot
-WORKING ON IT....
+
 ## Project Overview
 
 **Rate My Spot** is a platform for discovering spots, sharing experiences, and building social connections. It consists of two parts:
@@ -30,31 +30,6 @@ WORKING ON IT....
 - Maven
 
 ---
-## Screenshots
-
-### 1. User Authentication 
-<p align="center">
-  <img src="screenshots/img3.png" width="48%" alt="Sign In Page" />
-  <img src="screenshots/img4.png" width="48%" alt="Sign Up Page" />
-</p>
-
-### 2. Discover Feed & Spot
-<p align="center">
-  <img src="screenshots/img1.png" width="48%" alt="Discover Feed" />
-  <img src="screenshots/img8.png" width="48%" alt="Feed with Toast" />
-</p>
-
-### 3. Post & Creation
-<p align="center">
-  <img src="screenshots/img2.png" width="32%" alt="Post Details" />
-  <img src="screenshots/img5.png" width="32%" alt="Select a Spot" />
-  <img src="screenshots/img6.png" width="32%" alt="Write Review" />
-</p>
-
-### 4. User Profile
-<p align="center">
-  <img src="screenshots/img7.png" width="80%" alt="User Profile Page" />
-</p>
 
 ---
 
